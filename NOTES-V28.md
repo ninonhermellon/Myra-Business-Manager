@@ -31,3 +31,14 @@ Identité conservée (vert Myra, verre dépoli, typographies). Les corrections s
 ## Technique
 - Icônes Font Awesome 6.5.2 livrées dans `vendor/` : elles s'affichent aussi hors connexion.
 - Cache PWA passé en v13.
+
+## V28.1 — Style mobile « épuré » (inspiré des applications de boutique)
+Fichier `css/mobile.css` (mobile uniquement, l'ordinateur ne change pas).
+- Fond blanc, surfaces gris clair sans bordure ni ombre, une seule couleur d'action : le vert Myra.
+- Tableau de bord : barre de recherche, **bannière verte** (salutation, montant encaissé de la période,
+  bouton « Nouvelle vente »), périodes en puces défilantes, indicateurs en tuiles.
+- Produits en **vitrine** : grande image carrée, nom, prix, stock en une ligne.
+- Listes en pleine largeur avec grands avatars ; filtres en puces à contour, puce active pleine.
+- Barre d'onglets plate et pleine largeur, bouton « + » intégré.
+- Fiches en feuille glissante (poignée en haut), champs gris sans bordure, écran de connexion épuré.
+- Cache PWA passé en v14.

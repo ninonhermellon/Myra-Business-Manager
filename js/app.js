@@ -270,6 +270,7 @@
     host.innerHTML=`
       <div class="dash-top"><div><p class="dash-sub">${greet} ${first}, gérez et suivez votre activité</p><h1>Tableau de bord</h1></div>
         <div class="dash-actions"><button type="button" class="search-pill" id="dashSearch"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><span>Rechercher un client, une vente, un produit…</span><kbd>Ctrl K</kbd></button><button class="btn primary" id="dashNewSale" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> Nouvelle vente</button><button class="icon-button" id="refreshBtn" type="button" aria-label="Actualiser les données" title="Actualiser"><i class="fa-solid fa-rotate" aria-hidden="true"></i></button></div></div>
+      <section class="m-hero" aria-label="Résumé"><div class="m-hero-txt"><p>${greet}${first?' '+first:''}</p><h2>${money(curIn)}</h2><span>Encaissé · ${esc(PD.label.toLowerCase())}</span><button type="button" class="m-hero-cta" id="mHeroNewSale">Nouvelle vente <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div><img src="assets/logo-les-saveurs-de-myra.png" alt="" aria-hidden="true"></section>
       <div class="period-tabs in-page" role="group" aria-label="Période"><button type="button" data-period="day">Aujourd’hui</button><button type="button" data-period="week">Cette semaine</button><button type="button" data-period="month">Ce mois</button><button type="button" data-period="reports">Rapports</button></div>
       <div class="kpi-row">
         ${kpi('k-green','fa-wallet','Total en caisse',money(cashBalance),'Solde de tous les comptes')}
@@ -300,7 +301,7 @@
       </div>`;
     host.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));
     $('#refreshBtn').addEventListener('click',()=>dashboard());
-    $('#dashNewSale').addEventListener('click',()=>openSaleWorkflow());
+    $('#dashNewSale').addEventListener('click',()=>openSaleWorkflow());$('#mHeroNewSale')?.addEventListener('click',()=>openSaleWorkflow());
     $('#dashSearch').addEventListener('click',()=>$('#openPalette')?.click());
     host.querySelectorAll('[data-sale-open]').forEach(b=>b.addEventListener('click',()=>openSaleDetail(b.dataset.saleOpen)));
     host.querySelectorAll('[data-otab]').forEach(b=>b.addEventListener('click',()=>{host.querySelectorAll('[data-otab]').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',String(x===b))});$('#ordPrep').classList.toggle('hidden',b.dataset.otab!=='prep');$('#ordShip').classList.toggle('hidden',b.dataset.otab!=='ship')}));
