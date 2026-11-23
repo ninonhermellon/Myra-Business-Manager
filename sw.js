@@ -1,0 +1,45 @@
+/* Myra Business Manager — cache applicatif résilient */
+const CACHE_NAME = 'myra-manager-shell-v10';
+const RUNTIME_CACHE = 'myra-manager-runtime-v10';
+const APP_SHELL = [
+  './', './index.html', './manifest.webmanifest', './css/styles.css', './css/ux.css', './css/pro.css',
+  './js/config.js', './js/app.js', './js/pwa.js', './js/ui-kit.js', './js/shell.js',
+  './assets/favicon.png', './assets/logo-les-saveurs-de-myra.png'
+];
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.all(APP_SHELL.map(async path => {
+      try { const response = await fetch(new Request(path, {cache:'reload'})); if (response.ok) await cache.put(path, response); } catch (_) {}
+    }));
+    self.skipWaiting();
+  })());
+});
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k.startsWith('myra-manager-') && ![CACHE_NAME,RUNTIME_CACHE].includes(k)).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return; // APIs et CDN : jamais de cache de données sensibles
+  if (url.pathname.includes('/rest/v1/') || url.pathname.includes('/auth/v1/')) return;
+  event.respondWith((async () => {
+    const cached = await caches.match(req);
+    try {
+      const fresh = await fetch(req);
+      if (fresh && fresh.ok && (req.destination === 'document' || req.destination === 'style' || req.destination === 'script' || req.destination === 'image' || url.pathname.endsWith('.webmanifest'))) {
+        const cache = await caches.open(RUNTIME_CACHE); cache.put(req, fresh.clone());
+      }
+      return fresh;
+    } catch (_) {
+      if (cached) return cached;
+      if (req.mode === 'navigate') return (await caches.match('./index.html')) || Response.error();
+      return Response.error();
+    }
+  })());
+});
