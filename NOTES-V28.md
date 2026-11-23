@@ -32,13 +32,15 @@ Identité conservée (vert Myra, verre dépoli, typographies). Les corrections s
 - Icônes Font Awesome 6.5.2 livrées dans `vendor/` : elles s'affichent aussi hors connexion.
 - Cache PWA passé en v13.
 
-## V28.1 — Style mobile « épuré » (inspiré des applications de boutique)
+## V28.2 — Style mobile « application de gestion » (remplace le style V28.1)
 Fichier `css/mobile.css` (mobile uniquement, l'ordinateur ne change pas).
-- Fond blanc, surfaces gris clair sans bordure ni ombre, une seule couleur d'action : le vert Myra.
-- Tableau de bord : barre de recherche, **bannière verte** (salutation, montant encaissé de la période,
-  bouton « Nouvelle vente »), périodes en puces défilantes, indicateurs en tuiles.
-- Produits en **vitrine** : grande image carrée, nom, prix, stock en une ligne.
-- Listes en pleine largeur avec grands avatars ; filtres en puces à contour, puce active pleine.
-- Barre d'onglets plate et pleine largeur, bouton « + » intégré.
-- Fiches en feuille glissante (poignée en haut), champs gris sans bordure, écran de connexion épuré.
-- Cache PWA passé en v14.
+- Fond gris très clair, **cartes blanches** légèrement surélevées, coins arrondis.
+- Tableau de bord : **carte sombre** « Encaissé · période » avec gros montant, **pastille de tendance**
+  (+/- % vs période précédente) et bouton « + Vente » ; périodes en **sélecteur segmenté** ;
+  indicateurs en tuiles blanches ; nouvelle section **Accès rapide** (icônes colorées + chevrons).
+- **Profil** : photo centrée, nom, e-mail, puis liste de réglages (informations, paramètres de
+  l'entreprise, synchronisation, déconnexion en rouge).
+- Listes dans une carte blanche, avatars carrés arrondis ; filtres en puces, active verte.
+- **Barre d'onglets flottante** avec bouton central « + » vert surélevé.
+- Fiches en feuille glissante ; écran de connexion en carte.
+- Cache PWA passé en v15.

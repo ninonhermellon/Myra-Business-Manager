@@ -153,5 +153,3 @@
   .page-head .actions .btn.primary{grid-column:1/-1;order:-1}
 }
 
-/* Bannière d'accueil : réservée au mobile (voir css/mobile.css) */
-.m-hero{display:none}
