@@ -3,6 +3,7 @@ alter table public.profiles add column if not exists avatar_url text;
 
 drop policy if exists profile_select_self on public.profiles;
 create policy profile_select_self on public.profiles for select to authenticated using (id = (select auth.uid()));
+drop policy if exists profiles_self_update on public.profiles;
 create policy profiles_self_update on public.profiles for update to authenticated using (id = (select auth.uid())) with check (id = (select auth.uid()));
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

@@ -21,6 +21,8 @@ alter table public.loyalty_accounts enable row level security;
 alter table public.loyalty_transactions enable row level security;
 revoke all on public.loyalty_accounts, public.loyalty_transactions from anon, authenticated;
 grant select on public.loyalty_accounts, public.loyalty_transactions to authenticated;
+drop policy if exists loyalty_accounts_staff_read on public.loyalty_accounts;
+drop policy if exists loyalty_transactions_staff_read on public.loyalty_transactions;
 create policy loyalty_accounts_staff_read on public.loyalty_accounts for select to authenticated using ((select private.current_staff_role()) in ('owner','admin','manager','sales','stock_manager','accountant'));
 create policy loyalty_transactions_staff_read on public.loyalty_transactions for select to authenticated using ((select private.current_staff_role()) in ('owner','admin','manager','sales','accountant'));
 create or replace function public.award_loyalty_points_from_payment() returns trigger language plpgsql security definer set search_path = '' as $$
