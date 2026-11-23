@@ -47,8 +47,13 @@ projet de recette avant la production :
 | 6 | `customer_orders_module_v1.sql` | V24 | Commandes clients, conversion en vente (remplace la fonction du n°2) |
 | 7 | `myra_delete_reconciliation_v1.sql` | V24 | Suppressions avec régularisation stock / caisse / points |
 | 8 | `product_images_v1.sql` | V27 | Colonne `products.image_url`, bucket `myra-products` |
+| 9 | `myra_v29_extensions.sql` | V29 | 21 tables et 7 fonctions : lots, réclamations, tarifs, abonnements, crédit, traiteur, bons cadeaux, équipe, lieux, inventaire, charges fixes, messages |
 
 `verification.sql` : requêtes de contrôle (RLS activée, profil propriétaire), ne modifie rien.
+
+## Fonction serveur
+
+`functions/myra-assistant` : assistant IA (facultatif), voir `NOTES-V29.md`.
 
 ## Rappel limite de lignes
 
