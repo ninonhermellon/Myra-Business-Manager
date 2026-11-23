@@ -167,3 +167,6 @@
   .auth-card{text-align:left!important}
   .auth-card .auth-logo{display:block;margin:0 0 6px!important;width:84px!important;height:84px!important;box-shadow:none!important}
 }
+@media (max-width:760px){
+  .table-card .cards-m tbody tr[data-id] td[data-k="amount_paid"]::before{text-transform:none!important;letter-spacing:0!important;font-size:12.5px!important;display:inline!important;position:static!important}
+}
