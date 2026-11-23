@@ -1,0 +1,154 @@
+/* ==========================================================================
+   MYRA BUSINESS MANAGER — V28 · REMISE EN ORDRE UI/UX
+   Chargée en dernier. Ne change pas l'identité (vert #0d4426, feuille #71990e,
+   verre dépoli) : corrige la hiérarchie, la lisibilité et l'usage mobile.
+   Principes : un seul titre par écran, une action principale visible,
+   aucune donnée utile cachée hors écran, cibles tactiles ≥ 44 px.
+   ========================================================================== */
+:root{
+  --v28-ink:#16261c;--v28-mute:#6b7a70;--v28-hair:#e3ebe5;
+  --v28-ok:#1f7a45;--v28-ok-bg:#e4f4ea;
+  --v28-warn:#8a5a00;--v28-warn-bg:#fff2d6;
+  --v28-bad:#a3302a;--v28-bad-bg:#fde8e5;
+  --v28-neutral:#55635a;--v28-neutral-bg:#eef2ef;
+  --v28-info:#1d5fa8;--v28-info-bg:#e6f0fc;
+}
+
+/* ---------- 1. Un seul titre par écran ----------
+   Ordinateur : le fil d'Ariane suffit dans la barre du haut, le grand titre est dans la page.
+   Mobile : la barre du haut porte le titre, le grand titre de page disparaît. */
+@media (min-width:761px){
+  .topbar .welcome{display:none}
+  .topbar .crumb{font-size:13px}
+  .topbar .crumb b{color:var(--v28-ink)}
+}
+
+/* ---------- 2. Statuts lisibles (taille, contraste, couleur par sens) ---------- */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px!important;border-radius:999px;font:700 11.5px/1.2 'DM Sans',sans-serif!important;white-space:nowrap;background:var(--v28-neutral-bg)!important;color:var(--v28-neutral)!important;border:0!important}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.85}
+.pill:is([data-s="paid"],[data-s="completed"],[data-s="delivered"],[data-s="accepted"],[data-s="received"],[data-s="active"]){background:var(--v28-ok-bg)!important;color:var(--v28-ok)!important}
+.pill.warn,.pill:is([data-s="partially_paid"],[data-s="partial"],[data-s="partially_received"],[data-s="pending"],[data-s="preparing"],[data-s="in_progress"],[data-s="sent"]){background:var(--v28-warn-bg)!important;color:var(--v28-warn)!important}
+.pill[data-s="draft"]{background:var(--v28-neutral-bg)!important;color:var(--v28-neutral)!important}
+.pill.off,.pill:is([data-s="cancelled"],[data-s="rejected"],[data-s="expired"],[data-s="failed"],[data-s="conflict"]){background:var(--v28-bad-bg)!important;color:var(--v28-bad)!important}
+.pill:is([data-s="confirmed"],[data-s="ready"],[data-s="planned"],[data-s="ordered"]){background:var(--v28-info-bg)!important;color:var(--v28-info)!important}
+
+/* ---------- 3. Tableaux (ordinateur) : montants alignés, en-têtes calmes ---------- */
+.table-card .cards-m td[data-role="amount"],.table-card .cards-m td[data-k="amount_paid"],.table-card .cards-m td[data-k="total"]{font-variant-numeric:tabular-nums;font-weight:700;color:var(--v28-ink)}
+.table-card .cards-m th .th-sort{letter-spacing:.06em}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ---------- 4. Cartes produits : nom et prix d'abord, un seul badge utile ---------- */
+.prod-card .pc-body{gap:8px}
+.prod-card .pc-body h4{order:0;margin:0;font:800 15px/1.3 Manrope,sans-serif;color:var(--v28-ink)}
+.prod-card .pc-price{order:1;font:800 17px/1.2 Manrope,sans-serif;color:#0d4426;font-variant-numeric:tabular-nums}
+.prod-card .pc-tags{order:2;display:flex;flex-wrap:wrap;gap:6px}
+.prod-card .pc-tags .tag{display:inline-flex;width:auto;margin:0;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:700;background:var(--v28-neutral-bg);color:var(--v28-neutral)}
+.prod-card .pc-tags .tag.ok{background:var(--v28-ok-bg);color:var(--v28-ok)}
+.prod-card .pc-tags .tag.warn{background:var(--v28-warn-bg);color:var(--v28-warn)}
+.prod-card .pc-tags .tag.bad{background:var(--v28-bad-bg);color:var(--v28-bad)}
+.prod-card .pc-tags .tag.sku{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600}
+.prod-card .pc-badge{font-weight:800}
+.prod-card .pc-badge.out,.prod-card .pc-badge.off{background:var(--v28-bad)!important;color:#fff!important}
+.prod-card .pc-badge.low{background:#f2b705!important;color:#3a2a00!important}
+.prod-card .pc-img{aspect-ratio:4/3;height:auto!important;min-height:0}
+.prod-card .pc-img>i{font-size:30px;opacity:.55}
+
+/* ---------- 5. Fenêtres (fiches) : pied d'actions ordonné ---------- */
+.modal-foot{gap:8px;flex-wrap:wrap}
+
+/* ==========================================================================
+   MOBILE (≤ 760 px)
+   ========================================================================== */
+@media (max-width:760px){
+  /* 6. Plein écran : plus de cadre flottant (bandes de couleur sur les bords),
+        et plus de flou sur le conteneur, qui faisait passer la barre du bas
+        au-dessus du menu tiroir. */
+  body{background:#f3f7f3!important}
+  .app{margin:0!important;border-radius:0!important;border:0!important;box-shadow:none!important;min-height:100dvh!important;background:#f3f7f3!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .main{background:transparent!important}
+
+  /* Barre du haut = barre d'application : titre seul, sans fil d'Ariane */
+  .topbar{position:sticky;top:0;z-index:15;height:60px!important;min-height:60px!important;padding:0 12px!important;background:rgba(243,247,243,.92)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--v28-hair)!important}
+  .topbar .crumb{display:none}
+  .topbar .welcome{display:block;font:800 18px/1.2 Manrope,sans-serif;color:var(--v28-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+  .topbar .status-text,.topbar #installAppBtn{display:none}
+
+  /* Titre de page en double : supprimé ; la description reste en petit */
+  .page-head{flex-direction:column;align-items:stretch;gap:12px;margin:14px 0 14px}
+  .page-head h2{display:none}
+  .page-head p{margin:0;font-size:13px;color:var(--v28-mute)}
+  .dash-top h1{display:none}
+  .dash-top .dash-sub{font:700 15px/1.35 'DM Sans',sans-serif;color:var(--v28-mute);margin:12px 0 2px}
+
+  /* Actions de page : « Ajouter » en grand, CSV / PDF en boutons compacts */
+  .page-head .actions{display:grid!important;grid-template-columns:auto auto 1fr;gap:8px;width:100%}
+  .page-head .actions .btn{min-height:44px;padding:0 14px;justify-content:center}
+  .page-head .actions .btn.primary{grid-column:3}
+  .page-head .actions .btn:only-child{grid-column:1/-1}
+
+  /* 7. Listes : chaque ligne devient une ligne de liste lisible sans défilement
+        horizontal — ligne 1 : nom + montant ; ligne 2 : n°, date, statut… */
+  .table-card .cards-m{display:block!important;min-width:0!important;width:100%}
+  .table-card .cards-m thead{display:none!important}
+  .table-card .cards-m tbody{display:block!important}
+  .table-card .cards-m tbody tr[data-id]{display:flex!important;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:12px 14px!important;border-bottom:1px solid var(--v28-hair)!important}
+  .table-card .cards-m tbody tr[data-id] td{display:block!important;padding:0!important;border:0!important;white-space:nowrap;font-size:12.5px;color:var(--v28-mute);order:3}
+  .table-card .cards-m tbody tr[data-id] td:empty,.table-card .cards-m tbody tr[data-id] td[data-role="media"]{display:none!important}
+  .table-card .cards-m tbody tr[data-id] td[data-role="title"]{order:1;flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:14.5px;font-weight:700;color:var(--v28-ink)}
+  .table-card .cards-m tbody tr[data-id] td[data-role="amount"]{order:2;flex:none;margin-left:auto;font:800 14.5px/1.3 Manrope,sans-serif;color:var(--v28-ink);font-variant-numeric:tabular-nums}
+  .table-card .cards-m tbody tr[data-id] td[data-role="meta"]:not(:last-child)::after{content:"·";margin-left:8px;color:#b5c0b8}
+  .table-card .cards-m tbody tr[data-id]::after{content:"";order:2;flex-basis:100%;height:0}
+  .table-card .cards-m tbody tr[data-id] td[data-role="meta"]:has(.pill)::after{content:none}
+  .table-card .cards-m tbody tr[data-id] td[data-k="amount_paid"]::before{content:"Encaissé ";color:var(--v28-mute);font-weight:500}
+  .table-card .cards-m .cell-user{gap:8px;min-width:0}
+  .table-card .cards-m .cell-user>span{overflow:hidden;text-overflow:ellipsis}
+  .table-card .cards-m .cell-user .av{width:30px;height:30px;font-size:11px}
+  .table-card .cards-m tr.grp-row{display:block!important}
+  .table-card .cards-m tr.grp-row td{display:block!important;padding:10px 14px!important;white-space:normal}
+  .table-card .cards-m tr.empty-row,.table-card .cards-m tr.empty-row td{display:block!important;white-space:normal}
+
+  /* Barre d'outils : compteur + recherche sur une ligne, filtres défilants avec indice */
+  .table-toolbar{padding:12px 14px!important}
+  .chip-row{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;padding:0 14px 12px!important;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+  .chip-row::-webkit-scrollbar{display:none}
+  .total-bar{font-size:12px}
+  .total-bar b{font-size:13.5px}
+
+  /* 8. Tableau de bord : périodes sur une seule ligne, sans texte coupé */
+  .period-tabs.top{display:none!important}
+  .period-tabs.in-page{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));width:100%!important;overflow:visible}
+  .period-tabs.in-page button{padding:9px 4px!important;font-size:11.5px!important;min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+  /* Indicateurs : icône à côté du libellé pour gagner de la hauteur */
+  .kpi-row{gap:10px!important}
+  .kpi{padding:14px!important;gap:6px!important}
+  .kpi b,.kpi .kpi-value{font-size:16px!important}
+
+  /* 9. Cartes produits plus compactes */
+  .prod-grid{gap:10px!important;padding:10px!important}
+  .prod-card .pc-body{padding:10px 12px 12px!important}
+  .prod-card .pc-body h4{font-size:13.5px}
+  .prod-card .pc-price{font-size:15px}
+  .prod-card .pc-tags .tag.sku{display:none}
+
+  /* 10. Fiches : actions en grille régulière, action principale en pleine largeur */
+  .modal-backdrop{padding:0!important;align-items:flex-end!important}
+  .modal-backdrop .modal{width:100%!important;max-width:100%!important;border-radius:22px 22px 0 0!important;max-height:92dvh!important}
+  .modal-foot{display:grid!important;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom))!important}
+  .modal-foot>*{width:100%;min-height:44px;justify-content:center;margin:0!important}
+  .modal-foot .btn.primary,.modal-foot .btn.dark{grid-column:1/-1;order:-1}
+  .modal-foot>div{display:contents}
+  .modal-head h2,.modal-head h3{font-size:18px!important;line-height:1.25}
+
+  /* 11. Menu tiroir au-dessus de tout, barre du bas masquée quand il est ouvert */
+  .sidebar{z-index:40!important;padding-bottom:calc(20px + env(safe-area-inset-bottom))!important}
+  .scrim{z-index:39!important}
+  body.nav-open .bottom-nav{display:none!important}
+  .content{padding-bottom:110px!important}
+}
+
+@media (max-width:380px){
+  .topbar .welcome{max-width:38vw;font-size:16px}
+  .page-head .actions{grid-template-columns:1fr 1fr}
+  .page-head .actions .btn.primary{grid-column:1/-1;order:-1}
+}
