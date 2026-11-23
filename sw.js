@@ -1,6 +1,6 @@
 /* Myra Business Manager — cache applicatif résilient */
-const CACHE_NAME = 'myra-manager-shell-v11';
-const RUNTIME_CACHE = 'myra-manager-runtime-v11';
+const CACHE_NAME = 'myra-manager-shell-v12';
+const RUNTIME_CACHE = 'myra-manager-runtime-v12';
 const APP_SHELL = [
   './', './index.html', './manifest.webmanifest', './css/styles.css', './css/ux.css', './css/pro.css',
   './vendor/supabase-js-2.118.0.min.js', './js/config.js', './js/app.js', './js/pwa.js', './js/ui-kit.js', './js/shell.js',

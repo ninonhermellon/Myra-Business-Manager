@@ -400,3 +400,7 @@ tbody tr[data-id] .cell-user .av{box-shadow:0 0 0 3px #fff}
   .kpi b{font-size:15px}
 }
 @media (max-width:760px){.stat-card{display:flex;flex-direction:column;align-items:flex-start;gap:4px}.stat-card span{font-size:11.5px}}
+
+/* Écran de démarrage : affiché le temps de savoir si la session est déjà ouverte sur cet appareil */
+.boot-splash{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#f5f8f5;color:#0d4426;font:600 14px/1.4 'DM Sans',system-ui,sans-serif}
+.boot-splash img{width:96px;height:96px;border-radius:22px;box-shadow:0 8px 24px rgba(13,68,38,.10)}
