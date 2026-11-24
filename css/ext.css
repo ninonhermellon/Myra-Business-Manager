@@ -169,3 +169,9 @@ html.text-xl body{zoom:1.22}
 
 .ext-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}
 html.text-lg .kpi b,html.text-xl .kpi b,html.text-lg .stat-value,html.text-xl .stat-value{white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+/* V31 — Boutique en ligne */
+.shop-share{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.shop-qr{width:150px;flex:none;background:#fff;padding:8px;border-radius:12px;border:1px solid var(--line,#e5e7e4)}
+.shop-qr svg{width:100%;height:auto;display:block}
+.shop-share>div:last-child{flex:1;min-width:220px}
+.web-badge{display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:1px 7px;border-radius:999px;background:#eef5dc;color:#0d4426;font-size:11px;font-weight:700;vertical-align:middle}

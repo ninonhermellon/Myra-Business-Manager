@@ -17,6 +17,7 @@ npm install --no-save playwright@1.63.0
 npx playwright install chromium
 node tests/e2e/v29.test.js        # 22 parcours : tarifs, bon cadeau, crédit, inventaire, assistant…
 node tests/e2e/v30.test.js        # 19 parcours : espace client, avis, parrainage, objectifs, lieu de vente, affichage
+node tests/e2e/boutique.test.js   # 28 parcours : boutique en ligne (catalogue, panier, commande, sécurité, écran équipe)
 node tests/e2e/screens.js . tests/e2e/output   # captures de tous les écrans, ordinateur + mobile
 ```
 

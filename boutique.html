@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0d4426">
+  <title>Les Saveurs de Myra · Commandez en ligne à Brazzaville</title>
+  <meta name="description" content="Plats et produits traditionnels faits maison à Brazzaville. Choisissez vos produits, indiquez la quantité et votre adresse : nous vous livrons.">
+  <meta property="og:title" content="Les Saveurs de Myra · Commandez en ligne">
+  <meta property="og:description" content="Plats et produits traditionnels faits maison. Commandez en ligne, nous vous livrons à Brazzaville.">
+  <meta property="og:image" content="assets/logo-les-saveurs-de-myra.png">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="vendor/fontawesome-6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/boutique.css">
+</head>
+<body>
+  <a class="skip" href="#catalogue">Aller aux produits</a>
+  <header class="bar" id="bar">
+    <a class="bar-brand" href="#top" aria-label="Accueil">
+      <img src="assets/logo-les-saveurs-de-myra.png" alt="" width="44" height="44">
+      <span><b id="shopName">Les Saveurs de Myra</b><small>Fait maison · Brazzaville</small></span>
+    </a>
+    <button type="button" class="bar-cart" id="cartBtn" aria-label="Voir mon panier">
+      <i class="fa-solid fa-basket-shopping" aria-hidden="true"></i><span>Panier</span><em id="cartCount" hidden>0</em>
+    </button>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="hero-kicker"><i class="fa-solid fa-leaf" aria-hidden="true"></i> Cuisine traditionnelle faite maison</p>
+        <h1 id="heroTitle">Le secret de nos marmites</h1>
+        <p class="hero-intro" id="heroIntro">Plats et produits traditionnels faits maison à Brazzaville. Commandez en ligne, nous vous livrons.</p>
+        <div class="hero-cta">
+          <a class="btn btn-yellow" href="#catalogue"><i class="fa-solid fa-utensils" aria-hidden="true"></i> Voir nos produits</a>
+          <a class="btn btn-ghost" id="heroWa" href="#" target="_blank" rel="noopener" hidden><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Nous écrire</a>
+        </div>
+        <ul class="hero-trust">
+          <li><i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i> Préparé avec soin</li>
+          <li><i class="fa-solid fa-truck-fast" aria-hidden="true"></i> Livraison à domicile</li>
+          <li><i class="fa-solid fa-phone" aria-hidden="true"></i> Confirmation par téléphone</li>
+        </ul>
+      </div>
+      <div class="hero-art" aria-hidden="true"><img src="assets/logo-les-saveurs-de-myra.png" alt=""></div>
+    </section>
+
+    <div class="closed-banner" id="closedBanner" hidden><i class="fa-solid fa-store-slash" aria-hidden="true"></i> <span>La boutique en ligne est momentanément fermée. Vous pouvez nous écrire sur WhatsApp.</span></div>
+
+    <section class="steps" aria-label="Comment commander">
+      <div class="step"><span>1</span><div><b>Choisissez</b><small>Touchez un produit et indiquez la quantité.</small></div></div>
+      <div class="step"><span>2</span><div><b>Indiquez vos coordonnées</b><small>Nom, téléphone, WhatsApp et adresse.</small></div></div>
+      <div class="step"><span>3</span><div><b>Nous vous rappelons</b><small>Confirmation du total et de la livraison.</small></div></div>
+    </section>
+
+    <section class="catalogue" id="catalogue" aria-labelledby="catTitle">
+      <div class="cat-head">
+        <div><h2 id="catTitle">Nos produits</h2><p id="catSub">Touchez un produit pour le commander.</p></div>
+        <label class="search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="search" type="search" placeholder="Rechercher un produit…" autocomplete="off" aria-label="Rechercher un produit"></label>
+      </div>
+      <div class="chips" id="chips" role="tablist" aria-label="Catégories"></div>
+      <div class="grid" id="grid" aria-live="polite">
+        <div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div>
+      </div>
+    </section>
+
+    <section class="delivery" aria-labelledby="delTitle">
+      <i class="fa-solid fa-motorcycle" aria-hidden="true"></i>
+      <div><h2 id="delTitle">Livraison</h2><p id="deliveryInfo">Livraison à Brazzaville sous 24 à 48 h. Frais de livraison confirmés par téléphone.</p></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <img src="assets/logo-les-saveurs-de-myra.png" alt="" width="56" height="56">
+    <b id="footName">Les Saveurs de Myra</b>
+    <p id="footContact"></p>
+    <small>© <span id="year"></span> Les Saveurs de Myra · Tous droits réservés</small>
+  </footer>
+
+  <a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Nous écrire sur WhatsApp" hidden><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
+
+  <button type="button" class="cart-bar" id="cartBar" hidden>
+    <span><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> <b id="cartBarCount">0 article</b></span>
+    <span>Commander · <b id="cartBarTotal">0 FCFA</b> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+  </button>
+
+  <div id="layer"></div>
+
+  <script src="vendor/supabase-js-2.118.0.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/public/boutique.js"></script>
+</body>
+</html>

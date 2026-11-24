@@ -1,0 +1,98 @@
+// Tests de la boutique en ligne publique (boutique.html) avec le faux Supabase du banc d'essai
+const fs = require('fs'); const path = require('path'); const { chromium, devices } = require('playwright');
+const src = fs.readFileSync(__dirname + '/screens.js', 'utf8').replace(/srv\.listen\(0[\s\S]*$/, 'module.exports={srv,setup,DB,REQLOG,products,customers};');
+const mod = { exports: {} }; new Function('require', 'module', 'process', '__dirname', src)(require, mod, { argv: ['', '', path.resolve(__dirname, '../..'), path.join(__dirname, 'output')], env: {} }, __dirname);
+const { srv, setup, DB, REQLOG, products, customers } = mod.exports; const OUT = path.join(__dirname, 'output'); fs.mkdirSync(OUT, { recursive: true });
+const results = []; const check = (n, ok, d = '') => results.push([ok ? 'OK ' : 'ÉCHEC', n, d]);
+srv.listen(0, async () => {
+  const base = `http://localhost:${srv.address().port}/`; const b = await chromium.launch();
+  // ---- Téléphone
+  const ctx = await b.newContext({ ...devices['iPhone 13'], serviceWorkers: 'block' }); await setup(ctx, 'visitor');
+  const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
+  await page.goto(base + 'boutique.html'); await page.waitForTimeout(1500);
+  await page.screenshot({ path: OUT + '/boutique-mobile-accueil.png' });
+  const cards = await page.$$eval('#grid .card', c => c.length); const visible = products.filter(p => p.is_active !== false && p.sale_price > 0).length;
+  check('Catalogue : tous les produits actifs affichés', cards === visible, `${cards}/${visible}`);
+  check('Aucune donnée interne exposée (stock, coût)', !/stock_quantity|cost_price/.test(JSON.stringify(await page.evaluate(() => localStorage.getItem('myra_shop_catalog')))));
+  const n0 = await page.$$eval('#grid .card', c => c.length); await page.click('.chip >> nth=1'); await page.waitForTimeout(200);
+  const n1 = await page.$$eval('#grid .card', c => c.length); check('Filtre par catégorie', n1 > 0 && n1 < n0, `${n1}/${n0}`); await page.click('.chip >> nth=0');
+  await page.fill('#search', 'bissap'); await page.waitForTimeout(150); const ns = await page.$$eval('#grid .card', c => c.length); check('Recherche', ns >= 1 && ns < n0, String(ns)); await page.fill('#search', '');
+  await page.evaluate(() => document.querySelector('#catalogue').scrollIntoView()); await page.waitForTimeout(300); await page.screenshot({ path: OUT + '/boutique-mobile-catalogue.png' });
+  // Fiche produit + quantité
+  const saka = products.find(p => p.name.startsWith('Saka'));
+  await page.click(`[data-open="${saka.id}"]`); await page.waitForTimeout(400);
+  await page.click('.pd [data-step="1"]'); await page.click('.pd [data-step="1"]');
+  const pdTotal = await page.textContent('#pdTotal'); check('Fiche produit : quantité 3, total recalculé', pdTotal.replace(/\D/g, '') === String(saka.sale_price * 3), pdTotal);
+  await page.screenshot({ path: OUT + '/boutique-mobile-produit.png' });
+  await page.click('#pdAdd'); await page.waitForTimeout(300);
+  check('Panier : barre « Commander » visible', await page.isVisible('#cartBar') && /3 articles/.test(await page.textContent('#cartBarCount')));
+  const other = products.find(p => p.id !== saka.id && p.is_active !== false && p.sale_price > 0);
+  await page.click(`[data-open="${other.id}"]`); await page.waitForTimeout(300); await page.click('#pdAdd'); await page.waitForTimeout(300);
+  await page.click('#cartBar'); await page.waitForTimeout(400); await page.screenshot({ path: OUT + '/boutique-mobile-panier.png' });
+  check('Panier : 2 lignes, sous-total exact', (await page.$$('.line')).length === 2 && (await page.textContent('#cartSum')).replace(/\D/g, '') === String(saka.sale_price * 3 + other.sale_price), await page.textContent('#cartSum'));
+  await page.reload(); await page.waitForTimeout(1200);
+  check('Panier conservé après rechargement', /4 articles/.test(await page.textContent('#cartBarCount')));
+  // Commande
+  await page.click('#cartBar'); await page.waitForTimeout(300); await page.click('#toCheckout'); await page.waitForTimeout(300);
+  await page.click('#sendOrder'); await page.waitForTimeout(200);
+  check('Formulaire : nom obligatoire', /Indiquez votre nom/.test(await page.textContent('#formErr')));
+  await page.fill('[name=name]', 'Grâce Mabiala'); await page.fill('[name=phone]', '06 77 88 99 00'); await page.click('#sendOrder'); await page.waitForTimeout(200);
+  check('Formulaire : adresse obligatoire', /adresse/.test(await page.textContent('#formErr')));
+  await page.uncheck('[name=same]'); await page.fill('[name=whatsapp]', '+242 05 444 55 66');
+  await page.fill('[name=address]', '12 rue Mbochis, près du marché'); await page.fill('[name=zone]', 'Poto-Poto'); await page.fill('[name=notes]', 'Livrer avant midi');
+  await page.screenshot({ path: OUT + '/boutique-mobile-commande.png', fullPage: false });
+  const nOrders = DB.customer_orders.length; await page.click('#sendOrder'); await page.waitForTimeout(1200);
+  const o = DB.customer_orders[0];
+  check('Commande enregistrée en brouillon « boutique en ligne »', DB.customer_orders.length === nOrders + 1 && o.status === 'draft' && o.source === 'web' && o.total === saka.sale_price * 3 + other.sale_price, `${o.order_number} ${o.total}`);
+  check('WhatsApp du client enregistré', o.customer_whatsapp === '242054445566', o.customer_whatsapp);
+  check('Client créé (nom, téléphone, adresse)', customers.some(c => c.full_name === 'Grâce Mabiala' && c.phone === '06 77 88 99 00'));
+  const okText = await page.textContent('.ok'); await page.screenshot({ path: OUT + '/boutique-mobile-merci.png' });
+  check('Confirmation : numéro de commande et bouton WhatsApp', okText.includes(o.order_number) && /wa\.me\/242066000000/.test(await page.getAttribute('.ok .btn-wa', 'href')), okText.replace(/\s+/g, ' ').slice(0, 100));
+  check('Panier vidé après commande', !(await page.isVisible('#cartBar')) && (await page.evaluate(() => localStorage.getItem('myra_shop_cart'))) === '[]');
+  await page.click('.ok [data-close]'); await page.click(`[data-open="${saka.id}"]`); await page.click('#pdBuy'); await page.waitForTimeout(300);
+  check('Coordonnées pré-remplies à la commande suivante', (await page.inputValue('[name=name]')) === 'Grâce Mabiala' && (await page.inputValue('[name=address]')).startsWith('12 rue'));
+  // Boutique fermée
+  DB.shop_settings[0].open = false; await page.evaluate(() => localStorage.removeItem('myra_shop_catalog')); await page.reload(); await page.waitForTimeout(1200);
+  await page.click(`[data-open="${saka.id}"]`); await page.waitForTimeout(300);
+  check('Boutique fermée : bandeau + commande via WhatsApp uniquement', await page.isVisible('#closedBanner') && !(await page.$('#pdAdd')) && !!(await page.$('.pd a[href*="wa.me"]')));
+  DB.shop_settings[0].open = true;
+  // Débordement horizontal
+  await page.evaluate(() => { localStorage.removeItem('myra_shop_catalog'); }); await page.reload(); await page.waitForTimeout(1000);
+  check('Mobile : pas de défilement horizontal', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  check('Aucune erreur JavaScript (téléphone)', errs.length === 0, errs.join(' | '));
+  await page.screenshot({ path: OUT + '/boutique-mobile-page.png', fullPage: true });
+  await ctx.close();
+  // ---- Ordinateur
+  const dctx = await b.newContext({ viewport: { width: 1366, height: 860 }, serviceWorkers: 'block' }); await setup(dctx, 'visitor');
+  const d = await dctx.newPage(); const derrs = []; d.on('pageerror', e => derrs.push(e.message));
+  await d.goto(base + 'boutique.html'); await d.waitForTimeout(1500); await d.screenshot({ path: OUT + '/boutique-pc-accueil.png' });
+  await d.evaluate(() => document.querySelector('#catalogue').scrollIntoView()); await d.waitForTimeout(300); await d.screenshot({ path: OUT + '/boutique-pc-catalogue.png' });
+  await d.click(`[data-open="${saka.id}"]`); await d.waitForTimeout(400); await d.screenshot({ path: OUT + '/boutique-pc-produit.png' });
+  await d.click('#pdBuy'); await d.waitForTimeout(400); await d.screenshot({ path: OUT + '/boutique-pc-commande.png' });
+  await d.keyboard.press('Escape'); await d.waitForTimeout(200);
+  check('Ordinateur : Échap ferme la fenêtre', !(await d.$('.sheet')));
+  check('Aucune erreur JavaScript (ordinateur)', derrs.length === 0, derrs.join(' | '));
+  const pubLog = REQLOG.slice(); check('Seules les 2 fonctions publiques sont appelées', pubLog.filter(r => /^RPC|^GET|^POST|^PATCH|^DELETE/.test(r)).every(r => /get_public_catalog|place_public_order/.test(r)), REQLOG.filter(r => !/get_public_catalog|place_public_order/.test(r)).slice(0, 5).join(' | '));
+  await dctx.close();
+  // ---- Côté équipe : écran Boutique en ligne + badge dans Commandes
+  const actx = await b.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block' }); await setup(actx, true);
+  await actx.addInitScript(() => { try { localStorage.setItem('myra_v29_ready', '1'); } catch (_) {} });
+  const a = await actx.newPage(); const aerrs = []; a.on('pageerror', e => aerrs.push(e.message));
+  await a.goto(base); await a.waitForTimeout(2000);
+  check('Menu : « Boutique en ligne »', await a.evaluate(() => !!document.querySelector('[data-page="shop"], [data-nav="shop"], a[href="#shop"]') || document.body.innerText.includes('Boutique en ligne')));
+  await a.evaluate(() => window.MyraApp.navigate('shop')); await a.waitForTimeout(1500);
+  const shopTxt = await a.textContent('main, #content, body');
+  check('Écran boutique : lien, QR code, commande reçue', /boutique\.html/.test(shopTxt) && !!(await a.$('.shop-qr svg')) && shopTxt.includes(o.order_number), shopTxt.replace(/\s+/g, ' ').slice(0, 140));
+  await a.screenshot({ path: OUT + '/boutique-admin.png', fullPage: true });
+  await a.fill('[name=headline]', 'Saveurs du Congo, livrées chez vous'); await a.fill('[name=min_order]', '5000'); await a.click('#shopForm [type=submit]'); await a.waitForTimeout(1200);
+  check('Réglages enregistrés', DB.shop_settings[0].headline === 'Saveurs du Congo, livrées chez vous' && Number(DB.shop_settings[0].min_order) === 5000, JSON.stringify(DB.shop_settings[0]).slice(0, 160));
+  await a.evaluate(() => window.MyraApp.navigate('commandes')); await a.waitForTimeout(1500);
+  check('Commandes : badge « En ligne »', await a.isVisible(`#orderRows tr[data-id="${o.id}"] .web-badge`));
+  await a.click(`#orderRows tr[data-id="${o.id}"]`); await a.waitForTimeout(1200);
+  const det = await a.textContent('.record-detail'); await a.screenshot({ path: OUT + '/boutique-admin-commande.png' });
+  check('Détail : WhatsApp + origine boutique', /\+242054445566/.test(det) && /Boutique en ligne/.test(det), det.replace(/\s+/g, ' ').slice(0, 200));
+  check('Aucune erreur JavaScript (équipe)', aerrs.length === 0, aerrs.join(' | '));
+  await actx.close(); await b.close(); srv.close();
+  results.forEach(r => console.log(r.join(' · ')));
+  const ok = results.filter(r => r[0].startsWith('OK')).length; console.log(`\n${ok}/${results.length} vérifications réussies`); process.exit(ok === results.length ? 0 : 1);
+});

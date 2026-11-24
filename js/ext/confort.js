@@ -48,7 +48,7 @@
     channel = app.sb.channel('myra-direct')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sales' }, ({ new: s }) => { if (s.created_by && s.created_by !== app.state.user?.id) app.toast(`Nouvelle vente enregistrée sur un autre appareil${s.total ? ' : ' + money(s.total) : ''}.`); refresh('sales'); })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sales' }, () => refresh('sales'))
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'customer_orders' }, ({ new: o }) => { if (o.created_by !== app.state.user?.id) app.toast(`Nouvelle commande${o.order_number ? ' ' + o.order_number : ''}.`); refresh('customer_orders'); })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'customer_orders' }, ({ new: o }) => { if (o.created_by !== app.state.user?.id) app.toast(o.source === 'web' ? `🛒 Nouvelle commande en ligne${o.order_number ? ' ' + o.order_number : ''} : à confirmer dans Commandes.` : `Nouvelle commande${o.order_number ? ' ' + o.order_number : ''}.`); refresh('customer_orders'); })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'customer_orders' }, () => refresh('customer_orders'))
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'payments' }, () => refresh('payments'))
       .subscribe(status => { const dot = document.getElementById('connectionDot'); if (dot) dot.title = status === 'SUBSCRIBED' ? 'Connecté en direct' : ''; document.documentElement.classList.toggle('live-on', status === 'SUBSCRIBED'); });
