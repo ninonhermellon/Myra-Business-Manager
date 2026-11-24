@@ -48,6 +48,9 @@ Deno.serve(async (req) => {
   const context = JSON.stringify(body.context ?? {}).slice(0, 400_000);
 
   // 3. Demander la réponse à Claude.
+  if (!Deno.env.get("ANTHROPIC_API_KEY")) {
+    return json({ error: "L’assistant n’est pas encore configuré : ajoutez le secret ANTHROPIC_API_KEY dans Supabase (Edge Functions › Secrets)." }, 503);
+  }
   const client = new Anthropic(); // lit ANTHROPIC_API_KEY
   try {
     const response = await client.beta.messages.create({
