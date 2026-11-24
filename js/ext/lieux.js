@@ -22,7 +22,7 @@
     async render(host, app) {
       X.loading(host);
       let locs, stock, products;
-      try { [locs, stock, products] = await Promise.all([X.load('stock_locations', '*', 'name', true), app.fetchAll(() => app.sb.from('location_stock').select('location_id,product_id,quantity')).then(r => { if (r.error) throw r.error; return r.data; }), X.load('products', 'id,name,unit,stock_quantity,is_active', 'name', true)]); } catch (e) { return X.errorPanel(host, e); }
+      try { [locs, stock, products] = await Promise.all([X.load('stock_locations', '*', 'name', true), X.loadKeyed('location_stock', 'location_id,product_id,quantity', ['location_id', 'product_id']), X.load('products', 'id,name,unit,stock_quantity,is_active', 'name', true)]); } catch (e) { return X.errorPanel(host, e); }
       locs = locs.filter(l => l.is_active); products = products.filter(p => p.is_active !== false);
       const q = (l, p) => Number(stock.find(s => s.location_id === l && s.product_id === p)?.quantity || 0);
       const unassigned = p => Math.max(0, Number(p.stock_quantity) - locs.reduce((n, l) => n + q(l.id, p.id), 0));

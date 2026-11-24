@@ -24,6 +24,16 @@
   function menu(label, items, index) { const g = EXT.groups.find(x => x.label === label); if (g) g.items.push(...items); else EXT.groups.push({ label, items: [...items], index }); }
 
   /* Lecture d'une table complète (pagination gérée par l'application). */
+  /* Lecture complète d'une table sans colonne « id » (clé composée) : pagination sur les colonnes données. */
+  async function loadKeyed(table, select, orderCols) {
+    const app = A(); let rows = [];
+    for (let from = 0; from < 50000; from += 1000) {
+      let q = app.sb.from(table).select(select); orderCols.forEach(c => { q = q.order(c, { ascending: true }); });
+      const { data, error } = await q.range(from, from + 999); if (error) throw new Error(error.message);
+      rows = rows.concat(data || []); if (!data || data.length < 1000) break;
+    }
+    return rows;
+  }
   async function load(table, select = '*', order = 'created_at', asc = false) {
     const app = A(); const { data, error } = await app.fetchAll(() => app.sb.from(table).select(select).order(order, { ascending: asc }));
     // Copie locale par table ET par liste de colonnes (une copie partielle ne doit jamais en remplacer une autre),
@@ -35,10 +45,10 @@
   /* Indique clairement quand la migration SQL V29 n'a pas encore été exécutée. */
   function explain(err) {
     const m = String(err?.message || err || '');
-    if (/does not exist|schema cache|Could not find|PGRST20[25]|42P01|42883/i.test(m)) return 'Module pas encore activé : exécutez supabase/myra_v29_extensions.sql dans Supabase (SQL Editor).';
+    if (/relation "?[\w.]+"? does not exist|Could not find the (table|function)|schema cache|PGRST20[25]|42P01|42883/i.test(m)) return 'Module pas encore activé : exécutez supabase/myra_v29_extensions.sql dans Supabase (SQL Editor).';
     return m;
   }
-  const isMissing = err => /does not exist|schema cache|Could not find|PGRST20[25]|42P01|42883/i.test(String(err?.message || err || ''));
+  const isMissing = err => /relation "?[\w.]+"? does not exist|Could not find the (table|function)|schema cache|PGRST20[25]|42P01|42883/i.test(String(err?.message || err || ''));
   function errorPanel(host, err) {
     const missing = isMissing(err);
     host.innerHTML = `<div class="panel ext-error"><h3><i class="fa-solid fa-${missing ? 'puzzle-piece' : 'circle-info'}" aria-hidden="true"></i> ${missing ? 'Module pas encore activé' : 'Module indisponible'}</h3><p class="muted">${missing ? 'Les tables de ce module n’existent pas encore dans votre base Supabase. L’activation se fait une seule fois, en 2 minutes, pour tous les nouveaux modules.' : esc(explain(err))}</p>${missing ? '<div class="actions" style="margin-top:12px"><button type="button" class="btn primary" data-activate><i class="fa-solid fa-wand-magic-sparkles"></i> Activer les modules</button></div>' : ''}</div>`;
@@ -131,5 +141,5 @@
 
   const waNumber = phone => { let d = String(phone || '').replace(/\D/g, ''); if (!d) return ''; if (d.startsWith('00')) d = d.slice(2); else if (!d.startsWith('242') && (d.startsWith('0') || d.length <= 9)) d = '242' + d; return d; };
 
-  window.MyraX = { isMissing, EXT, A, whenReady, addField, isReady: () => v29, esc, money, num, fdate, iso, today, monthStart, addDays, daysBetween, on, menu, load, explain, errorPanel, loading, modal, head, kpis, table, qrSvg, printHtml, scan, findProduct, waNumber };
+  window.MyraX = { loadKeyed, isMissing, EXT, A, whenReady, addField, isReady: () => v29, esc, money, num, fdate, iso, today, monthStart, addDays, daysBetween, on, menu, load, explain, errorPanel, loading, modal, head, kpis, table, qrSvg, printHtml, scan, findProduct, waNumber };
 })();
