@@ -1,0 +1,42 @@
+/* Pages publiques (espace client, avis) — légères, lisibles sur téléphone */
+*{box-sizing:border-box}
+body{margin:0;background:#f2f4f3;color:#0f1a14;font:15px/1.5 'DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.pub{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+.pub-loading{padding:60px 0;text-align:center;color:#6b7a70}
+.pub-card{background:#fff;border-radius:20px;padding:18px;margin:0 0 12px;box-shadow:0 1px 2px rgba(15,26,20,.04),0 6px 20px rgba(15,26,20,.05)}
+.pub-center{text-align:center;padding:40px 20px}
+.pub-big-ico{font-size:40px;color:#1f7a45;margin-bottom:10px}
+.pub-head{display:flex;align-items:center;gap:14px;margin:4px 0 18px}
+.pub-logo{width:58px;height:58px;border-radius:16px;object-fit:contain;background:#fff}
+.pub-head small{color:#6b7a70;font-weight:700}
+.pub-head h1,.pub-center h1{margin:2px 0 0;font-size:22px;line-height:1.2}
+.pub-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.pub-kpi{background:#fff;border-radius:16px;padding:12px;box-shadow:0 1px 2px rgba(15,26,20,.05)}
+.pub-kpi small{display:block;color:#6b7a70;font-size:12px}
+.pub-kpi b{font-size:17px}
+.pub-kpi.warn b{color:#a3302a}.pub-kpi.ok b{color:#1f7a45}
+.pub-h2{font-size:17px;margin:6px 0 10px}
+.pub-sale{padding:0;overflow:hidden}
+.pub-sale-head{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;padding:14px 16px;border:0;background:none;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.pub-sale-head small{display:block;color:#6b7a70}
+.pub-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.pub-tone{font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;background:#eef2ef;color:#55635a}
+.pub-tone.ok{background:#e4f4ea;color:#1f7a45}.pub-tone.warn{background:#fff2d6;color:#8a5a00}
+.pub-sale-body{padding:0 16px 16px}
+.pub-sale-body table{width:100%;border-collapse:collapse;font-size:14px}
+.pub-sale-body th,.pub-sale-body td{padding:7px 4px;border-bottom:1px solid #eef0ee;text-align:left}
+.pub-sale-body .r{text-align:right}.pub-sale-body .tot td{font-weight:800}
+.pub-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin-top:12px;border:0;border-radius:14px;background:#0d4426;color:#fff;font-weight:700;font-size:15px;font-family:inherit;text-decoration:none;cursor:pointer}
+.pub-btn.light{background:#eef2ef;color:#0d4426}
+.pub-btn:disabled{opacity:.45;cursor:default}
+.pub-foot{text-align:center;margin-top:18px}
+.muted{color:#6b7a70}.small{font-size:12px}
+.pub-stars{display:flex;justify-content:center;gap:6px;margin:14px 0 4px}
+.pub-stars button{border:0;background:none;font-size:44px;line-height:1;color:#d5dbd7;cursor:pointer;padding:2px;transition:transform .1s}
+.pub-stars button.on{color:#f2b705}
+.pub-stars button:active{transform:scale(1.15)}
+.pub-star-label{text-align:center;margin:0 0 10px;font-weight:700}
+.pub-field{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px}
+.pub-field textarea{border:1px solid #dfe5e1;border-radius:12px;padding:10px;font-size:15px;font-family:inherit;resize:vertical}
+.pub-err{color:#a3302a;text-align:center;min-height:1em}
+@media (prefers-color-scheme:dark){body{background:#0f1411;color:#e8efe9}.pub-card,.pub-kpi{background:#18201b;box-shadow:none}.pub-sale-body th,.pub-sale-body td{border-color:#26302a}.pub-btn.light{background:#26302a;color:#cfe8d7}.pub-field textarea{background:#0f1411;color:#e8efe9;border-color:#26302a}}

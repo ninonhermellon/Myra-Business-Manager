@@ -149,3 +149,23 @@
 .act-sql{width:100%;min-height:180px;margin-top:14px;font:12px ui-monospace,monospace}
 .act-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 #actCopied{display:block;margin-top:8px}
+
+/* ==========================================================================
+   V30 — Affichage : mode sombre, taille du texte ; nouveaux écrans
+   ========================================================================== */
+/* Mode sombre : inversion douce des couleurs ; photos, logo et carte sombre gardent leurs vraies couleurs */
+html.theme-dark{filter:invert(.92) hue-rotate(180deg);background:#0f1411}
+html.theme-dark img,html.theme-dark video,html.theme-dark .m-hero,html.theme-dark .scan-box,html.theme-dark .lbl-qr,html.theme-dark .cal-ev{filter:invert(1) hue-rotate(180deg)}
+html.theme-dark .m-hero img{filter:none}
+/* Taille du texte */
+html.text-lg body{zoom:1.1}
+html.text-xl body{zoom:1.22}
+
+.ext-title{text-transform:capitalize;margin:6px 0 12px;font:800 18px Manrope,sans-serif}
+.ext-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.ext-alert.goal{background:#e9f6ee;color:#0d4426}
+.ext-alert.goal .ext-bar{margin-top:6px}
+.ext-alert>span{min-width:0}
+
+.ext-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}
+html.text-lg .kpi b,html.text-xl .kpi b,html.text-lg .stat-value,html.text-xl .stat-value{white-space:normal!important;overflow:visible!important;text-overflow:clip!important}

@@ -48,8 +48,10 @@ projet de recette avant la production :
 | 7 | `myra_delete_reconciliation_v1.sql` | V24 | Suppressions avec régularisation stock / caisse / points |
 | 8 | `product_images_v1.sql` | V27 | Colonne `products.image_url`, bucket `myra-products` |
 | 9 | `myra_v29_extensions.sql` | V29 | 21 tables et 7 fonctions : lots, réclamations, tarifs, abonnements, crédit, traiteur, bons cadeaux, équipe, lieux, inventaire, charges fixes, messages |
+| 10 | `myra_v30.sql` | V30 | Index, règles d'accès, espace client, avis, parrainage, objectifs, lieu de vente, temps réel |
 
 `verification.sql` : requêtes de contrôle (RLS activée, profil propriétaire), ne modifie rien.
+`tests/verification_lecture_seule.sql` : contrôle de santé complet après chaque migration (lecture seule).
 
 ## Fonction serveur
 

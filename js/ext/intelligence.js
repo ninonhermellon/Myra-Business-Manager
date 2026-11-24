@@ -237,7 +237,7 @@
   };
   /* Tableau de bord : anniversaires de la semaine */
   X.on('dashboard', async slot => {
-    if (!slot || !X.isReady()) return;
+    if (!slot) return;
     const app = A(); const { data } = await app.sb.from('customers').select('full_name,birth_date').not('birth_date', 'is', null); if (!data?.length) return;
     const now = new Date(); const soon = data.filter(c => { for (let i = 0; i < 7; i++) { const x = addDays(now, i), b = new Date(c.birth_date); if (x.getMonth() === b.getMonth() && x.getDate() === b.getDate()) return true; } return false; });
     if (!soon.length) return;
