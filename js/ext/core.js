@@ -26,8 +26,11 @@
   /* Lecture d'une table complète (pagination gérée par l'application). */
   async function load(table, select = '*', order = 'created_at', asc = false) {
     const app = A(); const { data, error } = await app.fetchAll(() => app.sb.from(table).select(select).order(order, { ascending: asc }));
-    if (error) { const cached = app.readOffline('ext:' + table); if (cached) return cached; throw new Error(error.message); }
-    app.writeOffline('ext:' + table, data || []); return data || [];
+    // Copie locale par table ET par liste de colonnes (une copie partielle ne doit jamais en remplacer une autre),
+    // utilisée seulement hors connexion : en ligne, une erreur est affichée telle quelle.
+    const key = 'ext:' + table + ':' + select;
+    if (error) { const cached = !navigator.onLine && app.readOffline(key); if (cached) return cached; throw new Error(error.message); }
+    app.writeOffline(key, data || []); return data || [];
   }
   /* Indique clairement quand la migration SQL V29 n'a pas encore été exécutée. */
   function explain(err) {
@@ -35,7 +38,12 @@
     if (/does not exist|schema cache|Could not find|PGRST20[25]|42P01|42883/i.test(m)) return 'Module pas encore activé : exécutez supabase/myra_v29_extensions.sql dans Supabase (SQL Editor).';
     return m;
   }
-  function errorPanel(host, err) { host.innerHTML = `<div class="panel ext-error"><h3><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Module indisponible</h3><p class="muted">${esc(explain(err))}</p></div>`; }
+  const isMissing = err => /does not exist|schema cache|Could not find|PGRST20[25]|42P01|42883/i.test(String(err?.message || err || ''));
+  function errorPanel(host, err) {
+    const missing = isMissing(err);
+    host.innerHTML = `<div class="panel ext-error"><h3><i class="fa-solid fa-${missing ? 'puzzle-piece' : 'circle-info'}" aria-hidden="true"></i> ${missing ? 'Module pas encore activé' : 'Module indisponible'}</h3><p class="muted">${missing ? 'Les tables de ce module n’existent pas encore dans votre base Supabase. L’activation se fait une seule fois, en 2 minutes, pour tous les nouveaux modules.' : esc(explain(err))}</p>${missing ? '<div class="actions" style="margin-top:12px"><button type="button" class="btn primary" data-activate><i class="fa-solid fa-wand-magic-sparkles"></i> Activer les modules</button></div>' : ''}</div>`;
+    host.querySelector('[data-activate]')?.addEventListener('click', () => A().navigate('activation'));
+  }
   function loading(host, label = 'Chargement…') { host.innerHTML = `<div class="loading"><i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> ${esc(label)}</div>`; }
 
   /* Fenêtre modale simple : renvoie { el, close }. */
@@ -123,5 +131,5 @@
 
   const waNumber = phone => { let d = String(phone || '').replace(/\D/g, ''); if (!d) return ''; if (d.startsWith('00')) d = d.slice(2); else if (!d.startsWith('242') && (d.startsWith('0') || d.length <= 9)) d = '242' + d; return d; };
 
-  window.MyraX = { EXT, A, whenReady, addField, isReady: () => v29, esc, money, num, fdate, iso, today, monthStart, addDays, daysBetween, on, menu, load, explain, errorPanel, loading, modal, head, kpis, table, qrSvg, printHtml, scan, findProduct, waNumber };
+  window.MyraX = { isMissing, EXT, A, whenReady, addField, isReady: () => v29, esc, money, num, fdate, iso, today, monthStart, addDays, daysBetween, on, menu, load, explain, errorPanel, loading, modal, head, kpis, table, qrSvg, printHtml, scan, findProduct, waNumber };
 })();

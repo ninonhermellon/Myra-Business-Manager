@@ -140,3 +140,12 @@
 .att-seg button{width:auto!important;height:auto!important;min-width:0;white-space:nowrap;flex:0 0 auto}
 .ext-person small{display:block;margin-top:2px}
 .ext-kpis .kpi b{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:clamp(17px,1.5vw,22px)}
+
+/* Activation des modules */
+.act-list{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:18px}
+.act-list li{padding-left:6px}.act-list li b{font:800 15px Manrope,sans-serif}.act-list li p{margin:4px 0 10px}
+.act-list code{background:#eef2ef;padding:1px 6px;border-radius:6px}
+.act-warn{margin-top:14px;padding:10px 12px;border-radius:12px;background:var(--x-warn-bg);color:var(--x-warn)}
+.act-sql{width:100%;min-height:180px;margin-top:14px;font:12px ui-monospace,monospace}
+.act-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+#actCopied{display:block;margin-top:8px}

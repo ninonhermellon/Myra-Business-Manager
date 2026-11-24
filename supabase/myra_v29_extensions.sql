@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Myra Business Manager V29 — 16 nouvelles fonctionnalités
--- À exécuter UNE fois dans Supabase > SQL Editor (rejouable sans danger :
+-- À exécuter dans Supabase > SQL Editor : tout ou rien (transaction), rejouable sans danger :
 -- "if not exists", "create or replace", "drop policy if exists").
 -- Ne supprime aucune donnée. N'altère pas les fonctions existantes.
 --
@@ -8,6 +8,26 @@
 --   tous : owner, admin, manager, sales, stock_manager, accountant
 --   direction : owner, admin, manager
 -- ============================================================================
+
+begin;
+
+-- ---------------------------------------------------------------------------
+-- Vérification préalable : le script s'arrête avec un message clair (et ne modifie
+-- rien) s'il manque un élément des versions précédentes.
+-- ---------------------------------------------------------------------------
+do $$
+declare v_missing text[] := '{}';
+begin
+  if to_regprocedure('private.current_staff_role()') is null then v_missing := array_append(v_missing, 'fonction private.current_staff_role()'); end if;
+  if to_regclass('public.products') is null then v_missing := array_append(v_missing, 'table products'); end if;
+  if to_regclass('public.customers') is null then v_missing := array_append(v_missing, 'table customers'); end if;
+  if to_regclass('public.sales') is null then v_missing := array_append(v_missing, 'table sales'); end if;
+  if to_regclass('public.product_movements') is null then v_missing := array_append(v_missing, 'table product_movements'); end if;
+  if to_regclass('public.customer_orders') is null then v_missing := array_append(v_missing, 'table customer_orders (exécutez d''abord customer_orders_module_v1.sql)'); end if;
+  if array_length(v_missing, 1) > 0 then
+    raise exception 'Installation V29 arrêtée, rien n''a été modifié. Élément(s) manquant(s) : %', array_to_string(v_missing, ', ');
+  end if;
+end $$;
 
 -- ---------------------------------------------------------------------------
 -- 0. Colonnes ajoutées aux tables existantes
@@ -483,6 +503,11 @@ select private.myra_v29_policies('inventory_lines',       array['owner','admin',
 select private.myra_v29_policies('recurring_expenses',    array['owner','admin','manager','accountant'],                         array['owner','admin','manager','accountant']);
 select private.myra_v29_policies('expense_budgets',       array['owner','admin','manager','accountant'],                         array['owner','admin','manager','accountant']);
 select private.myra_v29_policies('message_campaigns',     array['owner','admin','manager','sales'],                              array['owner','admin','manager','sales']);
+
+commit;
+
+-- Demande à l'API de Supabase de prendre en compte les nouvelles tables immédiatement.
+notify pgrst, 'reload schema';
 
 -- Vérification rapide : doit lister 21 tables avec rowsecurity = true
 select tablename, rowsecurity from pg_tables where schemaname = 'public' and tablename in

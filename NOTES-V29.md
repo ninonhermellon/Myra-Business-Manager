@@ -1,8 +1,20 @@
 # V29 — 16 nouvelles fonctionnalités
 
+## V29.1 — Activation simplifiée et correctifs
+- Nouvelle page **Mon espace › Activer les modules** : copie du script en un clic, lien direct vers
+  l'éditeur SQL de votre projet Supabase, puis bouton « Vérifier l'activation » qui contrôle les
+  21 tables une par une. L'entrée de menu disparaît une fois l'activation réussie.
+- Chaque module non activé affiche « Module pas encore activé » avec le bouton d'activation
+  (au lieu de « Could not find the table … in the schema cache »).
+- Script SQL en **tout ou rien** : s'il s'arrête sur une erreur, rien n'est modifié. Il vérifie
+  d'abord les éléments requis et l'indique en français s'il en manque un.
+- Étiquettes : les prix réels s'affichent même avant l'activation (un cache local partiel
+  remplaçait les produits par une version sans prix).
+
 ## Installation (dans cet ordre)
 
-1. **Base de données** — Supabase › SQL Editor › nouvelle requête : coller tout le fichier
+1. **Base de données** — le plus simple : dans l'application, **Mon espace › Activer les modules**.
+   Ou à la main : Supabase › SQL Editor › nouvelle requête : coller tout le fichier
    `supabase/myra_v29_extensions.sql` puis **Run**. Le résultat final doit lister **21 tables** avec
    `rowsecurity = true`. Le script ne supprime rien et peut être relancé sans danger.
    (Si ce n'est pas déjà fait : exécuter aussi `supabase/product_images_v1.sql` pour les photos.)

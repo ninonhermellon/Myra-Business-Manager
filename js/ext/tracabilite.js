@@ -71,7 +71,7 @@
     async render(host, app) {
       X.loading(host);
       let products, lots = [], company = {};
-      try { products = await X.load('products', 'id,name,unit,sale_price,sku,barcode,is_active', 'name', true); } catch (e) { return X.errorPanel(host, e); }
+      try { products = await X.load('products', 'id,name,unit,sale_price,sku,is_active', 'name', true); } catch (e) { return X.errorPanel(host, e); }
       try { lots = await X.load('product_lots', 'id,lot_number,product_id,expiry_date,production_date', 'production_date', false); } catch (_) { lots = []; }
       try { company = await app.getCompanyDocumentInfo(); } catch (_) {}
       host.innerHTML = X.head('Étiquettes', 'Imprimez des étiquettes avec prix, lot, date limite et QR code (format A4, 3 × 8 par page).')
