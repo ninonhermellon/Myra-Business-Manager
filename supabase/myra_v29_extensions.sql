@@ -496,7 +496,7 @@ select private.myra_v29_policies('employees',             array['owner','admin',
 select private.myra_v29_policies('attendance',            array['owner','admin','manager','accountant'],                         array['owner','admin','manager']);
 select private.myra_v29_policies('salary_advances',       array['owner','admin','manager','accountant'],                         array['owner','admin','manager','accountant']);
 select private.myra_v29_policies('stock_locations',       array['owner','admin','manager','sales','stock_manager','accountant'], array['owner','admin','manager','stock_manager']);
-select private.myra_v29_policies('location_stock',        array['owner','admin','manager','sales','stock_manager','accountant'], array['owner','admin','manager','stock_manager']);
+select private.myra_v29_policies('location_stock',        array['owner','admin','manager','sales','stock_manager','accountant'], array['owner','admin','manager','stock_manager','sales']);
 select private.myra_v29_policies('stock_transfers',       array['owner','admin','manager','sales','stock_manager','accountant'], array['owner','admin','manager','stock_manager','sales']);
 select private.myra_v29_policies('inventory_sessions',    array['owner','admin','manager','stock_manager'],                      array['owner','admin','manager','stock_manager']);
 select private.myra_v29_policies('inventory_lines',       array['owner','admin','manager','stock_manager'],                      array['owner','admin','manager','stock_manager']);
