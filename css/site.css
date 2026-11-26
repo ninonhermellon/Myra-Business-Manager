@@ -154,3 +154,46 @@ h1,h2,h3{font-family:var(--head);line-height:1.12;margin:0;letter-spacing:-.015e
 }
 @media (max-width:520px){.brand small{display:none}.act{min-width:40px;height:42px;padding:0 9px}.act.cart{padding:0 13px}.annonce{font-size:12.5px}.annonce .an-r a span{display:none}}
 @media (max-width:520px){.brand b{font-size:16.5px}.brand img{width:40px;height:40px}.search select{display:none}.acts{gap:2px}}
+
+/* V36.1 — Téléphone : en-tête épuré (logo + actions), recherche repliable, menu en pastilles */
+.only-m{display:none}
+@media (max-width:860px){
+  .annonce{display:none}
+  .only-m{display:inline-flex}
+  .top-row{flex-wrap:wrap;gap:8px;padding:8px 0;min-height:0}
+  .search{display:none;order:3;flex:1 1 100%;margin:2px 0 4px}
+  body.search-open .search{display:flex}
+  body.search-open #searchToggle{background:var(--lime)}
+  .nav{gap:6px;padding:0 0 10px}
+  .nav a{padding:7px 13px;font-size:13.5px;background:var(--cream-2)}
+  .nav a.on{background:var(--green);color:#fff}
+}
+@media (max-width:860px){.nav{padding:0 20px 10px}.acts #waTop{display:none}}
+@media (max-width:400px){.nav{padding:0 14px 10px}}
+@media (max-width:860px){.top-row{padding:8px 20px}}
+@media (max-width:400px){.top-row{padding:8px 14px}}
+
+/* V36.1 — Menu hamburger sur téléphone : panneau latéral */
+.nav-ov,.nav-head,.nav-foot{display:none}
+@media (max-width:860px){
+  .burger{background:var(--cream-2)}
+  .nav{position:fixed;z-index:70;top:0;right:0;bottom:0;width:min(330px,86vw);flex-direction:column;gap:2px;overflow-y:auto;padding:0 16px 24px!important;background:#fff;box-shadow:-20px 0 50px rgba(8,30,18,.22);transform:translateX(105%);transition:transform .25s cubic-bezier(.2,.8,.2,1);visibility:hidden;max-width:none;margin:0}
+  body.menu-open .nav{transform:none;visibility:visible}
+  body.menu-open{overflow:hidden}
+  .nav-ov{display:block;position:fixed;inset:0;z-index:69;background:rgba(8,30,18,.45);opacity:0;pointer-events:none;transition:opacity .2s}
+  body.menu-open .nav-ov{opacity:1;pointer-events:auto}
+  .nav-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 0 14px;margin-bottom:6px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+  .nav-head .brand b{font-size:16px}
+  .nav-close{width:42px;height:42px;border-radius:50%;border:0;background:var(--cream-2);font-size:18px;color:var(--ink);cursor:pointer;flex:none}
+  .nav>a{display:flex;align-items:center;min-height:50px;padding:0 14px!important;border-radius:14px;font-size:16px!important;font-weight:600;background:none!important;color:var(--ink)!important}
+  .nav>a:hover,.nav>a:focus-visible{background:var(--cream-2)!important}
+  .nav>a.on{background:var(--lime)!important;color:var(--green)!important}
+  .nav-foot{display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:18px;border-top:1px solid var(--line)}
+  .nav-tel{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border-radius:999px;border:1.5px solid var(--line);text-decoration:none;font-weight:700;color:var(--green)}
+  .nav-foot p{margin:4px 0 0;color:var(--muted);font-size:13.5px;line-height:1.7}
+  .nav-foot i{color:var(--leaf);width:18px}
+}
+@media (prefers-reduced-motion:reduce){.nav,.nav-ov{transition:none}}
+/* Le flou d'arrière-plan transforme l'en-tête en « conteneur » des éléments fixes : désactivé sur téléphone pour que le menu occupe tout l'écran */
+@media (max-width:860px){.top{backdrop-filter:none;-webkit-backdrop-filter:none;background:#fff}}
+@media (max-width:860px){.nav-foot .btn-wa{background:#1fa855!important;color:#fff!important;font-weight:700}.nav-foot .btn-wa i{color:#fff;width:auto}.nav-foot .nav-tel{background:#fff!important}}

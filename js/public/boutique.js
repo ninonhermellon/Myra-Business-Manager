@@ -2,7 +2,8 @@
    Les visiteurs n'utilisent que 2 fonctions sécurisées : get_public_catalog et place_public_order.
    Le prix est toujours recalculé côté serveur ; le panier est mémorisé sur l'appareil du client. */
 (() => {
-  const $ = s => document.querySelector(s);
+  // Un élément retiré de la page ne doit jamais bloquer la boutique : on renvoie alors un élément vide hors page.
+  const $ = s => document.querySelector(s) || document.createElement('div');
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let CUR = 'FCFA';
   const money = n => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Number(n || 0)) + ' ' + CUR;
@@ -235,9 +236,10 @@
     const rated = S.products.filter(p => p.reviews); const avg = rated.length ? rated.reduce((n, p) => n + p.rating * p.reviews, 0) / rated.reduce((n, p) => n + p.reviews, 0) : 0;
     let inner = '<div class="ha-bg"></div>';
     if (S.shop.hero_image) inner += `<img class="ha-cover" src="${esc(S.shop.hero_image)}" alt="">`;
+    else if (document.querySelector('#heroArt .ha-cover')) inner = `<img class="ha-cover" src="assets/hero-marinade.jpg" alt="Marinade universelle Les Saveurs de Myra, 100 % naturelle">`;
     else if (withImg.length) inner += `<img class="ha-main" src="${esc(withImg[0].image)}" alt="">` + (withImg[1] ? `<img class="ha-side a" src="${esc(withImg[1].image)}" alt="">` : '') + (withImg[2] ? `<img class="ha-side b" src="${esc(withImg[2].image)}" alt="">` : '');
     else inner += '<img class="ha-logo" src="assets/logo-les-saveurs-de-myra.png" alt="">';
-    if (isFinite(minPrice)) inner += `<div class="ha-badge">À partir de<b>${money(minPrice)}</b></div>`;
+    if (isFinite(minPrice) && !inner.includes('hero-marinade')) inner += `<div class="ha-badge">À partir de<b>${money(minPrice)}</b></div>`;
     if (avg) inner += `<div class="ha-rate"><i class="fa-solid fa-star" aria-hidden="true"></i> ${avg.toFixed(1)} / 5 · ${rated.reduce((n, p) => n + p.reviews, 0)} avis</div>`;
     art.innerHTML = inner;
   }
@@ -283,7 +285,7 @@
     if (S.shop.delivery) $('#deliveryInfo').textContent = S.shop.delivery + (Number(S.shop.min_order) > 0 ? ` Minimum de commande : ${money(S.shop.min_order)}.` : '');
     S.wa = waNum(S.shop.whatsapp || S.company.phone);
     if (S.wa) { const l = waLink('Bonjour, je souhaite passer une commande.'); ['#heroWa', '#waFloat', '#waTop', '#footWa'].forEach(s => { $(s).href = l; $(s).hidden = false; }); }
-    if (S.company.phone) { const a = $('#anPhone'); a.href = 'tel:' + S.company.phone.replace(/\s/g, ''); a.querySelector('span').textContent = S.company.phone; a.hidden = false; }
+    if (S.company.phone) { const a = $('#anPhone'); a.href = 'tel:' + S.company.phone.replace(/\s/g, ''); const sp = a.querySelector('span'); if (sp) sp.textContent = S.company.phone; a.hidden = false; }
     $('#footContact').innerHTML = [S.company.phone && `<li><a href="tel:${esc(S.company.phone.replace(/\s/g, ''))}"><i class="fa-solid fa-phone" aria-hidden="true"></i>${esc(S.company.phone)}</a></li>`,
       S.wa && `<li><a href="${esc(waLink('Bonjour'))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i>WhatsApp</a></li>`,
       S.company.email && `<li><a href="mailto:${esc(S.company.email)}"><i class="fa-regular fa-envelope" aria-hidden="true"></i>${esc(S.company.email)}</a></li>`,
@@ -328,6 +330,19 @@
   $('#moreBtn').addEventListener('click', () => { S.limit += 12; paintGrid(); });
   const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')];
   addEventListener('scroll', () => { const y = scrollY + 170; let cur = navLinks[0]; navLinks.forEach(a => { const t = document.querySelector(a.getAttribute('href')); if (t && !t.hidden && t.offsetTop <= y) cur = a; }); navLinks.forEach(a => a.classList.toggle('on', a === cur)); }, { passive: true });
+  /* Menu hamburger (téléphone) */
+  const navEl = document.querySelector('.nav'), burger = document.getElementById('menuBtn');
+  function setMenu(open) {
+    document.body.classList.toggle('menu-open', open); burger?.setAttribute('aria-expanded', String(open));
+    if (open) { navEl?.querySelector('a')?.focus({ preventScroll: true }); } else burger?.focus({ preventScroll: true });
+  }
+  burger?.addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
+  document.querySelector('.nav-ov')?.addEventListener('click', () => setMenu(false));
+  document.querySelector('.nav-close')?.addEventListener('click', () => setMenu(false));
+  navEl?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { if (document.body.classList.contains('menu-open')) setMenu(false); }));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('menu-open')) setMenu(false); });
+  addEventListener('resize', () => { if (innerWidth > 860 && document.body.classList.contains('menu-open')) setMenu(false); });
+  $('#searchToggle').addEventListener('click', e => { const open = document.body.classList.toggle('search-open'); e.currentTarget.setAttribute('aria-expanded', String(open)); if (open) setTimeout(() => $('#search').focus(), 50); });
   $('#cartBtn').onclick = openCart; $('#cartBar').onclick = openCart;
   $('#year').textContent = new Date().getFullYear();
   load();

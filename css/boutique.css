@@ -196,3 +196,17 @@ body.has-cartbar .wa-float{bottom:92px}
 @media (max-width:639px){.grid.pop{grid-template-columns:1fr}.grid.pop .card-body{min-width:0}}
 @media (max-width:420px){.cd-card{padding:28px 14px}.cd{gap:4px}.cd div{min-width:44px}.cd b{font-size:26px}.cd span{font-size:22px}.cd small{font-size:11px}}
 @media (max-width:400px){.cats{margin:0 -14px;padding-left:14px;padding-right:14px}}
+
+/* V36.1 — Accueil sur téléphone : image en premier, texte plus compact */
+.hero-art .ha-cover{border-radius:inherit}
+@media (max-width:959px){
+  .hero{padding:16px 0 4px}
+  .hero-grid{gap:18px}
+  .hero-art{order:-1;aspect-ratio:1/1;min-height:0;border-radius:24px}
+  .hero h1{font-size:clamp(34px,9vw,46px)}
+  .hero-intro{font-size:16.5px;margin:14px 0 20px}
+  .hero-cta .btn{flex:1 1 auto}
+  .trust{gap:10px;margin-top:22px}
+  .trust li{flex:1 1 140px}
+}
+@media (max-width:639px){.price small{display:block;margin:2px 0 0}}

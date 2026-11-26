@@ -16,6 +16,7 @@ srv.listen(0, async () => {
   check('Aucune donnée interne exposée (stock, coût)', !/stock_quantity|cost_price/.test(JSON.stringify(await page.evaluate(() => localStorage.getItem('myra_shop_catalog')))));
   const n0 = await page.$$eval('#grid .card', c => c.length); await page.click('.chip >> nth=1'); await page.waitForTimeout(200);
   const n1 = await page.$$eval('#grid .card', c => c.length); check('Filtre par catégorie', n1 > 0 && n1 < n0, `${n1}/${n0}`); await page.click('.chip >> nth=0');
+  if (await page.isVisible('#searchToggle')) await page.click('#searchToggle');
   await page.fill('#search', 'bissap'); await page.waitForTimeout(150); const ns = await page.$$eval('#grid .card', c => c.length); check('Recherche', ns >= 1 && ns < n0, String(ns)); await page.fill('#search', '');
   await page.evaluate(() => document.querySelector('#produits').scrollIntoView()); await page.waitForTimeout(300); await page.screenshot({ path: OUT + '/boutique-mobile-catalogue.png' });
   // Fiche produit + quantité

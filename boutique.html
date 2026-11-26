@@ -56,24 +56,26 @@
         <button type="submit" aria-label="Rechercher"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
       </form>
       <div class="acts">
+        <button type="button" class="act only-m" id="searchToggle" aria-label="Rechercher un produit" aria-expanded="false" aria-controls="searchForm"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
         <a class="act" href="commande.html" title="Suivre ma commande"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i><span class="lbl">Suivi</span></a>
         <a class="act" id="waTop" href="#" target="_blank" rel="noopener" title="Nous écrire sur WhatsApp" hidden><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
         <button type="button" class="act cart" id="cartBtn" aria-label="Voir mon panier"><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i><span class="lbl">Panier</span><em id="cartCount" hidden>0</em></button>
+        <button type="button" class="act only-m burger" id="menuBtn" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
       </div>
     </div>
-    <nav class="wrap nav" aria-label="Sections"><a href="#top" class="on">Accueil</a><a href="#categories">Catégories</a><a href="#produits">Produits</a><a href="#offres" id="navPromo" hidden>Promotions</a><a href="#populaires" id="navPop" hidden>Les plus commandés</a><a href="#livraison">Livraison</a><a href="commande.html">Suivre ma commande</a><a href="#contact">Contact</a></nav>
+    <div class="nav-ov" aria-hidden="true"></div>
+    <nav class="wrap nav" id="mainNav" aria-label="Menu principal"><div class="nav-head only-m"><span class="brand"><img src="assets/icons/icon-192.png" alt="" width="40" height="40"><span><b>Les Saveurs de Myra</b><small>FAIT MAISON · BRAZZAVILLE</small></span></span><button type="button" class="nav-close" aria-label="Fermer le menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div><a href="#top" class="on">Accueil</a><a href="#categories">Catégories</a><a href="#produits">Produits</a><a href="#offres" id="navPromo" hidden>Promotions</a><a href="#populaires" id="navPop" hidden>Les plus commandés</a><a href="#livraison">Livraison</a><a href="commande.html">Suivre ma commande</a><a href="#contact">Contact</a><div class="nav-foot only-m"><a class="btn btn-wa full" href="https://wa.me/242069007022" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Commander sur WhatsApp</a><a class="nav-tel" href="tel:069007022"><i class="fa-solid fa-phone" aria-hidden="true"></i> 06 900 70 22</a><p><i class="fa-regular fa-clock" aria-hidden="true"></i> Lun – Sam · 07 h 00 – 17 h 30<br><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Centre-ville, Brazzaville</p></div></nav>
   </header>
 
   <main id="top">
     <section class="hero"><div class="wrap hero-grid">
       <div class="hero-txt">
-        <p class="kicker"><i class="fa-solid fa-leaf" aria-hidden="true"></i> Fait maison à Brazzaville</p>
         <h1 id="heroTitle">Le secret de nos <span class="hl">marmites<svg viewBox="0 0 200 14" aria-hidden="true" preserveAspectRatio="none"><path d="M3 10 C 50 2, 120 2, 197 8" /></svg></span></h1>
-        <p class="hero-intro" id="heroIntro">Plats et produits traditionnels faits maison à Brazzaville. Commandez en ligne, nous vous livrons.</p>
+        <p class="hero-intro" id="heroIntro">Nous vous proposons une marinade universelle, une préparation 100% naturelle, conçue pour apporter une saveur authentique à vos plats.</p>
         <div class="hero-cta"><a class="btn btn-green" href="#produits">Commander maintenant <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="btn btn-ghost" id="heroWa" href="#" target="_blank" rel="noopener" hidden><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp</a></div>
-        <ul class="trust"><li><i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i><span><b>Fait maison</b>préparé avec soin</span></li><li><i class="fa-solid fa-truck-fast" aria-hidden="true"></i><span><b>Livraison</b>à domicile</span></li><li><i class="fa-solid fa-phone" aria-hidden="true"></i><span><b>Confirmation</b>par téléphone</span></li></ul>
+        <ul class="trust"><li><i class="fa-solid fa-leaf" aria-hidden="true"></i><span><b>100% naturel</b>préparé avec soin</span></li><li><i class="fa-solid fa-truck-fast" aria-hidden="true"></i><span><b>Livraison</b>à domicile</span></li><li><i class="fa-solid fa-phone" aria-hidden="true"></i><span><b>Confirmation</b>par téléphone</span></li></ul>
       </div>
-      <div class="hero-art" id="heroArt" aria-hidden="true"><div class="ha-bg"></div><img class="ha-logo" src="assets/logo-les-saveurs-de-myra.png" alt=""></div>
+      <div class="hero-art" id="heroArt"><img class="ha-cover" src="assets/hero-marinade.jpg" alt="Marinade universelle Les Saveurs de Myra, 100 % naturelle" width="1000" height="1000" fetchpriority="high"></div>
     </div></section>
 
     <div class="wrap"><div class="closed-banner" id="closedBanner" hidden><i class="fa-solid fa-store-slash" aria-hidden="true"></i> <span>La boutique en ligne est momentanément fermée. Vous pouvez nous écrire sur WhatsApp.</span></div></div>
@@ -105,7 +107,7 @@
         <div class="step"><span class="n">1</span><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i><b>Choisissez</b><p>Touchez un produit, indiquez la quantité et ajoutez-le au panier.</p></div>
         <div class="step"><span class="n">2</span><i class="fa-solid fa-location-dot" aria-hidden="true"></i><b>Vos coordonnées</b><p>Nom, téléphone, WhatsApp et adresse de livraison.</p></div>
         <div class="step"><span class="n">3</span><i class="fa-solid fa-phone-volume" aria-hidden="true"></i><b>Nous vous rappelons</b><p>Confirmation du total, des frais et de l’heure de livraison.</p></div>
-        <div class="step"><span class="n">4</span><i class="fa-solid fa-motorcycle" aria-hidden="true"></i><b>Livraison</b><p id="deliveryInfo">Livraison à Brazzaville sous 24 à 48 h. Frais de livraison confirmés par téléphone.</p></div>
+        <div class="step"><span class="n">4</span><i class="fa-solid fa-motorcycle" aria-hidden="true"></i><b>Livraison</b><p id="deliveryInfo">Livraison à Brazzaville sous 24 h. Frais de livraison confirmés par WhatsApp.</p></div>
       </div>
       <div class="track-cta"><div><b>Déjà commandé ?</b><span>Suivez l’avancement de votre commande avec son numéro.</span></div><a class="btn btn-green" href="commande.html"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i> Suivre ma commande</a></div>
     </div></section>
@@ -113,12 +115,12 @@
 
   <footer class="foot" id="contact"><div class="wrap">
     <div class="foot-grid">
-      <div><div class="foot-brand"><img src="assets/icons/icon-192.png" alt="" width="54" height="54"><b id="footName">Les Saveurs de Myra</b></div><p id="footIntro">Le secret de nos marmites : marinades et produits traditionnels faits maison à Brazzaville.</p><div class="socials" id="socials"></div></div>
+      <div><div class="foot-brand"><img src="assets/icons/icon-192.png" alt="" width="54" height="54"><b id="footName">Les Saveurs de Myra</b></div><p id="footIntro">Le secret de nos marmites : une marinade universelle 100% naturelle, préparée à Brazzaville.</p><div class="socials" id="socials"></div></div>
       <div><h4>Boutique</h4><ul><li><a href="#produits">Tous les produits</a></li><li><a href="#categories">Catégories</a></li><li><a href="#offres">Promotions</a></li><li><a href="commande.html">Suivre ma commande</a></li></ul></div>
       <div><h4>Aide</h4><ul><li><a href="#livraison">Comment commander</a></li><li><a href="#livraison">Livraison</a></li><li><a href="#" id="footWa" target="_blank" rel="noopener">Nous écrire sur WhatsApp</a></li></ul></div>
       <div><h4>Contact</h4><ul id="footContact"></ul></div>
     </div>
-    <div class="foot-bottom"><span>© <span id="year"></span> Les Saveurs de Myra · Tous droits réservés</span><span>Paiement à la livraison ou Mobile Money après confirmation</span></div>
+    <div class="foot-bottom"><span>© <span id="year"></span> <a href="#top">Les Saveurs de Myra</a> · Tous droits réservés</span><span>Paiement à la livraison ou Mobile Money après confirmation</span></div>
   </div></footer>
 
   <a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Nous écrire sur WhatsApp" hidden><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
