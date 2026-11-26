@@ -91,18 +91,13 @@
     if (queued.length) out.push({ tone: 'info', icon: 'fa-rotate', title: `${queued.length} ${plural(queued.length, 'opération', 'opérations')} en attente de synchronisation`, text: 'Ouvrez le centre de synchronisation.', go: 'sync_center' });
     return out;
   }
-  const bellBtn = $('#bellBtn'), bellPanel = $('#bellPanel'), bellBadge = $('#bellBadge');
-  async function renderBell() {
-    const items = await computeAlerts();
-    if (bellBadge) { bellBadge.textContent = String(items.length); bellBadge.classList.toggle('hidden', !items.length); }
-    bellBtn?.setAttribute('aria-label', items.length ? `Notifications : ${items.length}` : 'Notifications');
-    if (!bellPanel) return items;
-    bellPanel.innerHTML = `<div class="pop-head"><b>Notifications</b><span>${items.length ? `${items.length} à traiter` : 'À jour'}</span></div>` + (items.length ? items.map((n, i) => `<button type="button" class="note ${n.tone}" data-note="${i}" ${n.go ? '' : 'disabled'}><span class="pi"><i class="fa-solid ${n.icon}" aria-hidden="true"></i></span><span><b>${esc(n.title)}</b><small>${esc(n.text || '')}</small></span></button>`).join('') : '<div class="empty small"><span class="empty-ico ok"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span><b>Tout est en ordre</b><p>Aucune alerte pour le moment.</p></div>');
-    bellPanel._items = items; return items;
-  }
+  /* La cloche affiche le centre de notifications (js/ext/notifcenter.js) : le compteur = notifications NON LUES.
+     Les alertes permanentes (stock bas, créances…) sont rangées dans l'onglet « À traiter ». */
+  const bellBtn = $('#bellBtn'), bellPanel = $('#bellPanel');
+  async function renderBell() { const alerts = await computeAlerts(); window.MyraNotif?.setAlerts(alerts); return alerts; }
   if (bellBtn && bellPanel) {
-    const bp = popover(bellBtn, bellPanel, () => { renderBell(); });
-    bellPanel.addEventListener('click', e => { const b = e.target.closest('[data-note]'); if (!b) return; const n = bellPanel._items?.[Number(b.dataset.note)]; bp.close(); if (n?.go) App().navigate(n.go); });
+    bellPanel.classList.add('nc-pop');
+    const bp = popover(bellBtn, bellPanel, () => { window.MyraNotif?.panel(bellPanel, () => bp.close()); renderBell(); window.MyraNotif?.load(); });
   }
   setInterval(() => { if (!$('#appView')?.classList.contains('hidden')) renderBell(); }, 60000);
   window.addEventListener('online', renderBell); window.addEventListener('offline', renderBell);

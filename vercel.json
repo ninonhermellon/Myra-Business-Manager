@@ -46,7 +46,7 @@
       ]
     },
     {
-      "source": "/(boutique|commande|commander)",
+      "source": "/(boutique|commande|commander|suivi)",
       "headers": [
         {
           "key": "Content-Security-Policy",
@@ -148,8 +148,8 @@
       "destination": "/boutique.html"
     },
     {
-      "source": "/commande",
-      "destination": "/boutique.html"
+      "source": "/suivi",
+      "destination": "/commande.html"
     }
   ]
 }

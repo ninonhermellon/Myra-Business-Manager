@@ -38,80 +38,91 @@
   <!-- SEO:END -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="vendor/fontawesome-6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/site.css">
   <link rel="stylesheet" href="css/boutique.css">
 </head>
 <body>
-  <a class="skip" href="#catalogue">Aller aux produits</a>
-  <header class="bar" id="bar">
-    <a class="bar-brand" href="#top" aria-label="Accueil">
-      <img src="assets/logo-les-saveurs-de-myra.png" alt="" width="44" height="44">
-      <span><b id="shopName">Les Saveurs de Myra</b><small>Fait maison · Brazzaville</small></span>
-    </a>
-    <button type="button" class="bar-cart" id="cartBtn" aria-label="Voir mon panier">
-      <i class="fa-solid fa-basket-shopping" aria-hidden="true"></i><span>Panier</span><em id="cartCount" hidden>0</em>
-    </button>
+  <a class="skip" href="#produits">Aller aux produits</a>
+  <div class="annonce"><div class="wrap"><span id="annonce"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i>Livraison à domicile à Brazzaville · commandez en 1 minute</span><span class="an-r"><a href="commande.html"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>Suivre ma commande</a><a id="anPhone" href="#" hidden><i class="fa-solid fa-phone" aria-hidden="true"></i><span></span></a></span></div></div>
+
+  <header class="top" id="bar">
+    <div class="wrap top-row">
+      <a class="brand" href="#top" aria-label="Les Saveurs de Myra, accueil"><img src="assets/icons/icon-192.png" alt="" width="46" height="46"><span><b id="shopName">Les Saveurs de Myra</b><small>FAIT MAISON · BRAZZAVILLE</small></span></a>
+      <form class="search" id="searchForm" role="search">
+        <label class="sr" for="searchCat">Catégorie</label><select id="searchCat"><option value="">Toutes catégories</option></select>
+        <label class="sr" for="search">Rechercher un produit</label><input id="search" type="search" placeholder="Rechercher une marinade, un produit…" autocomplete="off">
+        <button type="submit" aria-label="Rechercher"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+      </form>
+      <div class="acts">
+        <a class="act" href="commande.html" title="Suivre ma commande"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i><span class="lbl">Suivi</span></a>
+        <a class="act" id="waTop" href="#" target="_blank" rel="noopener" title="Nous écrire sur WhatsApp" hidden><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
+        <button type="button" class="act cart" id="cartBtn" aria-label="Voir mon panier"><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i><span class="lbl">Panier</span><em id="cartCount" hidden>0</em></button>
+      </div>
+    </div>
+    <nav class="wrap nav" aria-label="Sections"><a href="#top" class="on">Accueil</a><a href="#categories">Catégories</a><a href="#produits">Produits</a><a href="#offres" id="navPromo" hidden>Promotions</a><a href="#populaires" id="navPop" hidden>Les plus commandés</a><a href="#livraison">Livraison</a><a href="commande.html">Suivre ma commande</a><a href="#contact">Contact</a></nav>
   </header>
 
   <main id="top">
-    <section class="hero">
-      <div class="hero-inner">
-        <p class="hero-kicker"><i class="fa-solid fa-leaf" aria-hidden="true"></i> Cuisine traditionnelle faite maison</p>
-        <h1 id="heroTitle">Le secret de nos marmites</h1>
+    <section class="hero"><div class="wrap hero-grid">
+      <div class="hero-txt">
+        <p class="kicker"><i class="fa-solid fa-leaf" aria-hidden="true"></i> Fait maison à Brazzaville</p>
+        <h1 id="heroTitle">Le secret de nos <span class="hl">marmites<svg viewBox="0 0 200 14" aria-hidden="true" preserveAspectRatio="none"><path d="M3 10 C 50 2, 120 2, 197 8" /></svg></span></h1>
         <p class="hero-intro" id="heroIntro">Plats et produits traditionnels faits maison à Brazzaville. Commandez en ligne, nous vous livrons.</p>
-        <div class="hero-cta">
-          <a class="btn btn-yellow" href="#catalogue"><i class="fa-solid fa-utensils" aria-hidden="true"></i> Voir nos produits</a>
-          <a class="btn btn-ghost" id="heroWa" href="#" target="_blank" rel="noopener" hidden><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Nous écrire</a>
-        </div>
-        <ul class="hero-trust">
-          <li><i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i> Préparé avec soin</li>
-          <li><i class="fa-solid fa-truck-fast" aria-hidden="true"></i> Livraison à domicile</li>
-          <li><i class="fa-solid fa-phone" aria-hidden="true"></i> Confirmation par téléphone</li>
-        </ul>
+        <div class="hero-cta"><a class="btn btn-green" href="#produits">Commander maintenant <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="btn btn-ghost" id="heroWa" href="#" target="_blank" rel="noopener" hidden><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp</a></div>
+        <ul class="trust"><li><i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i><span><b>Fait maison</b>préparé avec soin</span></li><li><i class="fa-solid fa-truck-fast" aria-hidden="true"></i><span><b>Livraison</b>à domicile</span></li><li><i class="fa-solid fa-phone" aria-hidden="true"></i><span><b>Confirmation</b>par téléphone</span></li></ul>
       </div>
-      <div class="hero-art" aria-hidden="true"><img src="assets/logo-les-saveurs-de-myra.png" alt=""></div>
-    </section>
+      <div class="hero-art" id="heroArt" aria-hidden="true"><div class="ha-bg"></div><img class="ha-logo" src="assets/logo-les-saveurs-de-myra.png" alt=""></div>
+    </div></section>
 
-    <div class="closed-banner" id="closedBanner" hidden><i class="fa-solid fa-store-slash" aria-hidden="true"></i> <span>La boutique en ligne est momentanément fermée. Vous pouvez nous écrire sur WhatsApp.</span></div>
+    <div class="wrap"><div class="closed-banner" id="closedBanner" hidden><i class="fa-solid fa-store-slash" aria-hidden="true"></i> <span>La boutique en ligne est momentanément fermée. Vous pouvez nous écrire sur WhatsApp.</span></div></div>
 
-    <section class="steps" aria-label="Comment commander">
-      <div class="step"><span>1</span><div><b>Choisissez</b><small>Touchez un produit et indiquez la quantité.</small></div></div>
-      <div class="step"><span>2</span><div><b>Indiquez vos coordonnées</b><small>Nom, téléphone, WhatsApp et adresse.</small></div></div>
-      <div class="step"><span>3</span><div><b>Nous vous rappelons</b><small>Confirmation du total et de la livraison.</small></div></div>
-    </section>
+    <section class="sec" id="categories" aria-labelledby="catH"><div class="wrap">
+      <div class="sec-head"><div><small>Notre sélection</small><h2 id="catH">Nos <em>catégories</em></h2></div><a href="#produits">Voir tous les produits <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+      <div class="cats" id="cats"></div>
+    </div></section>
 
-    <section class="catalogue" id="catalogue" aria-labelledby="catTitle">
-      <div class="cat-head">
-        <div><h2 id="catTitle">Nos produits</h2><p id="catSub">Touchez un produit pour le commander.</p></div>
-        <label class="search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="search" type="search" placeholder="Rechercher un produit…" autocomplete="off" aria-label="Rechercher un produit"></label>
-      </div>
+    <section class="sec pt0" id="offres" aria-label="Offres"><div class="wrap promos" id="promos"></div></section>
+
+    <section class="sec cream" id="produits" aria-labelledby="prodH"><div class="wrap">
+      <div class="sec-head"><div><small id="catSub">Nos produits</small><h2 id="prodH">Produits <em>phares</em></h2></div></div>
       <div class="chips" id="chips" role="tablist" aria-label="Catégories"></div>
-      <div class="grid" id="grid" aria-live="polite">
-        <div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div>
-      </div>
-    </section>
+      <div class="grid" id="grid" aria-live="polite"><div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div></div>
+      <div class="more"><button type="button" class="btn btn-ghost btn-sm" id="moreBtn" hidden>Voir plus</button></div>
+    </div></section>
 
-    <section class="delivery" aria-labelledby="delTitle">
-      <i class="fa-solid fa-motorcycle" aria-hidden="true"></i>
-      <div><h2 id="delTitle">Livraison</h2><p id="deliveryInfo">Livraison à Brazzaville sous 24 à 48 h. Frais de livraison confirmés par téléphone.</p></div>
-    </section>
+    <section class="sec" id="compte" hidden><div class="wrap countdown" id="countdown"></div></section>
+
+    <section class="sec cream" id="populaires" hidden aria-labelledby="popH"><div class="wrap">
+      <div class="sec-head"><div><small>Vos préférés</small><h2 id="popH">Les plus <em>commandés</em></h2></div></div>
+      <div class="grid pop" id="popGrid"></div>
+    </div></section>
+
+    <section class="sec" id="livraison" aria-labelledby="howH"><div class="wrap">
+      <div class="sec-head center"><div><small>Simple et rapide</small><h2 id="howH">Comment <em>commander</em> ?</h2></div></div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i><b>Choisissez</b><p>Touchez un produit, indiquez la quantité et ajoutez-le au panier.</p></div>
+        <div class="step"><span class="n">2</span><i class="fa-solid fa-location-dot" aria-hidden="true"></i><b>Vos coordonnées</b><p>Nom, téléphone, WhatsApp et adresse de livraison.</p></div>
+        <div class="step"><span class="n">3</span><i class="fa-solid fa-phone-volume" aria-hidden="true"></i><b>Nous vous rappelons</b><p>Confirmation du total, des frais et de l’heure de livraison.</p></div>
+        <div class="step"><span class="n">4</span><i class="fa-solid fa-motorcycle" aria-hidden="true"></i><b>Livraison</b><p id="deliveryInfo">Livraison à Brazzaville sous 24 à 48 h. Frais de livraison confirmés par téléphone.</p></div>
+      </div>
+      <div class="track-cta"><div><b>Déjà commandé ?</b><span>Suivez l’avancement de votre commande avec son numéro.</span></div><a class="btn btn-green" href="commande.html"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i> Suivre ma commande</a></div>
+    </div></section>
   </main>
 
-  <footer class="foot">
-    <img src="assets/logo-les-saveurs-de-myra.png" alt="" width="56" height="56">
-    <b id="footName">Les Saveurs de Myra</b>
-    <p id="footContact"></p>
-    <small>© <span id="year"></span> Les Saveurs de Myra · Tous droits réservés</small>
-  </footer>
+  <footer class="foot" id="contact"><div class="wrap">
+    <div class="foot-grid">
+      <div><div class="foot-brand"><img src="assets/icons/icon-192.png" alt="" width="54" height="54"><b id="footName">Les Saveurs de Myra</b></div><p id="footIntro">Le secret de nos marmites : marinades et produits traditionnels faits maison à Brazzaville.</p><div class="socials" id="socials"></div></div>
+      <div><h4>Boutique</h4><ul><li><a href="#produits">Tous les produits</a></li><li><a href="#categories">Catégories</a></li><li><a href="#offres">Promotions</a></li><li><a href="commande.html">Suivre ma commande</a></li></ul></div>
+      <div><h4>Aide</h4><ul><li><a href="#livraison">Comment commander</a></li><li><a href="#livraison">Livraison</a></li><li><a href="#" id="footWa" target="_blank" rel="noopener">Nous écrire sur WhatsApp</a></li></ul></div>
+      <div><h4>Contact</h4><ul id="footContact"></ul></div>
+    </div>
+    <div class="foot-bottom"><span>© <span id="year"></span> Les Saveurs de Myra · Tous droits réservés</span><span>Paiement à la livraison ou Mobile Money après confirmation</span></div>
+  </div></footer>
 
   <a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Nous écrire sur WhatsApp" hidden><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
-
-  <button type="button" class="cart-bar" id="cartBar" hidden>
-    <span><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> <b id="cartBarCount">0 article</b></span>
-    <span>Commander · <b id="cartBarTotal">0 FCFA</b> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
-  </button>
-
+  <button type="button" class="cart-bar" id="cartBar" hidden><span><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> <b id="cartBarCount">0 article</b></span><span>Commander · <b id="cartBarTotal">0 FCFA</b> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></button>
   <div id="layer"></div>
 
   <script src="vendor/supabase-js-2.118.0.min.js"></script>

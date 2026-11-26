@@ -9,11 +9,12 @@
     title: 'Boutique en ligne',
     async render(host, app) {
       X.loading(host);
-      let s, orders, products;
+      let s, orders, products, promos = null;
       try {
         const r = await app.sb.from('shop_settings').select('*').maybeSingle(); if (r.error) throw r.error; s = r.data || { is_open: true };
         const o = await app.fetchAll(() => app.sb.from('customer_orders').select('id,order_number,order_date,total,status,customer_whatsapp,delivery_zone,delivery_address,customers(full_name,phone)').eq('source', 'web').order('created_at', { ascending: false }), 2000); if (o.error) throw o.error; orders = o.data || [];
         products = await X.load('products', 'id,name,sale_price,is_active,image_url,description', 'name', true);
+        try { const pr = await app.sb.from('promo_campaigns').select('id,name,code,discount_type,discount_value,is_active,ends_at,show_on_shop').order('created_at', { ascending: false }); promos = pr.error ? null : pr.data || []; } catch (_) { promos = null; }
       } catch (e) {
         if (X.isMissing(e) || /source|shop_settings/.test(String(e?.message || ''))) {
           host.innerHTML = X.head('Boutique en ligne', 'Une page de commande pour vos clients, sans accès à votre espace de gestion.')
@@ -48,8 +49,15 @@
             <label class="field full-span">Présentation<textarea name="intro" rows="2" maxlength="300">${esc(s.intro || '')}</textarea></label>
             <label class="field full-span">Informations de livraison<textarea name="delivery_info" rows="2" maxlength="300">${esc(s.delivery_info || '')}</textarea></label>
             <label class="field">Minimum de commande (FCFA)<input name="min_order" type="number" min="0" step="500" value="${Number(s.min_order || 0)}"></label>
-            <label class="field">Numéro WhatsApp de la boutique<input name="whatsapp" type="tel" value="${esc(s.whatsapp || '')}" placeholder="Par défaut : téléphone de l’entreprise"></label></div>
+            <label class="field">Numéro WhatsApp de la boutique<input name="whatsapp" type="tel" value="${esc(s.whatsapp || '')}" placeholder="Par défaut : téléphone de l’entreprise"></label>
+            <label class="field full-span">Bandeau d’annonce (haut de page)<input name="announcement" maxlength="140" value="${esc(s.announcement || '')}" placeholder="Ex. : Livraison offerte dès 20 000 FCFA ce week-end"></label>
+            <label class="field full-span">Horaires<input name="hours" maxlength="120" value="${esc(s.hours || '')}" placeholder="Ex. : Du lundi au samedi, 8 h – 19 h"></label>
+            <div class="field full-span"><span>Image d’accueil (facultatif)</span><div class="shop-hero-row">${s.hero_image_url ? `<img src="${esc(s.hero_image_url)}" alt="Image d’accueil actuelle">` : '<span class="muted">Par défaut : les photos de vos produits.</span>'}<label class="btn light sm"><i class="fa-solid fa-image"></i> Choisir une photo<input type="file" id="heroFile" accept="image/png,image/jpeg,image/webp" hidden></label>${s.hero_image_url ? '<button type="button" class="btn light sm" id="heroDel"><i class="fa-solid fa-trash-can"></i> Retirer</button>' : ''}</div><input type="hidden" name="hero_image_url" value="${esc(s.hero_image_url || '')}"></div>
+            <label class="field">Page Facebook<input name="facebook_url" type="url" value="${esc(s.facebook_url || '')}" placeholder="https://facebook.com/…"></label>
+            <label class="field">Compte Instagram<input name="instagram_url" type="url" value="${esc(s.instagram_url || '')}" placeholder="https://instagram.com/…"></label>
+            <label class="field">Compte TikTok<input name="tiktok_url" type="url" value="${esc(s.tiktok_url || '')}" placeholder="https://tiktok.com/@…"></label></div>
             <div class="actions" style="margin-top:12px"><button type="submit" class="btn primary"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button></div></form></section>`
+        + (promos ? `<section class="card"><div class="card-head"><h3>Promotions sur la boutique</h3><span class="muted">Les promotions cochées s’affichent en bannière (avec compte à rebours si elles ont une date de fin)</span></div>${promos.length ? promos.map(pr => `<label class="m-row shop-promo"><span class="m-txt"><b>${esc(pr.name)} · <code>${esc(pr.code || '')}</code></b><small>${pr.discount_type === 'percent' ? '− ' + Number(pr.discount_value) + ' %' : '− ' + money(pr.discount_value)}${pr.ends_at ? ' · jusqu’au ' + fdate(pr.ends_at) : ''}${pr.is_active ? '' : ' · inactive'}</small></span><input type="checkbox" class="switch" data-promo="${esc(pr.id)}" ${pr.show_on_shop ? 'checked' : ''} ${pr.is_active ? '' : 'disabled'}></label>`).join('') : '<p class="muted">Aucune promotion. Créez-en une dans Marketing & fidélisation.</p>'}</section>` : '')
         + `<h3 style="margin:18px 0 8px">Commandes reçues en ligne</h3>`
         + X.table(['N° commande', 'Client', 'Livraison', 'Total', 'Statut', ''], orders.slice(0, 50).map(o => {
           const n = X.waNumber(o.customer_whatsapp || o.customers?.phone);
@@ -60,9 +68,25 @@
       host.querySelector('#shopPrint').onclick = () => X.printDoc({ title: 'Boutique en ligne', kicker: 'Commandez en ligne', subtitle: 'Scannez ce code avec votre téléphone',
         sections: [{ html: `<div style="text-align:center;padding:10px 0"><div style="width:250px;margin:0 auto">${X.qrSvg(url, 8)}</div><p style="color:#7b807d;font-size:13px;margin:12px 0 0;word-break:break-all">${esc(url)}</p></div>` }],
         pill: 'Livraison à Brazzaville', status: ['Commande en 1 minute · confirmation par téléphone', 'ok'] });
+      host.querySelectorAll('[data-promo]').forEach(c => c.onchange = async () => {
+        const { error } = await app.sb.from('promo_campaigns').update({ show_on_shop: c.checked, updated_at: new Date().toISOString() }).eq('id', c.dataset.promo);
+        if (error) { c.checked = !c.checked; return app.toast(X.explain(error), true); } app.toast(c.checked ? 'Promotion affichée sur la boutique.' : 'Promotion retirée de la boutique.');
+      });
+      host.querySelector('#heroDel')?.addEventListener('click', () => { host.querySelector('[name=hero_image_url]').value = ''; host.querySelector('#shopForm').requestSubmit(); });
+      host.querySelector('#heroFile')?.addEventListener('change', async e => {
+        const file = e.target.files?.[0]; if (!file) return;
+        if (!/^image\/(png|jpeg|webp)$/.test(file.type) || file.size > 5 * 1024 * 1024) return app.toast('Choisissez une image PNG, JPG ou WEBP de 5 Mo maximum.', true);
+        const path = `${app.state.user.id}/boutique-accueil-${Date.now()}.${file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg'}`;
+        const { error } = await app.sb.storage.from('myra-products').upload(path, file, { upsert: true, contentType: file.type, cacheControl: '86400' });
+        if (error) return app.toast('Envoi impossible : ' + X.explain(error), true);
+        host.querySelector('[name=hero_image_url]').value = app.sb.storage.from('myra-products').getPublicUrl(path).data.publicUrl;
+        host.querySelector('#shopForm').requestSubmit();
+      });
       host.querySelector('#shopForm').onsubmit = async e => {
         e.preventDefault(); const f = e.target;
-        const row = { id: true, is_open: f.is_open.checked, headline: f.headline.value.trim() || 'Le secret de nos marmites', intro: f.intro.value.trim() || ' ', delivery_info: f.delivery_info.value.trim() || ' ', min_order: Math.max(0, Number(f.min_order.value) || 0), whatsapp: f.whatsapp.value.trim() || null, updated_at: new Date().toISOString() };
+        const row = { id: true, is_open: f.is_open.checked, headline: f.headline.value.trim() || 'Le secret de nos marmites', intro: f.intro.value.trim() || ' ', delivery_info: f.delivery_info.value.trim() || ' ', min_order: Math.max(0, Number(f.min_order.value) || 0), whatsapp: f.whatsapp.value.trim() || null, announcement: f.announcement.value.trim() || null, hours: f.hours.value.trim() || null, hero_image_url: f.hero_image_url.value || null,
+          facebook_url: f.facebook_url.value.trim() || null, instagram_url: f.instagram_url.value.trim() || null, tiktok_url: f.tiktok_url.value.trim() || null, updated_at: new Date().toISOString() };
+        if ([row.facebook_url, row.instagram_url, row.tiktok_url].some(u => u && !/^https:\/\//.test(u))) return app.toast('Les liens des réseaux sociaux doivent commencer par https://', true);
         const { error } = await app.sb.from('shop_settings').upsert(row, { onConflict: 'id' }); if (error) return app.toast(X.explain(error), true);
         app.toast('Boutique mise à jour.'); EXT.pages.shop.render(host, app);
       };

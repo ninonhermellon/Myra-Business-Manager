@@ -10,6 +10,10 @@ with checks(nom, ok, detail) as (
       union all select 1 from pg_trigger where not tgisinternal and tgname in ('trg_myra_push_order','trg_myra_push_sale','trg_myra_push_payment','trg_myra_push_review','trg_myra_push_stock')
       union all select 1 from public.push_config where vapid_public is not null) x
   union all select 'Notifications : configuration illisible par les visiteurs et l''équipe', not has_table_privilege('anon', 'public.push_config', 'select') and not has_table_privilege('authenticated', 'public.push_config', 'select'), ''
+  union all select 'Centre de notifications, boutique enrichie, suivi (V36)', count(*) = 5, count(*)::text from (
+      select 1 from pg_tables where schemaname = 'public' and tablename in ('app_notifications','app_notification_reads')
+      union all select 1 from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'app_notifications'
+      union all select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname in ('get_public_order','check_public_promo') and has_function_privilege('anon', p.oid, 'execute')) x
   union all select 'Règles d''accès actives sur toutes les tables', count(*) = 0, coalesce(string_agg(tablename, ', '), '') from pg_tables where schemaname = 'public' and not rowsecurity
   union all select 'Clés étrangères toutes indexées', count(*) = 0, count(*)::text from pg_constraint c join pg_namespace n on n.oid = c.connamespace and n.nspname = 'public'
     where c.contype = 'f' and array_length(c.conkey, 1) = 1 and not exists (select 1 from pg_index i where i.indrelid = c.conrelid and i.indkey[0] = c.conkey[1])

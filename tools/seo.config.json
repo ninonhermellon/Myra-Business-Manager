@@ -17,15 +17,16 @@
       "jsonld": true
     },
     "commande.html": {
-      "path": "/boutique",
-      "title": "Commander · Les Saveurs de Myra",
-      "description": "Passez votre commande aux Saveurs de Myra : marinades et produits traditionnels faits maison, livrés à Brazzaville.",
-      "ogTitle": "Commander chez Les Saveurs de Myra",
-      "ogDescription": "Marinades et produits faits maison à Brazzaville. Commandez en ligne, nous vous livrons.",
+      "path": "/commande.html",
+      "title": "Suivre ma commande · Les Saveurs de Myra",
+      "description": "Suivez votre commande Les Saveurs de Myra en temps réel : confirmation, préparation, livraison. Il suffit du numéro de commande et de votre téléphone.",
+      "ogTitle": "Suivre ma commande · Les Saveurs de Myra",
+      "ogDescription": "Où en est votre commande ? Confirmation, préparation, livraison : suivez-la en un clic.",
       "image": "/assets/og/og-boutique.jpg",
       "imageAlt": "Commander chez Les Saveurs de Myra",
       "robots": "noindex, follow",
-      "type": "website"
+      "type": "website",
+      "noCanonical": true
     },
     "index.html": {
       "path": "/",

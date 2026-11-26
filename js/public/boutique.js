@@ -12,7 +12,7 @@
   const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
   const layer = $('#layer');
 
-  const S = { products: [], categories: [], shop: {}, company: {}, cat: '', q: '', cart: store.get('myra_shop_cart', []), wa: '' };
+  const S = { products: [], categories: [], shop: {}, company: {}, popular: [], promos: [], cat: '', q: '', limit: 12, cart: store.get('myra_shop_cart', []), wa: '', promo: null, promoCode: '' };
   const byId = id => S.products.find(p => p.id === id);
   const unitLabel = p => p.unit ? ` / ${esc(p.unit)}` : '';
   const stars = r => { const n = Math.round(Number(r) || 0); return '<span class="stars" aria-label="' + Number(r).toFixed(1) + ' sur 5">' + '★'.repeat(n) + '<i>' + '★'.repeat(5 - n) + '</i></span>'; };
@@ -100,8 +100,9 @@
     const me = store.get('myra_shop_me', {});
     const minDate = new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
     const el = sheet(`${closeBtn}<h2 class="sh-title">Finaliser ma commande</h2>
-      <div class="recap">${lines.map(l => `<div><span>${l.qty} × ${esc(l.p.name)}</span><b>${money(l.p.price * l.qty)}</b></div>`).join('')}<div class="recap-total"><span>Sous-total</span><b>${money(cartTotal())}</b></div></div>
+      <div class="recap" id="recap"></div>
       <form id="orderForm" novalidate>
+        <label class="fld" for="promoCode"><span>Code promo</span></label><div class="promo-fld"><input id="promoCode" name="promo" maxlength="30" autocomplete="off" placeholder="Facultatif" value="${esc(S.promoCode || '')}" class="fldx"><button type="button" class="btn btn-ghost btn-sm" id="promoApply">Appliquer</button></div><p class="promo-msg" id="promoMsg" hidden></p>
         <label class="fld"><span>Nom complet *</span><input name="name" autocomplete="name" required maxlength="120" value="${esc(me.name || '')}" placeholder="Ex. : Grâce Mabiala"></label>
         <div class="two">
           <label class="fld"><span>Téléphone *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required value="${esc(me.phone || '')}" placeholder="06 123 45 67"></label>
@@ -115,10 +116,29 @@
         </div>
         <label class="fld"><span>Remarque</span><textarea name="notes" rows="2" maxlength="500" placeholder="Heure préférée, précisions…"></textarea></label>
         <p class="form-err" id="formErr" role="alert" hidden></p>
-        <button type="submit" class="btn btn-green full" id="sendOrder"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Envoyer ma commande · ${money(cartTotal())}</button>
+        <button type="submit" class="btn btn-green full" id="sendOrder"></button>
         <p class="hint center">Aucun paiement en ligne : nous vous appelons pour confirmer le total et la livraison.</p>
       </form>`, 'side');
     const f = el.querySelector('#orderForm'), wa = f.elements.whatsapp, same = f.elements.same;
+    const due = () => Math.max(0, cartTotal() - (S.promo?.discount || 0));
+    const sendLabel = () => `<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Envoyer ma commande · ${money(due())}`;
+    const paintRecap = () => {
+      el.querySelector('#recap').innerHTML = cartLines().map(l => `<div><span>${l.qty} × ${esc(l.p.name)}</span><b>${money(l.p.price * l.qty)}</b></div>`).join('')
+        + (S.promo ? `<div class="disc"><span>Code ${esc(S.promo.code)} (${esc(S.promo.name)})</span><b>− ${money(S.promo.discount)}</b></div>` : '')
+        + `<div class="recap-total"><span>${S.promo ? 'Total des produits' : 'Sous-total'}</span><b>${money(due())}</b></div>`;
+      el.querySelector('#sendOrder').innerHTML = sendLabel();
+    };
+    const promoMsg = (txt, ok) => { const m = el.querySelector('#promoMsg'); m.textContent = txt; m.className = 'promo-msg ' + (ok ? 'ok' : 'bad'); m.hidden = !txt; };
+    async function applyPromo(silent) {
+      const code = el.querySelector('#promoCode').value.trim().toUpperCase(); S.promoCode = code;
+      if (!code) { S.promo = null; promoMsg(''); return paintRecap(); }
+      const { data, error } = await sb.rpc('check_public_promo', { p_code: code, p_subtotal: cartTotal() });
+      if (error || !data) { S.promo = null; if (!silent) promoMsg(/^[A-ZÀ-Ü]/.test(error?.message || '') && !/function|permission/i.test(error.message) ? error.message : 'Code promo indisponible pour le moment.', false); return paintRecap(); }
+      S.promo = { code: data.code, name: data.name, discount: Number(data.discount || 0) }; promoMsg(`Code appliqué : − ${money(S.promo.discount)}`, true); paintRecap();
+    }
+    el.querySelector('#promoApply').onclick = () => applyPromo(false);
+    el.querySelector('#promoCode').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); applyPromo(false); } });
+    paintRecap(); if (S.promoCode) applyPromo(true);
     const syncWa = () => { wa.closest('.fld').classList.toggle('dim', same.checked); wa.disabled = same.checked; if (same.checked) wa.value = ''; };
     same.onchange = syncWa; syncWa();
     f.addEventListener('input', e => { e.target.closest('.fld')?.classList.remove('bad'); el.querySelector('#formErr').hidden = true; });
@@ -134,16 +154,19 @@
       if ((v.address || '').trim().length < 3) return bad('address', 'Indiquez votre adresse de livraison.');
       const btn = el.querySelector('#sendOrder'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Envoi en cours…';
       const items = cartLines().map(l => ({ product_id: l.id, quantity: l.qty }));
-      const { data, error } = await sb.rpc('place_public_order', { p_name: v.name.trim(), p_phone: v.phone.trim(), p_whatsapp: same.checked ? '' : (v.whatsapp || '').trim(), p_address: v.address.trim(), p_zone: (v.zone || '').trim(), p_delivery_date: v.date || null, p_notes: (v.notes || '').trim(), p_items: items });
+      const args = { p_name: v.name.trim(), p_phone: v.phone.trim(), p_whatsapp: same.checked ? '' : (v.whatsapp || '').trim(), p_address: v.address.trim(), p_zone: (v.zone || '').trim(), p_delivery_date: v.date || null, p_notes: (v.notes || '').trim(), p_items: items };
+      if (S.promo) args.p_promo_code = S.promo.code;
+      const { data, error } = await sb.rpc('place_public_order', args);
       if (error || !data) {
-        btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Envoyer ma commande · ${money(cartTotal())}`;
+        btn.disabled = false; btn.innerHTML = sendLabel();
         const msg = error?.message || ''; const friendly = /^[A-ZÀ-Ü][^]*\.$/.test(msg) && !/function|permission|relation|schema|JWT|fetch/i.test(msg);
         err.textContent = friendly ? msg : (navigator.onLine ? 'La commande n’a pas pu être envoyée. Réessayez dans un instant, ou écrivez-nous sur WhatsApp.' : 'Pas de connexion Internet. Vérifiez votre connexion puis réessayez.');
         err.hidden = false; return;
       }
       store.set('myra_shop_me', { name: v.name.trim(), phone: v.phone.trim(), whatsapp: same.checked ? '' : (v.whatsapp || '').trim(), address: v.address.trim(), zone: (v.zone || '').trim() });
       const summary = cartLines().map(l => `• ${l.qty} × ${l.p.name}`).join('\n');
-      S.cart = []; saveCart();
+      try { const r = store.get('myra_shop_orders', []).filter(x => x !== data.order_number); r.unshift(data.order_number); localStorage.setItem('myra_shop_orders', JSON.stringify(r.slice(0, 6))); } catch (_) {}
+      S.cart = []; S.promo = null; S.promoCode = ''; saveCart();
       done(data, v, summary);
     };
   }
@@ -155,58 +178,123 @@
       <span class="ok-ico"><i class="fa-solid fa-check" aria-hidden="true"></i></span>
       <h2>Merci ${esc(v.name.trim().split(' ')[0])}, commande reçue !</h2>
       <p>Votre numéro de commande</p><p class="ok-num">${esc(r.order_number)}</p>
-      <p class="ok-total">Total des produits : <b>${money(r.total)}</b></p>
+      <p class="ok-total">Total des produits : <b>${money(r.total)}</b>${Number(r.discount) ? ` <small class="muted">(remise ${money(r.discount)} incluse)</small>` : ''}</p>
       <p class="muted">Nous vous appelons très vite au <b>${esc(v.phone.trim())}</b> pour confirmer la commande et la livraison.</p>
       ${link ? `<a class="btn btn-wa full" href="${esc(link)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Recevoir la confirmation sur WhatsApp</a>` : ''}
-      <button type="button" class="btn btn-line full" data-close>Continuer mes achats</button></div>`, 'side');
+      <a class="btn btn-line full" href="commande.html?n=${encodeURIComponent(r.order_number)}"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i> Suivre ma commande</a>
+      <button type="button" class="btn btn-ghost full" data-close>Continuer mes achats</button></div>`, 'side');
   }
 
   let toastT = null;
   function toast(msg) { let t = $('#toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); } t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
 
   /* ---------- Catalogue ---------- */
+  const card = (p, rank) => `<article class="card">
+      <button type="button" class="card-hit" data-open="${esc(p.id)}" aria-label="${esc(p.name)}, ${money(p.price)}"></button>
+      ${rank ? `<span class="rank" aria-hidden="true">${rank}</span>` : ''}
+      <div class="card-media">${thumb(p, 'card-img')}${!p.available ? '<span class="tag">Sur commande</span>' : p.is_new ? '<span class="tag new">Nouveau</span>' : ''}</div>
+      <div class="card-body">
+        ${p.category ? `<small class="card-cat">${esc(p.category)}</small>` : ''}
+        <h3>${esc(p.name)}</h3>
+        ${p.description && !rank ? `<p class="card-desc">${esc(p.description)}</p>` : ''}
+        ${p.reviews ? `<p class="card-rate">${stars(p.rating)} <span>${p.reviews} avis</span></p>` : ''}
+        <p class="price">${money(p.price)}<small>${p.unit ? '/ ' + esc(p.unit) : ''}</small></p>
+        ${S.shop.open !== false ? `<button type="button" class="add" data-add="${esc(p.id)}"><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Ajouter au panier</button>` : ''}
+      </div></article>`;
+  function bindCards(root) {
+    root.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openProduct(b.dataset.open));
+    root.querySelectorAll('[data-add]').forEach(b => b.onclick = e => {
+      e.stopPropagation(); const p = byId(b.dataset.add); addToCart(p.id, 1); toast(`${p.name} ajouté au panier`);
+      b.classList.add('done'); b.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i> Ajouté'; setTimeout(() => { b.classList.remove('done'); b.innerHTML = '<i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Ajouter au panier'; }, 1600);
+    });
+  }
+  function setCat(id, scroll) { S.cat = id; S.limit = 12; $('#searchCat').value = id; paintChips(); paintCats(); paintGrid(); if (scroll) $('#produits').scrollIntoView({ behavior: 'smooth' }); }
   function paintChips() {
     const chips = [['', 'Tout']].concat(S.categories.map(c => [c.id, c.name]));
     $('#chips').hidden = S.categories.length < 1;
     $('#chips').innerHTML = chips.map(([id, n]) => `<button type="button" role="tab" aria-selected="${S.cat === id}" class="chip ${S.cat === id ? 'on' : ''}" data-cat="${esc(id)}">${esc(n)}</button>`).join('');
-    $('#chips').querySelectorAll('[data-cat]').forEach(b => b.onclick = () => { S.cat = b.dataset.cat; paintChips(); paintGrid(); });
+    $('#chips').querySelectorAll('[data-cat]').forEach(b => b.onclick = () => setCat(b.dataset.cat));
+  }
+  function paintCats() {
+    const firstImg = id => (S.products.find(p => (!id || p.category_id === id) && p.image) || {}).image;
+    const tiles = S.categories.map(c => ({ id: c.id, name: c.name, img: c.image || firstImg(c.id), n: c.count ?? S.products.filter(p => p.category_id === c.id).length }));
+    const all = { id: '', name: 'Tous les produits', img: '', n: S.products.length, icon: 'fa-border-all' };
+    $('#cats').innerHTML = [...tiles, all].map(t => `<button type="button" class="cat ${S.cat === t.id ? 'on' : ''}" data-tile="${esc(t.id)}"><span class="cat-img">${t.img ? `<img src="${esc(t.img)}" alt="" loading="lazy">` : `<i class="fa-solid ${t.icon || 'fa-jar'}" aria-hidden="true"></i>`}</span><b>${esc(t.name)}</b><small>${t.n} produit${t.n > 1 ? 's' : ''}</small></button>`).join('');
+    $('#cats').querySelectorAll('[data-tile]').forEach(b => b.onclick = () => setCat(b.dataset.tile, true));
   }
   function paintGrid() {
     const q = S.q.trim().toLowerCase();
     const list = S.products.filter(p => (!S.cat || p.category_id === S.cat) && (!q || (p.name + ' ' + (p.description || '') + ' ' + (p.category || '')).toLowerCase().includes(q)));
-    $('#grid').innerHTML = list.map(p => `<article class="card">
-        <button type="button" class="card-hit" data-open="${esc(p.id)}" aria-label="${esc(p.name)}, ${money(p.price)}"></button>
-        <div class="card-media">${thumb(p, 'card-img')}${p.available ? '' : '<span class="tag">Sur commande</span>'}</div>
-        <div class="card-body">
-          ${p.category ? `<small class="card-cat">${esc(p.category)}</small>` : ''}
-          <h3>${esc(p.name)}</h3>
-          ${p.description ? `<p class="card-desc">${esc(p.description)}</p>` : ''}
-          ${p.reviews ? `<p class="card-rate">${stars(p.rating)} <span>${p.reviews}</span></p>` : ''}
-          <div class="card-foot"><p class="price">${money(p.price)}<small>${unitLabel(p)}</small></p><span class="add" aria-hidden="true"><i class="fa-solid fa-plus"></i></span></div>
-        </div></article>`).join('') || `<div class="none"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><p>${S.products.length ? 'Aucun produit ne correspond à votre recherche.' : 'Nos produits arrivent très bientôt.'}</p></div>`;
-    $('#grid').querySelectorAll('[data-open]').forEach(b => b.onclick = () => openProduct(b.dataset.open));
+    $('#grid').innerHTML = list.slice(0, S.limit).map(p => card(p)).join('') || `<div class="none"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><p>${S.products.length ? 'Aucun produit ne correspond à votre recherche.' : 'Nos produits arrivent très bientôt.'}</p></div>`;
+    $('#moreBtn').hidden = list.length <= S.limit; $('#moreBtn').textContent = `Voir plus (${list.length - S.limit})`;
+    $('#catSub').textContent = `${list.length} produit${list.length > 1 ? 's' : ''}${S.cat ? ' · ' + (S.categories.find(c => c.id === S.cat)?.name || '') : ''}`;
+    bindCards($('#grid'));
+  }
+  function paintHero() {
+    const art = $('#heroArt'), withImg = S.products.filter(p => p.image), minPrice = Math.min(...S.products.map(p => p.price).filter(Boolean));
+    const rated = S.products.filter(p => p.reviews); const avg = rated.length ? rated.reduce((n, p) => n + p.rating * p.reviews, 0) / rated.reduce((n, p) => n + p.reviews, 0) : 0;
+    let inner = '<div class="ha-bg"></div>';
+    if (S.shop.hero_image) inner += `<img class="ha-cover" src="${esc(S.shop.hero_image)}" alt="">`;
+    else if (withImg.length) inner += `<img class="ha-main" src="${esc(withImg[0].image)}" alt="">` + (withImg[1] ? `<img class="ha-side a" src="${esc(withImg[1].image)}" alt="">` : '') + (withImg[2] ? `<img class="ha-side b" src="${esc(withImg[2].image)}" alt="">` : '');
+    else inner += '<img class="ha-logo" src="assets/logo-les-saveurs-de-myra.png" alt="">';
+    if (isFinite(minPrice)) inner += `<div class="ha-badge">À partir de<b>${money(minPrice)}</b></div>`;
+    if (avg) inner += `<div class="ha-rate"><i class="fa-solid fa-star" aria-hidden="true"></i> ${avg.toFixed(1)} / 5 · ${rated.reduce((n, p) => n + p.reviews, 0)} avis</div>`;
+    art.innerHTML = inner;
+  }
+  const promoLabel = pr => pr.type === 'percent' ? `− ${Number(pr.value)} %` : `− ${money(pr.value)}`;
+  function usePromo(code) { S.promoCode = code; toast(`Code ${code} : il sera appliqué à votre commande`); $('#produits').scrollIntoView({ behavior: 'smooth' }); }
+  function paintPromos() {
+    const imgs = S.products.filter(p => p.image).map(p => p.image);
+    const banners = S.promos.slice(0, 2).map((pr, i) => ({ chip: promoLabel(pr) + (Number(pr.min_order) ? ` dès ${money(pr.min_order)}` : ''), title: pr.name, text: pr.description || 'Offre valable sur toute la boutique.', code: pr.code, img: imgs[i] || imgs[0] }));
+    const defaults = [{ chip: 'Fait maison', title: 'Le goût de la tradition', text: 'Recettes maison préparées avec soin, comme à la maison.', icon: 'fa-hand-holding-heart', img: imgs[0] }, { chip: 'Brazzaville', title: 'Livré chez vous', text: S.shop.delivery || 'Livraison à domicile, frais confirmés par téléphone.', icon: 'fa-motorcycle', img: imgs[1] }];
+    while (banners.length < 2) banners.push(defaults[banners.length]);
+    $('#promos').innerHTML = banners.map((b, i) => `<div class="promo ${i ? 'mint' : ''}"><div class="promo-txt"><span class="promo-chip">${esc(b.chip)}</span><h3>${esc(b.title)}</h3><p>${esc(b.text)}</p>${b.code ? `<span class="promo-code">${esc(b.code)}</span><button type="button" class="btn btn-green btn-sm" data-code="${esc(b.code)}">J’en profite <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>` : `<a class="btn btn-green btn-sm" href="#produits">Découvrir <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>`}</div>${b.img ? `<img class="promo-img" src="${esc(b.img)}" alt="" loading="lazy">` : `<i class="fa-solid ${b.icon || 'fa-tag'} promo-ico" aria-hidden="true"></i>`}</div>`).join('');
+    $('#promos').querySelectorAll('[data-code]').forEach(b => b.onclick = () => usePromo(b.dataset.code));
+    $('#navPromo').hidden = !S.promos.length;
+  }
+  let cdTimer = null;
+  function paintCountdown() {
+    clearInterval(cdTimer);
+    const pr = S.promos.filter(x => x.ends_at && new Date(x.ends_at) - Date.now() < 31 * 864e5).sort((a, b) => a.ends_at.localeCompare(b.ends_at))[0];
+    $('#compte').hidden = !pr; if (!pr) return;
+    const img = (S.products.find(p => p.image) || {}).image;
+    $('#countdown').innerHTML = `<div class="cd-card"><span class="promo-chip">${esc(promoLabel(pr))} · offre limitée</span><h2>${esc(pr.name)}</h2><p>${esc(pr.description || 'Profitez-en avant la fin de l’offre !')}</p><div class="cd" id="cd" role="timer" aria-live="off"></div><p class="muted">Code <span class="promo-code">${esc(pr.code)}</span></p><button type="button" class="btn btn-green" data-code="${esc(pr.code)}">J’en profite <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div><div class="cd-img">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : '<img src="assets/logo-les-saveurs-de-myra.png" alt="" style="width:50%;border-radius:50%">'}</div>`;
+    $('#countdown [data-code]').onclick = () => usePromo(pr.code);
+    const tick = () => { let t = Math.max(0, Math.floor((new Date(pr.ends_at) - Date.now()) / 1000)); const d = Math.floor(t / 86400); t %= 86400; const h = Math.floor(t / 3600); t %= 3600; const m = Math.floor(t / 60), sec = t % 60; const f = n => String(n).padStart(2, '0');
+      $('#cd').innerHTML = [[f(d), 'Jours'], [f(h), 'Heures'], [f(m), 'Minutes'], [f(sec), 'Secondes']].map(([v, l], i) => `${i ? '<span>:</span>' : ''}<div><b>${v}</b><small>${l}</small></div>`).join(''); if (!t) clearInterval(cdTimer); };
+    tick(); cdTimer = setInterval(tick, 1000);
+  }
+  function paintPopular() {
+    const list = S.popular.map(byId).filter(Boolean).slice(0, 4);
+    $('#populaires').hidden = !list.length; $('#navPop').hidden = !list.length; if (!list.length) return;
+    $('#popGrid').innerHTML = list.map((p, i) => card(p, i + 1)).join(''); bindCards($('#popGrid'));
   }
 
   function fill(data) {
     S.shop = data.shop || {}; S.company = data.company || {}; CUR = S.company.currency || 'FCFA';
-    S.categories = data.categories || [];
+    S.categories = data.categories || []; S.popular = data.popular || []; S.promos = data.promos || [];
     const cats = new Map(S.categories.map(c => [c.id, c.name]));
     S.products = (data.products || []).map(p => ({ ...p, price: Number(p.price || 0), category: cats.get(p.category_id) || '' }));
     const name = S.company.name || 'Les Saveurs de Myra';
     $('#shopName').textContent = name; $('#footName').textContent = name;
-    if (S.shop.headline) $('#heroTitle').textContent = S.shop.headline;
-    if (S.shop.intro) $('#heroIntro').textContent = S.shop.intro;
+    if (S.shop.headline) { const words = S.shop.headline.trim().split(/\s+/); const last = words.pop(); $('#heroTitle').innerHTML = `${esc(words.join(' '))} <span class="hl">${esc(last)}<svg viewBox="0 0 200 14" aria-hidden="true" preserveAspectRatio="none"><path d="M3 10 C 50 2, 120 2, 197 8" /></svg></span>`; }
+    if (S.shop.intro) { $('#heroIntro').textContent = S.shop.intro; $('#footIntro').textContent = S.shop.intro; }
+    if (S.shop.announcement) $('#annonce').innerHTML = `<i class="fa-solid fa-bullhorn" aria-hidden="true"></i>${esc(S.shop.announcement)}`;
     if (S.shop.delivery) $('#deliveryInfo').textContent = S.shop.delivery + (Number(S.shop.min_order) > 0 ? ` Minimum de commande : ${money(S.shop.min_order)}.` : '');
     S.wa = waNum(S.shop.whatsapp || S.company.phone);
-    if (S.wa) { const l = waLink('Bonjour, je souhaite passer une commande.'); ['#heroWa', '#waFloat'].forEach(s => { $(s).href = l; $(s).hidden = false; }); }
-    const contact = [S.company.phone && `<a href="tel:${esc(S.company.phone.replace(/\s/g, ''))}"><i class="fa-solid fa-phone" aria-hidden="true"></i> ${esc(S.company.phone)}</a>`,
-      S.wa && `<a href="${esc(waLink('Bonjour'))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp</a>`,
-      S.company.address && !/@/.test(S.company.address) && `<span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> ${esc(S.company.address)}</span>`].filter(Boolean);
-    $('#footContact').innerHTML = contact.join('');
+    if (S.wa) { const l = waLink('Bonjour, je souhaite passer une commande.'); ['#heroWa', '#waFloat', '#waTop', '#footWa'].forEach(s => { $(s).href = l; $(s).hidden = false; }); }
+    if (S.company.phone) { const a = $('#anPhone'); a.href = 'tel:' + S.company.phone.replace(/\s/g, ''); a.querySelector('span').textContent = S.company.phone; a.hidden = false; }
+    $('#footContact').innerHTML = [S.company.phone && `<li><a href="tel:${esc(S.company.phone.replace(/\s/g, ''))}"><i class="fa-solid fa-phone" aria-hidden="true"></i>${esc(S.company.phone)}</a></li>`,
+      S.wa && `<li><a href="${esc(waLink('Bonjour'))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i>WhatsApp</a></li>`,
+      S.company.email && `<li><a href="mailto:${esc(S.company.email)}"><i class="fa-regular fa-envelope" aria-hidden="true"></i>${esc(S.company.email)}</a></li>`,
+      S.company.address && !/@/.test(S.company.address) && `<li><i class="fa-solid fa-location-dot" aria-hidden="true"></i>${esc(S.company.address)}</li>`,
+      S.shop.hours && `<li><i class="fa-regular fa-clock" aria-hidden="true"></i>${esc(S.shop.hours)}</li>`].filter(Boolean).join('');
+    $('#socials').innerHTML = [['facebook', 'fa-facebook-f', 'Facebook'], ['instagram', 'fa-instagram', 'Instagram'], ['tiktok', 'fa-tiktok', 'TikTok']].filter(([k]) => /^https:\/\//.test(S.shop[k] || '')).map(([k, i, l]) => `<a href="${esc(S.shop[k])}" target="_blank" rel="noopener" aria-label="${l}"><i class="fa-brands ${i}" aria-hidden="true"></i></a>`).join('') + (S.wa ? `<a href="${esc(waLink('Bonjour'))}" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>` : '');
+    $('#searchCat').innerHTML = '<option value="">Toutes catégories</option>' + S.categories.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+    $('#searchCat').value = S.cat;
     $('#closedBanner').hidden = S.shop.open !== false;
-    $('#catSub').textContent = S.products.length ? `${S.products.length} produit${S.products.length > 1 ? 's' : ''} · touchez un produit pour le commander.` : 'Touchez un produit pour le commander.';
-    paintChips(); paintGrid(); paintCart(); productsJsonLd();
-    const deep = new URLSearchParams(location.search).get('p'); if (deep && byId(deep)) openProduct(deep);
+    paintHero(); paintCats(); paintPromos(); paintChips(); paintGrid(); paintCountdown(); paintPopular(); paintCart(); productsJsonLd();
+    const deep = new URLSearchParams(location.search).get('p'); if (deep && byId(deep) && !layer.firstChild) openProduct(deep);
   }
 
   /* Données structurées des produits (Google : nom, photo, prix, disponibilité) */
@@ -234,9 +322,13 @@
     store.set('myra_shop_catalog', data); fill(data);
   }
 
-  $('#search').addEventListener('input', e => { S.q = e.target.value; paintGrid(); });
+  $('#search').addEventListener('input', e => { S.q = e.target.value; S.limit = 12; paintGrid(); });
+  $('#searchForm').addEventListener('submit', e => { e.preventDefault(); S.q = $('#search').value; paintGrid(); $('#produits').scrollIntoView({ behavior: 'smooth' }); });
+  $('#searchCat').addEventListener('change', e => setCat(e.target.value, true));
+  $('#moreBtn').addEventListener('click', () => { S.limit += 12; paintGrid(); });
+  const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')];
+  addEventListener('scroll', () => { const y = scrollY + 170; let cur = navLinks[0]; navLinks.forEach(a => { const t = document.querySelector(a.getAttribute('href')); if (t && !t.hidden && t.offsetTop <= y) cur = a; }); navLinks.forEach(a => a.classList.toggle('on', a === cur)); }, { passive: true });
   $('#cartBtn').onclick = openCart; $('#cartBar').onclick = openCart;
   $('#year').textContent = new Date().getFullYear();
-  const bar = $('#bar'); addEventListener('scroll', () => bar.classList.toggle('scrolled', scrollY > 10), { passive: true });
   load();
 })();

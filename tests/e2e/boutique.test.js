@@ -17,7 +17,7 @@ srv.listen(0, async () => {
   const n0 = await page.$$eval('#grid .card', c => c.length); await page.click('.chip >> nth=1'); await page.waitForTimeout(200);
   const n1 = await page.$$eval('#grid .card', c => c.length); check('Filtre par catégorie', n1 > 0 && n1 < n0, `${n1}/${n0}`); await page.click('.chip >> nth=0');
   await page.fill('#search', 'bissap'); await page.waitForTimeout(150); const ns = await page.$$eval('#grid .card', c => c.length); check('Recherche', ns >= 1 && ns < n0, String(ns)); await page.fill('#search', '');
-  await page.evaluate(() => document.querySelector('#catalogue').scrollIntoView()); await page.waitForTimeout(300); await page.screenshot({ path: OUT + '/boutique-mobile-catalogue.png' });
+  await page.evaluate(() => document.querySelector('#produits').scrollIntoView()); await page.waitForTimeout(300); await page.screenshot({ path: OUT + '/boutique-mobile-catalogue.png' });
   // Fiche produit + quantité
   const saka = products.find(p => p.name.startsWith('Saka'));
   await page.click(`[data-open="${saka.id}"]`); await page.waitForTimeout(400);
@@ -51,6 +51,27 @@ srv.listen(0, async () => {
   check('Panier vidé après commande', !(await page.isVisible('#cartBar')) && (await page.evaluate(() => localStorage.getItem('myra_shop_cart'))) === '[]');
   await page.click('.ok [data-close]'); await page.click(`[data-open="${saka.id}"]`); await page.click('#pdBuy'); await page.waitForTimeout(300);
   check('Coordonnées pré-remplies à la commande suivante', (await page.inputValue('[name=name]')) === 'Grâce Mabiala' && (await page.inputValue('[name=address]')).startsWith('12 rue'));
+  // Nouveautés V36 : bouton sur la carte, tuiles de catégories, code promo, compte à rebours, plus commandés
+  check('Compte à rebours de la promotion affiché', await page.isVisible('#cd') && /Jours/.test(await page.textContent('#cd')));
+  check('Section « Les plus commandés »', (await page.$$('#popGrid .card')).length >= 1);
+  await page.keyboard.press('Escape').catch(() => {});
+  await page.evaluate(() => localStorage.setItem('myra_shop_cart', '[]')); await page.reload(); await page.waitForTimeout(1200);
+  await page.click(`#grid [data-add="${saka.id}"]`); await page.waitForTimeout(300);
+  check('« Ajouter au panier » directement depuis la carte', /1 article/.test(await page.textContent('#cartBarCount')));
+  const nAll = (await page.$$('#grid .card')).length; await page.click('#cats .cat >> nth=1'); await page.waitForTimeout(400);
+  const nCat = (await page.$$('#grid .card')).length; check('Tuile de catégorie : filtre les produits', nCat > 0 && nCat < nAll, `${nCat}/${nAll}`); await page.click('#cats .cat:last-child');
+  await page.click('#cartBar'); await page.waitForTimeout(300); await page.click('#toCheckout'); await page.waitForTimeout(300);
+  await page.fill('#promoCode', 'FETE10'); await page.click('#promoApply'); await page.waitForTimeout(500);
+  check('Code promo trop tôt : minimum d’achat signalé', /valable dès/.test(await page.textContent('#promoMsg')));
+  await page.keyboard.press('Escape'); await page.click(`#grid [data-add="${saka.id}"]`); await page.click(`#grid [data-add="${saka.id}"]`); await page.waitForTimeout(200);
+  await page.click('#cartBar'); await page.waitForTimeout(300); await page.click('#toCheckout'); await page.waitForTimeout(300);
+  await page.fill('#promoCode', 'fete10'); await page.click('#promoApply'); await page.waitForTimeout(500);
+  const recap = await page.textContent('#recap'); check('Code promo appliqué : remise de 10 % dans le récapitulatif', /FETE10/.test(recap) && /1\s?350/.test(recap), recap.replace(/\s+/g, ' ').slice(0, 120));
+  await page.screenshot({ path: OUT + '/boutique-mobile-promo.png' });
+  const nb = DB.customer_orders.length; await page.click('#sendOrder'); await page.waitForTimeout(1200);
+  const po = DB.customer_orders[0]; check('Commande avec code promo : remise enregistrée par le serveur', DB.customer_orders.length === nb + 1 && po.discount === 1350 && po.total === 12150, `${po.discount} / ${po.total}`);
+  check('Confirmation : lien « Suivre ma commande »', /commande\.html\?n=WEB-/.test(await page.getAttribute('.ok a[href*="commande.html"]', 'href') || ''));
+  await page.click('.ok [data-close]');
   // Boutique fermée
   DB.shop_settings[0].open = false; await page.evaluate(() => localStorage.removeItem('myra_shop_catalog')); await page.reload(); await page.waitForTimeout(1200);
   await page.click(`[data-open="${saka.id}"]`); await page.waitForTimeout(300);
@@ -66,13 +87,13 @@ srv.listen(0, async () => {
   const dctx = await b.newContext({ viewport: { width: 1366, height: 860 }, serviceWorkers: 'block' }); await setup(dctx, 'visitor');
   const d = await dctx.newPage(); const derrs = []; d.on('pageerror', e => derrs.push(e.message));
   await d.goto(base + 'boutique.html'); await d.waitForTimeout(1500); await d.screenshot({ path: OUT + '/boutique-pc-accueil.png' });
-  await d.evaluate(() => document.querySelector('#catalogue').scrollIntoView()); await d.waitForTimeout(300); await d.screenshot({ path: OUT + '/boutique-pc-catalogue.png' });
+  await d.evaluate(() => document.querySelector('#produits').scrollIntoView()); await d.waitForTimeout(300); await d.screenshot({ path: OUT + '/boutique-pc-catalogue.png' });
   await d.click(`[data-open="${saka.id}"]`); await d.waitForTimeout(400); await d.screenshot({ path: OUT + '/boutique-pc-produit.png' });
   await d.click('#pdBuy'); await d.waitForTimeout(400); await d.screenshot({ path: OUT + '/boutique-pc-commande.png' });
   await d.keyboard.press('Escape'); await d.waitForTimeout(200);
   check('Ordinateur : Échap ferme la fenêtre', !(await d.$('.sheet')));
   check('Aucune erreur JavaScript (ordinateur)', derrs.length === 0, derrs.join(' | '));
-  const pubLog = REQLOG.slice(); check('Seules les 2 fonctions publiques sont appelées', pubLog.filter(r => /^RPC|^GET|^POST|^PATCH|^DELETE/.test(r)).every(r => /get_public_catalog|place_public_order/.test(r)), REQLOG.filter(r => !/get_public_catalog|place_public_order/.test(r)).slice(0, 5).join(' | '));
+  const pubLog = REQLOG.slice(); check('Seules les 2 fonctions publiques sont appelées', pubLog.filter(r => /^RPC|^GET|^POST|^PATCH|^DELETE/.test(r)).every(r => /get_public_catalog|place_public_order|check_public_promo/.test(r)), REQLOG.filter(r => !/get_public_catalog|place_public_order/.test(r)).slice(0, 5).join(' | '));
   await dctx.close();
   // ---- Côté équipe : écran Boutique en ligne + badge dans Commandes
   const actx = await b.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block' }); await setup(actx, true);
