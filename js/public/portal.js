@@ -7,12 +7,12 @@
   const STATUS = { confirmed: ['À payer', 'warn'], partially_paid: ['Partiellement payée', 'warn'], paid: ['Payée', 'ok'] };
   const fail = msg => { app.innerHTML = `<section class="pub-card pub-center"><i class="fa-solid fa-link-slash pub-big-ico" aria-hidden="true"></i><h1>Lien indisponible</h1><p>${esc(msg)}</p><p class="muted">Demandez un nouveau lien aux Saveurs de Myra.</p></section>`; };
   const token = new URLSearchParams(location.search).get('t') || '';
-  if (token.length < 40) return fail('Ce lien est incomplet.');
+  if (token.length < 40) { app.innerHTML = window.MyraLanding ? window.MyraLanding('client') : ''; if (window.MyraLanding) return; return fail('Ce lien est incomplet.'); }
   const cfg = window.MYRA_CONFIG || {};
   const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 
   sb.rpc('get_customer_portal', { p_token: token }).then(({ data, error }) => {
-    if (error || !data) return fail(/expir|invalide/i.test(error?.message || '') ? 'Ce lien a expiré ou a été désactivé.' : 'Impossible de charger votre espace pour le moment. Réessayez dans un instant.');
+    if (error || !data) { const expired = /expir|invalide/i.test(error?.message || ''); if (expired && window.MyraLanding) { app.innerHTML = window.MyraLanding('client', 'Ce lien a expiré ou a été désactivé. Demandez-nous un nouveau lien sur WhatsApp : c’est immédiat.'); return; } return fail(expired ? 'Ce lien a expiré ou a été désactivé.' : 'Impossible de charger votre espace pour le moment. Réessayez dans un instant.'); }
     const c = data.company || {}, cur = c.currency || 'FCFA', sales = data.sales || [];
     const waNum = (() => { let d = String(c.phone || '').replace(/\D/g, ''); if (!d) return ''; if (d.startsWith('00')) d = d.slice(2); else if (!d.startsWith('242') && (d.startsWith('0') || d.length <= 9)) d = '242' + d; return d; })();
     const wa = waNum ? 'https://wa.me/' + waNum : '';

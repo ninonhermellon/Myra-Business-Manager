@@ -57,3 +57,13 @@ body{background:#fff}
 .pub-stars button{transition:transform .12s}
 .pub-stars button:hover{transform:scale(1.08)}
 .pub-foot{color:var(--muted);text-align:center;margin-top:24px}
+
+/* Accueil des pages personnelles sans lien */
+.landing{padding:34px 22px 26px}
+.land-ico{display:inline-grid;place-items:center;width:96px;height:96px;border-radius:50%;background:#d9f0e0;color:var(--green);font-size:38px;margin-bottom:14px}
+.landing h1{margin-bottom:8px}
+.landing>p{color:var(--ink-2);margin:0 auto;max-width:460px}
+.land-list{list-style:none;margin:20px auto 22px;padding:0;max-width:380px;text-align:left;display:grid;gap:10px}
+.land-list li{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--cream-2);font-weight:600;font-size:14.5px}
+.land-list i{color:var(--leaf);width:20px;text-align:center}
+.land-actions{display:grid;gap:10px;max-width:380px;margin:0 auto}

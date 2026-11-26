@@ -23,3 +23,10 @@ de 07 h 00 à 17 h 30**. Elles apparaissent sur la boutique, les pages publiques
 - Sur ordinateur, rien ne change : menu en ligne, bandeau, recherche visible.
 
 Cache PWA v27. Tests : boutique 36/36, V36 26/26, audit 49/49.
+
+## Espace client et avis ouverts sans lien personnel
+Ces deux pages sont personnelles : elles s'ouvrent avec le lien `…?t=…` envoyé au client sur WhatsApp.
+Ouvertes sans ce lien (ou avec un lien expiré), elles affichent maintenant une page d'accueil utile au lieu d'une
+erreur : ce que contient l'espace, bouton « Recevoir mon lien sur WhatsApp » / « Donner mon avis sur WhatsApp »
+(message prérempli vers le 069007022), « Suivre une commande » et « Voir la boutique ».
+Pour tester avec un vrai lien : Relation client › Espace client en ligne › Envoyer (ou Avis clients › Demander).

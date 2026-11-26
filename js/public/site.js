@@ -30,6 +30,30 @@
     window.MyraSite = { wa, link, company: c, shop: s };
     document.dispatchEvent(new CustomEvent('myra:site', { detail: window.MyraSite }));
   }
+  /* Accueil utile quand la page est ouverte sans lien personnel (ou avec un lien expiré) */
+  const WA_DEFAULT = '242069007022';
+  window.MyraLanding = (kind, reason) => {
+    let c = null; try { c = JSON.parse(localStorage.getItem('myra_shop_catalog') || 'null'); } catch (_) {}
+    const wa = window.MyraSite?.wa || waNum(c?.shop?.whatsapp || c?.company?.phone) || WA_DEFAULT;
+    const waLink = t => `https://wa.me/${wa}?text=${encodeURIComponent(t)}`;
+    const K = kind === 'avis' ? {
+      ico: 'fa-star', title: reason ? 'Lien d’avis indisponible' : 'Votre avis compte',
+      text: reason || 'Après chaque livraison, nous vous envoyons sur WhatsApp un lien pour noter votre commande en 10 secondes.',
+      points: [['fa-star', 'Notez de 1 à 5 étoiles'], ['fa-comment', 'Ajoutez un commentaire si vous le souhaitez'], ['fa-heart', 'Vous nous aidez à mieux vous servir']],
+      main: ['Donner mon avis sur WhatsApp', 'Bonjour Les Saveurs de Myra, voici mon avis sur ma commande : ']
+    } : {
+      ico: 'fa-user-lock', title: reason ? 'Lien expiré ou désactivé' : 'Votre espace client',
+      text: reason || 'Cet espace est personnel : il s’ouvre uniquement avec le lien que nous vous envoyons sur WhatsApp.',
+      points: [['fa-file-invoice', 'Vos factures et leur détail'], ['fa-hand-holding-dollar', 'Ce qu’il vous reste à payer'], ['fa-gift', 'Vos points fidélité']],
+      main: ['Recevoir mon lien sur WhatsApp', 'Bonjour Les Saveurs de Myra, pouvez-vous m’envoyer le lien de mon espace client ? Mon nom : ']
+    };
+    return `<section class="pub-card pub-center landing"><span class="land-ico"><i class="fa-solid ${K.ico}" aria-hidden="true"></i></span><h1>${esc(K.title)}</h1><p>${esc(K.text)}</p>
+      <ul class="land-list">${K.points.map(([i, t]) => `<li><i class="fa-solid ${i}" aria-hidden="true"></i>${esc(t)}</li>`).join('')}</ul>
+      <div class="land-actions"><a class="btn btn-wa full" href="${esc(waLink(K.main[1]))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> ${esc(K.main[0])}</a>
+      <a class="btn btn-ghost full" href="commande.html"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i> Suivre une commande</a>
+      <a class="btn btn-green full" href="boutique.html"><i class="fa-solid fa-store" aria-hidden="true"></i> Voir la boutique</a></div></section>`;
+  };
+
   let cached = null; try { cached = JSON.parse(localStorage.getItem('myra_shop_catalog') || 'null'); } catch (_) {}
   if (cached) apply(cached);
   const cfg = window.MYRA_CONFIG || {};

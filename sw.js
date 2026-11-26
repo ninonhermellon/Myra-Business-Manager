@@ -1,6 +1,6 @@
 /* Myra Business Manager — cache applicatif résilient */
-const CACHE_NAME = 'myra-manager-shell-v27';
-const RUNTIME_CACHE = 'myra-manager-runtime-v27';
+const CACHE_NAME = 'myra-manager-shell-v28';
+const RUNTIME_CACHE = 'myra-manager-runtime-v28';
 const APP_SHELL = [
   './', './index.html', './manifest.webmanifest', './css/styles.css', './css/ux.css', './css/pro.css', './css/v28.css', './css/mobile.css', './vendor/fontawesome-6.5.2/css/all.min.css', './vendor/fontawesome-6.5.2/webfonts/fa-solid-900.woff2', './vendor/fontawesome-6.5.2/webfonts/fa-regular-400.woff2', './vendor/fontawesome-6.5.2/webfonts/fa-brands-400.woff2',
   './vendor/supabase-js-2.118.0.min.js', './css/ext.css', './vendor/qrcode-generator-1.4.4/qrcode.js', './js/doc-kit.js', './js/ext/core.js', './js/ext/tracabilite.js', './js/ext/b2b.js', './js/ext/evenements.js', './js/ext/equipe.js', './js/ext/lieux.js', './js/ext/intelligence.js', './js/ext/activation.js', './js/ext/relation.js', './js/ext/pilotage.js', './js/ext/confort.js', './js/ext/boutique.js', './js/ext/notifications.js', './js/ext/notifcenter.js', './js/ext/espace.js', './js/config.js', './js/app.js', './loyverse.html', './js/pwa.js', './js/ui-kit.js', './js/shell.js',

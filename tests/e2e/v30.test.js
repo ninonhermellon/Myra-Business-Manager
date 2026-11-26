@@ -15,7 +15,7 @@ srv.listen(0, async () => {
   await pp.click('.pub-sale-head'); await pp.waitForTimeout(200);
   check('Espace client : détail d’une facture', await pp.isVisible('.pub-sale-body table'));
   await pp.goto(base + 'client.html?t=' + 'z'.repeat(64)); await pp.waitForTimeout(1200);
-  check('Espace client : faux lien refusé', /Lien indisponible/.test(await pp.textContent('#app')));
+  check('Espace client : faux lien refusé', /Lien indisponible|Lien expiré/.test(await pp.textContent('#app')));
   await pp.goto(base + 'avis.html?t=' + 'c'.repeat(64)); await pp.waitForTimeout(1200);
   await pp.screenshot({ path: OUT + '/public-avis.png' });
   await pp.click('[data-n="5"]'); await pp.fill('#comment', 'Parfait !'); await pp.click('#send'); await pp.waitForTimeout(800);

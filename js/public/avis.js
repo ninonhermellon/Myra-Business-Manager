@@ -4,13 +4,13 @@
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const token = new URLSearchParams(location.search).get('t') || '';
   const box = (ico, title, text) => `<section class="pub-card pub-center"><i class="fa-solid ${ico} pub-big-ico" aria-hidden="true"></i><h1>${title}</h1><p>${text}</p></section>`;
-  if (token.length < 40) { app.innerHTML = box('fa-link-slash', 'Lien incomplet', 'Ouvrez le lien reçu sur WhatsApp en entier.'); return; }
+  if (token.length < 40) { app.innerHTML = window.MyraLanding ? window.MyraLanding('avis') : box('fa-link-slash', 'Lien incomplet', 'Ouvrez le lien reçu sur WhatsApp en entier.'); return; }
   const cfg = window.MYRA_CONFIG || {};
   const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
   const thanks = () => { app.innerHTML = box('fa-heart', 'Merci beaucoup !', 'Votre avis a bien été envoyé. Il nous aide à mieux vous servir.'); };
 
   sb.rpc('get_review_request', { p_token: token }).then(({ data, error }) => {
-    if (error || !data) { app.innerHTML = box('fa-link-slash', 'Lien indisponible', 'Ce lien n’existe pas ou plus.'); return; }
+    if (error || !data) { app.innerHTML = window.MyraLanding ? window.MyraLanding('avis', 'Ce lien n’existe pas ou plus. Vous pouvez nous donner votre avis directement sur WhatsApp.') : box('fa-link-slash', 'Lien indisponible', 'Ce lien n’existe pas ou plus.'); return; }
     if (data.submitted) { app.innerHTML = box('fa-circle-check', 'Avis déjà envoyé', `Merci, vous avez déjà donné votre avis (${'★'.repeat(data.rating || 0)}).`); return; }
     let rating = 0;
     app.innerHTML = `<section class="pub-card"><header class="pub-head"><img src="assets/logo-les-saveurs-de-myra.png" alt="" class="pub-logo"><div><small>${esc(data.company || 'Les Saveurs de Myra')}</small><h1>${data.customer ? 'Bonjour ' + esc(data.customer) + ' !' : 'Bonjour !'}</h1></div></header>
