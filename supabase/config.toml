@@ -3,3 +3,6 @@ verify_jwt = true
 
 [functions.loyverse-webhook]
 verify_jwt = false
+
+[functions.myra-push]
+verify_jwt = false
