@@ -209,3 +209,18 @@ body.has-cartbar .wa-float{bottom:92px}
   body.has-cartbar .wa-float{bottom:96px;right:24px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Finitions petits écrans (≤ 380 px) : nom complet, panier en icône */
+@media (max-width:380px){
+  .bar{padding:8px 12px;gap:8px}
+  .bar-brand img{width:38px;height:38px}
+  .bar-brand b{font-size:16px}
+  .bar-brand small{display:none}
+  .bar-cart{padding:0;width:46px;justify-content:center}
+  .bar-cart span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .hero{margin:6px 12px 0;border-radius:22px}
+  .hero-inner{padding:26px 18px 22px}
+  .steps,.catalogue,.delivery,.closed-banner{margin-left:12px;margin-right:12px}
+  .grid{gap:10px}
+  .card-body{padding:9px 10px 11px}
+  .price{font-size:15px}
+}

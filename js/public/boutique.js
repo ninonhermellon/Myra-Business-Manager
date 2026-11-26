@@ -205,8 +205,22 @@
     $('#footContact').innerHTML = contact.join('');
     $('#closedBanner').hidden = S.shop.open !== false;
     $('#catSub').textContent = S.products.length ? `${S.products.length} produit${S.products.length > 1 ? 's' : ''} · touchez un produit pour le commander.` : 'Touchez un produit pour le commander.';
-    paintChips(); paintGrid(); paintCart();
+    paintChips(); paintGrid(); paintCart(); productsJsonLd();
     const deep = new URLSearchParams(location.search).get('p'); if (deep && byId(deep)) openProduct(deep);
+  }
+
+  /* Données structurées des produits (Google : nom, photo, prix, disponibilité) */
+  function productsJsonLd() {
+    const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+    const data = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Produits ' + (S.company.name || 'Les Saveurs de Myra'),
+      itemListElement: S.products.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, item: {
+        '@type': 'Product', name: p.name, description: p.description || undefined, image: p.image || undefined, category: p.category || undefined,
+        url: base + 'boutique.html?p=' + encodeURIComponent(p.id),
+        aggregateRating: p.reviews ? { '@type': 'AggregateRating', ratingValue: Number(p.rating).toFixed(1), reviewCount: p.reviews } : undefined,
+        offers: { '@type': 'Offer', price: Number(p.price).toFixed(0), priceCurrency: 'XAF', availability: p.available ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder', areaServed: 'Brazzaville' } } })) };
+    let el = document.getElementById('productsLd');
+    if (!el) { el = document.createElement('script'); el.type = 'application/ld+json'; el.id = 'productsLd'; document.head.appendChild(el); }
+    el.textContent = JSON.stringify(data);
   }
 
   async function load() {

@@ -40,3 +40,15 @@ body{margin:0;background:#f2f4f3;color:#0f1a14;font:15px/1.5 'DM Sans',system-ui
 .pub-field textarea{border:1px solid #dfe5e1;border-radius:12px;padding:10px;font-size:15px;font-family:inherit;resize:vertical}
 .pub-err{color:#a3302a;text-align:center;min-height:1em}
 @media (prefers-color-scheme:dark){body{background:#0f1411;color:#e8efe9}.pub-card,.pub-kpi{background:#18201b;box-shadow:none}.pub-sale-body th,.pub-sale-body td{border-color:#26302a}.pub-btn.light{background:#26302a;color:#cfe8d7}.pub-field textarea{background:#0f1411;color:#e8efe9;border-color:#26302a}}
+/* Finitions petits écrans (≤ 400 px) */
+.pub-sale-head b,.pub-right b,.pub-kpi b{white-space:nowrap}
+.pub-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right}
+@media (max-width:400px){
+  .pub{padding:16px 12px 32px}
+  .pub-kpis{grid-template-columns:1fr 1fr;gap:8px}
+  .pub-kpis .pub-kpi:first-child{grid-column:1/-1}
+  .pub-kpi b{font-size:16px}
+  .pub-sale-head{flex-wrap:wrap;padding:12px 14px}
+  .pub-sale-head>span:first-child{flex:1 1 150px;min-width:0}
+  .pub-sale-head b{font-size:14.5px}
+}

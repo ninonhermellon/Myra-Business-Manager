@@ -1,0 +1,7 @@
+# Les Saveurs de Myra
+# Seule la boutique est destinée aux moteurs de recherche ; les autres pages portent « noindex ».
+# (Pas de « Disallow » : les aperçus WhatsApp / Facebook doivent pouvoir lire toutes les pages.)
+User-agent: *
+Allow: /
+
+Sitemap: https://lessaveursdemyra.vercel.app/sitemap.xml
