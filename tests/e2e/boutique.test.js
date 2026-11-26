@@ -94,7 +94,7 @@ srv.listen(0, async () => {
   await d.keyboard.press('Escape'); await d.waitForTimeout(200);
   check('Ordinateur : Échap ferme la fenêtre', !(await d.$('.sheet')));
   check('Aucune erreur JavaScript (ordinateur)', derrs.length === 0, derrs.join(' | '));
-  const pubLog = REQLOG.slice(); check('Seules les 2 fonctions publiques sont appelées', pubLog.filter(r => /^RPC|^GET|^POST|^PATCH|^DELETE/.test(r)).every(r => /get_public_catalog|place_public_order|check_public_promo/.test(r)), REQLOG.filter(r => !/get_public_catalog|place_public_order/.test(r)).slice(0, 5).join(' | '));
+  const pubLog = REQLOG.slice(); check('Seules les 2 fonctions publiques sont appelées', pubLog.filter(r => /^RPC|^GET|^POST|^PATCH|^DELETE/.test(r)).every(r => /get_public_catalog|place_public_order|check_public_promo|get_product_reviews/.test(r)), REQLOG.filter(r => !/get_public_catalog|place_public_order/.test(r)).slice(0, 5).join(' | '));
   await dctx.close();
   // ---- Côté équipe : écran Boutique en ligne + badge dans Commandes
   const actx = await b.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block' }); await setup(actx, true);

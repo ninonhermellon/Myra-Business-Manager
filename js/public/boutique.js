@@ -76,11 +76,48 @@
           <button type="button" class="btn btn-line" id="pdAdd"><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Ajouter au panier</button>
           <button type="button" class="btn btn-green" id="pdBuy">Commander · <b id="pdTotal">${money(p.price)}</b></button>
         </div>` : `<a class="btn btn-green full" href="${esc(waLink(`Bonjour, je souhaite commander : ${p.name}`))}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Commander sur WhatsApp</a>`}
+        <section class="pd-rev" id="pdReviews" aria-label="Avis clients"><div class="rv-head"><h3>Avis clients</h3><button type="button" class="btn btn-ghost btn-sm" id="pdRate"><i class="fa-regular fa-star" aria-hidden="true"></i> Donner mon avis</button></div><div id="rvBody"><p class="muted">Chargement des avis…</p></div></section>
       </div>`, 'pd');
+    loadReviews(p, el);
     if (!open) return;
     bindStepper(el, v => { qty = v; el.querySelector('#pdTotal').textContent = money(p.price * v); });
     el.querySelector('#pdAdd').onclick = () => { addToCart(p.id, qty); close(); toast(`${p.name} ajouté au panier`); };
     el.querySelector('#pdBuy').onclick = () => { addToCart(p.id, qty); openCheckout(); };
+  }
+
+  /* ---------- Avis clients (fiche produit) ---------- */
+  async function loadReviews(p, el) {
+    const A = window.MyraAvis, body = el.querySelector('#rvBody'); if (!A || !body) return;
+    el.querySelector('#pdRate').onclick = () => openReviewForm(p);
+    const { data, error } = await sb.rpc('get_product_reviews', { p_product_id: p.id });
+    if (!body.isConnected) return;
+    if (error || !data) { body.innerHTML = '<p class="muted">Avis indisponibles pour le moment.</p>'; return; }
+    body.innerHTML = A.summary(data.summary) + `<div class="rv-list">${A.list(data.reviews)}</div>`;
+  }
+  function openReviewForm(p) {
+    const A = window.MyraAvis; const me = store.get('myra_shop_me', {});
+    const el = sheet(`${closeBtn}<h2 class="sh-title">Votre avis</h2><p class="rv-prod">${thumb(p, 'ln-img')}<span><small>Vous notez</small><b>${esc(p.name)}</b></span></p>
+      <form id="rvForm" novalidate>${A.CRITERIA.map(A.starInput).join('')}
+        <label class="fld"><span>Votre commentaire</span><textarea name="comment" rows="3" maxlength="1000" placeholder="Ce que vous avez aimé, ce que nous pouvons améliorer…"></textarea></label>
+        <div class="two"><label class="fld"><span>Prénom *</span><input name="name" autocomplete="given-name" maxlength="80" value="${esc((me.name || '').split(' ')[0] || '')}" required></label>
+        <label class="fld"><span>Téléphone *</span><input name="phone" type="tel" inputmode="tel" value="${esc(me.phone || '')}" placeholder="Jamais affiché" required></label></div>
+        <p class="hint">Seuls votre prénom et l’initiale de votre nom sont publiés. Le téléphone sert à vérifier votre achat (badge « Achat vérifié »).</p>
+        <p class="form-err" id="rvErr" role="alert" hidden></p>
+        <button type="submit" class="btn btn-green full" id="rvSend"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Publier mon avis</button></form>`, 'side');
+    const get = A.bind(el); const f = el.querySelector('#rvForm'), err = el.querySelector('#rvErr');
+    f.onsubmit = async e => {
+      e.preventDefault(); err.hidden = true; const v = Object.fromEntries(new FormData(f)); const d = get();
+      const bad = m => { err.textContent = m; err.hidden = false; };
+      if (!d.product) return bad('Touchez une étoile pour noter le produit.');
+      if ((v.name || '').trim().length < 2) return bad('Indiquez votre prénom.');
+      if (String(v.phone || '').replace(/\D/g, '').length < 8) return bad('Indiquez votre numéro de téléphone.');
+      const btn = el.querySelector('#rvSend'); btn.disabled = true;
+      const { data, error } = await sb.rpc('submit_product_review', { p_product_id: p.id, p_name: v.name.trim(), p_phone: v.phone.trim(), p_details: d, p_comment: (v.comment || '').trim() || null });
+      btn.disabled = false;
+      if (error || !data) { const m = error?.message || ''; return bad(/^[A-ZÀ-Ü][^]*[.!]$/.test(m) && !/function|permission|schema/i.test(m) ? m : 'Avis non envoyé. Réessayez dans un instant.'); }
+      sheet(`${closeBtn}<div class="ok"><span class="ok-ico"><i class="fa-solid fa-heart" aria-hidden="true"></i></span><h2>Merci ${esc(v.name.trim())} !</h2><p>Votre avis sur <b>${esc(p.name)}</b> est publié${data.verified ? ' avec le badge « Achat vérifié »' : ''}.</p><p class="muted">Il nous aide à améliorer nos produits et notre service.</p><button type="button" class="btn btn-green full" id="rvBack">Revoir le produit</button></div>`, 'side');
+      layer.querySelector('#rvBack').onclick = () => { load(); openProduct(p.id); };
+    };
   }
 
   function openCart() {

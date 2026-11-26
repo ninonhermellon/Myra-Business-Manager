@@ -197,3 +197,34 @@ h1,h2,h3{font-family:var(--head);line-height:1.12;margin:0;letter-spacing:-.015e
 /* Le flou d'arrière-plan transforme l'en-tête en « conteneur » des éléments fixes : désactivé sur téléphone pour que le menu occupe tout l'écran */
 @media (max-width:860px){.top{backdrop-filter:none;-webkit-backdrop-filter:none;background:#fff}}
 @media (max-width:860px){.nav-foot .btn-wa{background:#1fa855!important;color:#fff!important;font-weight:700}.nav-foot .btn-wa i{color:#fff;width:auto}.nav-foot .nav-tel{background:#fff!important}}
+
+/* V37 — Avis clients (boutique, avis.html) */
+.rv-stars{color:#e6a700;letter-spacing:1px;white-space:nowrap}.rv-stars i{color:#d9ddd5;font-style:normal}.rv-stars.sm{font-size:13px}
+.rv-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:22px 0 12px;padding-top:16px;border-top:1px solid var(--line)}
+.rv-head h3{font-family:var(--head);font-size:21px}
+.rv-sum{display:flex;gap:18px;align-items:center;padding:14px;border-radius:16px;background:var(--cream-2)}
+.rv-big{display:flex;flex-direction:column;align-items:center;min-width:92px}.rv-big b{font:700 38px var(--head);color:var(--green);line-height:1}.rv-big small{color:var(--muted);font-size:12.5px;margin-top:4px}
+.rv-bars{flex:1;display:grid;gap:4px}
+.rv-bar{display:grid;grid-template-columns:28px 1fr 22px;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.rv-bar i{height:8px;border-radius:9px;background:#e8e9e2;overflow:hidden}.rv-bar i b{display:block;height:100%;background:#e6a700;border-radius:9px}
+.rv-crits{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 14px;margin:12px 2px}
+.rv-c{display:flex;align-items:center;gap:6px;font-size:13px}.rv-c span{flex:1;color:var(--ink-2)}.rv-c b{font-size:12.5px}
+.rv-list{display:grid;gap:10px;margin-top:12px}
+.rv-item{border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.rv-item header{display:flex;gap:10px;align-items:center}
+.rv-item header>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}
+.rv-item header b{font-size:14px}.rv-item header small{color:var(--muted);font-size:12px}
+.rv-ok{font-style:normal;color:#2f9e4f;font-size:11.5px;font-weight:700}
+.rv-av{flex:none;width:36px;height:36px;border-radius:50%;background:var(--lime);color:var(--green);display:grid;place-items:center;font-weight:800}
+.rv-item p{margin:8px 0 0;color:var(--ink-2);font-size:14.5px;white-space:pre-line}
+.rv-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.rv-tags span{font-size:11.5px;background:var(--cream-2);border-radius:99px;padding:3px 9px;color:var(--ink-2)}
+.rv-reply{margin-top:10px;padding:10px 12px;border-left:3px solid var(--leaf);background:#f6faef;border-radius:0 12px 12px 0;font-size:13.5px;color:var(--ink-2)}.rv-reply b{display:block;color:var(--green);font-size:12.5px;margin-bottom:2px}
+.rv-empty{text-align:center;padding:18px;border-radius:16px;background:var(--cream-2)}.rv-empty b{display:block}.rv-empty span{color:var(--muted);font-size:14px}
+.rv-prod{display:flex;gap:12px;align-items:center;margin:0 0 14px;padding:10px;border-radius:16px;background:var(--cream-2)}.rv-prod .ln-img,.rv-prod .ph{width:54px;height:54px;border-radius:12px;object-fit:contain;background:#fff}.rv-prod span{display:flex;flex-direction:column}.rv-prod small{color:var(--muted)}
+.rv-crit{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.rv-crit-t b{display:block;font-size:15px}.rv-crit-t small{color:var(--muted);font-size:12.5px}
+.rv-pick{display:flex;gap:2px}.rv-pick button{width:38px;height:38px;border:0;background:none;font-size:27px;line-height:1;color:#d9ddd5;cursor:pointer;padding:0;transition:transform .1s}.rv-pick button.on{color:#e6a700}.rv-pick button:active{transform:scale(1.2)}
+.rv-word{grid-column:1/-1;justify-self:end;font-size:12px;color:var(--muted);margin-top:-4px}
+#rvForm .fld:first-of-type{margin-top:14px}
+@media (max-width:420px){.rv-crit{grid-template-columns:1fr}.rv-pick{justify-content:flex-start}.rv-word{justify-self:start}.rv-pick button{width:44px;height:44px;font-size:30px}}
+@media (max-width:860px){.hide-m{display:none!important}}

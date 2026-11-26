@@ -292,3 +292,23 @@ input.switch:focus-visible{outline:3px solid #71990e;outline-offset:2px}
 .shop-hero-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:6px}
 .shop-hero-row img{width:140px;height:90px;object-fit:cover;border-radius:12px;border:1px solid #e3e8e4}
 .shop-promo code{font-size:12px;background:#f1f4f2;padding:1px 6px;border-radius:6px}
+
+/* V37 — Avis clients */
+.av-crit{display:grid;gap:10px}
+.av-c{display:grid;grid-template-columns:34px 92px 1fr 40px 64px;align-items:center;gap:10px}
+.av-ico{width:34px;height:34px;border-radius:10px;background:#eef5dc;color:#0d4426;display:grid;place-items:center}
+.av-bar{height:10px;border-radius:9px;background:#eef1ee;overflow:hidden}.av-bar i{display:block;height:100%;border-radius:9px;background:#b7c2ba}
+.av-bar i.ok{background:#2f9e4f}.av-bar i.warn{background:#e0a100}.av-bar i.bad{background:#c0392b}
+.av-v{font-weight:800;text-align:right}.av-c small{color:#7b887f;font-size:12px}
+.av-item{border:1px solid #eef1ee;border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.av-item.low{border-color:#f3c9c4;background:#fffafa}.av-item.off{opacity:.55}
+.av-top{display:flex;gap:10px;align-items:center}
+.av-av{flex:none;width:38px;height:38px;border-radius:50%;background:#e3f1e8;color:#0d4426;display:grid;place-items:center;font-weight:800}
+.av-who{flex:1;min-width:0;display:flex;flex-direction:column}.av-who small{color:#7b887f;font-size:12px}
+.av-com{margin:8px 0 0;white-space:pre-line}
+.av-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.av-tags span{font-size:11.5px;background:#f4f7f2;border-radius:99px;padding:3px 9px}
+.av-reply{margin-top:8px;padding:8px 12px;border-left:3px solid #71990e;background:#f6faef;border-radius:0 10px 10px 0;font-size:13px}.av-reply b{display:block;font-size:12px;color:#0d4426}
+.av-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.av-q{margin:8px 0 12px;padding:10px 12px;background:#f6f8f6;border-radius:12px}
+@media (max-width:640px){.av-c{grid-template-columns:30px 1fr 40px;row-gap:4px}.av-c .av-bar{grid-column:2/4;grid-row:2}.av-c small{display:none}}
+.m-row.av-more{display:none}

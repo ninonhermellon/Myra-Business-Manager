@@ -14,6 +14,10 @@ with checks(nom, ok, detail) as (
       select 1 from pg_tables where schemaname = 'public' and tablename in ('app_notifications','app_notification_reads')
       union all select 1 from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'app_notifications'
       union all select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname in ('get_public_order','check_public_promo') and has_function_privilege('anon', p.oid, 'execute')) x
+  union all select 'Avis détaillés : table boutique, critères, fonctions publiques (V37)', count(*) = 4, count(*)::text from (
+      select 1 from pg_tables where schemaname = 'public' and tablename = 'product_reviews'
+      union all select 1 from information_schema.columns where table_schema = 'public' and table_name = 'order_reviews' and column_name = 'rating_after_sales'
+      union all select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname in ('submit_product_review','get_product_reviews') and has_function_privilege('anon', p.oid, 'execute')) x
   union all select 'Règles d''accès actives sur toutes les tables', count(*) = 0, coalesce(string_agg(tablename, ', '), '') from pg_tables where schemaname = 'public' and not rowsecurity
   union all select 'Clés étrangères toutes indexées', count(*) = 0, count(*)::text from pg_constraint c join pg_namespace n on n.oid = c.connamespace and n.nspname = 'public'
     where c.contype = 'f' and array_length(c.conkey, 1) = 1 and not exists (select 1 from pg_index i where i.indrelid = c.conrelid and i.indkey[0] = c.conkey[1])

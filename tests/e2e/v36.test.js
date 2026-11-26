@@ -77,7 +77,7 @@ srv.listen(0, async () => {
   const tx = await q.textContent('#result'); const nSteps = (await q.$$('.tl li')).length; check('Suivi : état, étapes, articles, montants', /Étape [1-6] sur 6/.test(tx) && nSteps === 6 && tx.includes(products[0].name) && /Total/.test(tx), `${nSteps} étapes · ${tx.replace(/\s+/g, ' ').slice(150, 420)}`);
   await q.screenshot({ path: OUT + '/suivi-mobile.png', fullPage: true });
   await q.goto(base + 'avis.html?t=' + 'c'.repeat(64)); await q.waitForTimeout(1500);
-  check('Avis : même en-tête que la boutique', await q.isVisible('header.top .brand') && await q.isVisible('.pub-stars'));
+  check('Avis : même en-tête que la boutique', await q.isVisible('header.top .brand') && await q.isVisible('.rv-crit'));
   await q.screenshot({ path: OUT + '/avis-mobile.png', fullPage: true });
   await q.goto(base + 'client.html?t=' + 'a'.repeat(64)); await q.waitForTimeout(1500);
   check('Espace client : même en-tête que la boutique', await q.isVisible('header.top .brand') && /Reste à payer/.test(await q.textContent('#app')));
