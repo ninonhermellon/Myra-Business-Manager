@@ -79,7 +79,9 @@
         if (error) return app.toast(X.explain(error), true);
         b.parentElement.querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
       });
-      host.querySelector('#pyPrint').onclick = () => X.printHtml('Paie ' + month, `<h1>État de paie — ${new Date(month).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h1><table><thead><tr><th>Employé</th><th>Poste</th><th class="r">Salaire</th><th class="r">Jours</th><th class="r">Absences</th><th class="r">Avances</th><th class="r">Net</th><th>Signature</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.e.full_name)}</td><td>${esc(r.e.job_title || '')}</td><td class="r">${money(r.e.monthly_salary)}</td><td class="r">${num(r.present)}</td><td class="r">${r.absent}</td><td class="r">${money(r.advances)}</td><td class="r"><b>${money(r.net)}</b></td><td style="width:30mm"></td></tr>`).join('')}<tr><th colspan="6" class="r">Total net</th><th class="r">${money(rows.reduce((n, r) => n + r.net, 0))}</th><th></th></tr></tbody></table>`);
+      host.querySelector('#pyPrint').onclick = () => X.printDoc({ title: 'Paie ' + month, kicker: 'État de paie', subtitle: new Date(month).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }), wide: true,
+        sections: [{ title: rows.length + ' employé(s)', table: { head: ['Employé', 'Poste', 'Salaire', 'Jours', 'Absences', 'Avances', 'Net à payer', 'Signature'], align: ['', '', 'r', 'r', 'r', 'r', 'r', ''], rows: rows.map(r => [r.e.full_name, r.e.job_title || '', money(r.e.monthly_salary), num(r.present), String(r.absent), money(r.advances), money(r.net), '']), foot: ['Total', '', '', '', '', '', money(rows.reduce((n, r) => n + r.net, 0)), ''] } }],
+        pill: 'Total net · ' + money(rows.reduce((n, r) => n + r.net, 0)), signatures: ['Le responsable', 'Visa comptabilité'] });
     }
   };
 })();

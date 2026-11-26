@@ -47,14 +47,23 @@
     }
   };
   async function printQuote(e) {
-    const app = A(); let c = {}; try { c = await app.getCompanyDocumentInfo(); } catch (_) {}
-    let cust = null; if (e.customer_id) { const r = await app.sb.from('customers').select('full_name,phone,address').eq('id', e.customer_id).maybeSingle(); cust = r.data; }
-    const rest = Math.max(0, Number(e.total_amount) - Number(e.deposit_paid));
-    X.printHtml('Devis traiteur', `<div style="display:flex;justify-content:space-between;gap:20px;align-items:flex-start"><div>${c.logo ? `<img src="${esc(c.logo)}" alt="" style="height:60px">` : ''}<h1>${esc(c.name || 'Les Saveurs de Myra')}</h1><div class="muted">${esc(c.address || '')}${c.phone ? ' · ' + esc(c.phone) : ''}</div></div><div style="text-align:right"><h1>${e.status === 'quote' ? 'DEVIS' : 'CONFIRMATION'} TRAITEUR</h1><div class="muted">Émis le ${fdate(new Date())}</div></div></div>
-      <h2 style="margin:24px 0 6px">${esc(e.title)}</h2><div>${esc(EXT.labels[e.event_type] || '')} · ${new Date(e.event_date).toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' })}${e.location ? ' · ' + esc(e.location) : ''}</div>${cust ? `<div class="muted">Client : ${esc(cust.full_name)}${cust.phone ? ' · ' + esc(cust.phone) : ''}</div>` : ''}
-      ${e.menu ? `<h3>Menu</h3><div style="white-space:pre-line">${esc(e.menu)}</div>` : ''}
-      <table style="margin-top:18px"><thead><tr><th>Désignation</th><th class="r">Quantité</th><th class="r">Prix unitaire</th><th class="r">Montant</th></tr></thead><tbody><tr><td>Prestation traiteur par personne</td><td class="r">${num(e.guests)}</td><td class="r">${money(e.price_per_guest)}</td><td class="r">${money(e.guests * e.price_per_guest)}</td></tr>${Number(e.extra_fees) ? `<tr><td>Frais supplémentaires (service, transport, matériel)</td><td class="r">1</td><td class="r">${money(e.extra_fees)}</td><td class="r">${money(e.extra_fees)}</td></tr>` : ''}<tr><th colspan="3" class="r">Total</th><th class="r">${money(e.total_amount)}</th></tr><tr><td colspan="3" class="r">Acompte demandé</td><td class="r">${money(e.deposit_amount)}</td></tr><tr><td colspan="3" class="r">Acompte reçu</td><td class="r">${money(e.deposit_paid)}</td></tr><tr><th colspan="3" class="r">Reste à payer</th><th class="r">${money(rest)}</th></tr></tbody></table>
-      <p class="muted" style="margin-top:18px">Devis valable 15 jours. La réservation de la date est confirmée à réception de l’acompte.</p><p style="margin-top:40px">Bon pour accord, date et signature du client :</p>`);
+    const app = A(); let cust = null;
+    if (e.customer_id) { const r = await app.sb.from('customers').select('full_name,phone,address').eq('id', e.customer_id).maybeSingle(); cust = r.data; }
+    const rest = Math.max(0, Number(e.total_amount) - Number(e.deposit_paid)), quote = e.status === 'quote';
+    const when = new Date(e.event_date).toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' });
+    X.printDoc({ title: 'Devis traiteur', kicker: quote ? 'Devis traiteur' : 'Confirmation traiteur', subtitle: e.title,
+      itemsTitle: 'Prestation',
+      items: [{ name: 'Prestation traiteur par personne', meta: EXT.labels[e.event_type] || 'Traiteur', qty: e.guests, price: e.price_per_guest, total: e.guests * e.price_per_guest },
+        ...(Number(e.extra_fees) ? [{ name: 'Frais supplémentaires', meta: 'Service, transport, matériel', qty: 1, price: e.extra_fees, total: e.extra_fees }] : [])],
+      parties: [{ label: 'Client', main: cust?.full_name || '—', lines: [cust?.phone, cust?.address] }, { label: 'Événement', main: EXT.labels[e.event_type] || e.title, lines: [when, e.location] }],
+      blocks: [['Émis le', fdate(new Date())], ['Validité', '15 jours'], ['Invités', String(e.guests)]],
+      sections: e.menu ? [{ title: 'Menu', text: e.menu }] : [],
+      totals: [['Acompte demandé', money(e.deposit_amount)], ['Acompte reçu', money(e.deposit_paid)]],
+      grand: ['Total', money(e.total_amount)], rest: rest > 0 ? ['Reste à payer', money(rest), 'due'] : ['Prestation soldée', '✓', 'ok'],
+      pill: (quote ? 'Total du devis · ' : 'Reste à payer · ') + money(quote ? e.total_amount : rest),
+      status: quote ? ['Date réservée à réception de l’acompte', 'warn'] : ['Réservation confirmée — merci !', 'ok'],
+      notice: ['Conditions', 'Devis valable 15 jours. La réservation de la date est confirmée à réception de l’acompte.'],
+      signatures: ['Bon pour accord — date et signature du client'] });
   }
 
   /* ---------- 8. Bons cadeaux ---------- */
@@ -83,9 +92,12 @@
     }
   };
   async function printCard(g) {
-    let c = {}; try { c = await A().getCompanyDocumentInfo(); } catch (_) {}
-    X.printHtml('Bon cadeau ' + g.code, `<div class="gc"><div><small>${esc(c.name || 'Les Saveurs de Myra')}</small><h1>Bon cadeau</h1><div class="amt">${money(g.initial_amount)}</div>${g.buyer_name ? `<div>Offert par ${esc(g.buyer_name)}</div>` : ''}<div class="code">${esc(g.code)}</div>${g.expires_at ? `<div class="muted">Valable jusqu’au ${fdate(g.expires_at)}</div>` : ''}</div><div class="qr">${X.qrSvg(g.code, 4)}</div></div>`, `.gc{max-width:150mm;margin:10mm auto;padding:10mm;border-radius:6mm;background:linear-gradient(135deg,#0d4426,#1f7a45);color:#fff;display:flex;justify-content:space-between;gap:8mm;align-items:center}.gc h1{font-size:22pt;margin:2mm 0}.gc .amt{font-size:26pt;font-weight:800;margin:3mm 0}.gc .code{font:700 14pt monospace;letter-spacing:1px;margin-top:4mm}.gc .muted{color:#cfe8d7}.qr{background:#fff;padding:3mm;border-radius:3mm}.qr svg{width:32mm;height:32mm;display:block}`);
+    X.printDoc({ title: 'Bon cadeau ' + g.code, kicker: 'Bon cadeau', subtitle: g.buyer_name ? 'Offert par ' + g.buyer_name : 'Un moment de saveurs à partager',
+      sections: [{ html: `<div style="text-align:center;padding:6px 0 2px"><div style="font-size:34px;font-weight:700;letter-spacing:-.02em">${money(g.initial_amount)}</div><div style="width:150px;margin:14px auto 6px">${X.qrSvg(g.code, 4)}</div><div style="font:600 16px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em">${esc(g.code)}</div></div>` },
+        { title: 'Récapitulatif', soft: true, rows: [['Valeur', money(g.initial_amount)], ['Code', g.code], ['Valable jusqu’au', g.expires_at ? fdate(g.expires_at) : 'Sans limite'], ['Offert par', g.buyer_name || '']] }],
+      pill: 'Valeur · ' + money(g.initial_amount), status: ['Présentez ce bon lors de votre achat', 'ok'] });
   }
+
   async function useCard(g) {
     const app = A();
     const m = X.modal('Utiliser le bon ' + g.code, `<p>Solde disponible : <b>${money(g.balance)}</b></p><div class="form-grid"><label class="field">Montant utilisé (FCFA)<input name="amount" type="number" min="1" max="${Number(g.balance)}" value="${Number(g.balance)}" required></label><label class="field">Note<input name="note" placeholder="Ex. vente du 12/03"></label></div><p class="muted">Pour une vente, utilisez plutôt le champ « Bon cadeau » du formulaire de vente : la remise et le débit du bon sont alors faits ensemble.</p>`, `<button type="button" class="btn light" data-close>Annuler</button><button class="btn primary" type="submit">Débiter le bon</button>`, { form: true });

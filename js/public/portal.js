@@ -30,9 +30,14 @@
     app.querySelectorAll('[data-print]').forEach(b => b.onclick = () => {
       const s = sales[Number(b.dataset.print)];
       const w = window.open('', '_blank'); if (!w) return;
-      w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Facture ${esc(s.number)}</title><style>body{font:13px/1.5 Arial,sans-serif;color:#14231a;margin:24px}h1{margin:0}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{padding:8px;border-bottom:1px solid #e3e9e4;text-align:left}.r{text-align:right}.tot td{font-weight:700}button{margin-top:18px;padding:10px 16px;border:0;border-radius:10px;background:#0d4426;color:#fff;font-weight:700}@media print{button{display:none}}</style></head><body><h1>${esc(c.name || 'Les Saveurs de Myra')}</h1><div>${esc([c.address, c.phone].filter(Boolean).join(' · '))}</div><h2>Facture ${esc(s.number)}</h2><div>Date : ${fdate(s.date)} · Client : ${esc(data.customer?.name || '')}</div><table><thead><tr><th>Article</th><th class="r">Qté</th><th class="r">Prix</th><th class="r">Montant</th></tr></thead><tbody>${(s.items || []).map(it => `<tr><td>${esc(it.name)}</td><td class="r">${Number(it.quantity)}</td><td class="r">${money(it.price, cur)}</td><td class="r">${money(it.total, cur)}</td></tr>`).join('')}${Number(s.discount) ? `<tr><td colspan="3">Remise</td><td class="r">− ${money(s.discount, cur)}</td></tr>` : ''}${Number(s.shipping) ? `<tr><td colspan="3">Livraison</td><td class="r">${money(s.shipping, cur)}</td></tr>` : ''}<tr class="tot"><td colspan="3">Total</td><td class="r">${money(s.total, cur)}</td></tr><tr><td colspan="3">Déjà payé</td><td class="r">${money(s.paid, cur)}</td></tr><tr class="tot"><td colspan="3">Reste à payer</td><td class="r">${money(Math.max(0, s.total - s.paid), cur)}</td></tr></tbody></table><button id="printBtn">Imprimer / Enregistrer en PDF</button></body></html>`);
-      w.document.close();
-      w.document.getElementById('printBtn').addEventListener('click', () => w.print());
+      const due = Math.max(0, s.total - s.paid), m = v => money(v, cur);
+      window.MyraDoc.write(w, { company: c, title: 'Facture ' + s.number, kicker: 'Facture', subtitle: 'N° ' + s.number,
+        itemsTitle: 'Articles', items: (s.items || []).map(it => ({ name: it.name, unit: it.unit, qty: it.quantity, price: it.price, total: it.total })),
+        parties: [{ label: 'Client', main: data.customer?.name || '—' }], blocks: [['Date', fdate(s.date)]],
+        totals: [...(Number(s.discount) ? [['Remise', '− ' + m(s.discount)]] : []), ...(Number(s.shipping) ? [['Livraison', m(s.shipping)]] : []), ['Déjà payé', m(s.paid)]],
+        grand: ['Total', m(s.total)], rest: due > 0 ? ['Reste à payer', m(due), 'due'] : ['Facture soldée', '✓', 'ok'],
+        pill: due > 0 ? 'Reste à payer · ' + m(due) : 'Total · ' + m(s.total),
+        status: due > 0 ? ['Facture · en attente de paiement', 'warn'] : ['Facture · payée — merci !', 'ok'] });
     });
   });
 })();

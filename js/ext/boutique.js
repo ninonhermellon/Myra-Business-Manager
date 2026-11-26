@@ -57,7 +57,9 @@
         }), 'Aucune commande en ligne pour le moment. Partagez le lien de votre boutique !')
         + `<p class="muted" style="margin-top:8px">Les commandes en ligne arrivent en <b>Brouillon</b> dans <b>Commandes</b> : appelez le client, ajoutez les frais de livraison si besoin, puis confirmez.</p>`;
       host.querySelector('#shopCopy').onclick = () => copy(url);
-      host.querySelector('#shopPrint').onclick = () => X.printHtml('Boutique en ligne', `<div style="text-align:center;font-family:sans-serif;padding:30px"><img src="${esc(new URL('assets/logo-les-saveurs-de-myra.png', location.href).href)}" style="width:140px"><h1 style="color:#0d4426;font-size:34px;margin:16px 0 4px">Commandez en ligne</h1><p style="font-size:18px">Scannez ce code avec votre téléphone</p><div style="width:280px;margin:16px auto">${X.qrSvg(url, 8)}</div><p style="font-size:15px;color:#555">${esc(url)}</p></div>`);
+      host.querySelector('#shopPrint').onclick = () => X.printDoc({ title: 'Boutique en ligne', kicker: 'Commandez en ligne', subtitle: 'Scannez ce code avec votre téléphone',
+        sections: [{ html: `<div style="text-align:center;padding:10px 0"><div style="width:250px;margin:0 auto">${X.qrSvg(url, 8)}</div><p style="color:#7b807d;font-size:13px;margin:12px 0 0;word-break:break-all">${esc(url)}</p></div>` }],
+        pill: 'Livraison à Brazzaville', status: ['Commande en 1 minute · confirmation par téléphone', 'ok'] });
       host.querySelector('#shopForm').onsubmit = async e => {
         e.preventDefault(); const f = e.target;
         const row = { id: true, is_open: f.is_open.checked, headline: f.headline.value.trim() || 'Le secret de nos marmites', intro: f.intro.value.trim() || ' ', delivery_info: f.delivery_info.value.trim() || ' ', min_order: Math.max(0, Number(f.min_order.value) || 0), whatsapp: f.whatsapp.value.trim() || null, updated_at: new Date().toISOString() };

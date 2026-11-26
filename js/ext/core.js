@@ -80,12 +80,21 @@
     const q = window.qrcode(0, 'M'); q.addData(String(text)); q.make(); return q.createSvgTag(cell, 0);
   }
 
-  /* Impression dans une fenêtre dédiée (mêmes règles que les factures). */
+  /* Documents imprimables : tous passent par le gabarit unique MyraDoc (js/doc-kit.js). */
+  async function printDoc(d) {
+    const app = A(); const win = app?.openPrintWindow ? app.openPrintWindow() : window.open('', '_blank');
+    if (!win) { app?.toast('Autorisez les fenêtres pour imprimer.', true); return; }
+    let c = {}; try { c = await app.getCompanyDocumentInfo(); } catch (_) {}
+    window.MyraDoc.write(win, { company: c, ...d });
+  }
+  /* Planches brutes (étiquettes adhésives) : mise en page fixe au millimètre, hors gabarit. */
   function printHtml(title, inner, css = '') {
-    const w = window.open('', '_blank'); if (!w) { A().toast('Autorisez les fenêtres pour imprimer.', true); return; }
+    const w = A()?.openPrintWindow ? A().openPrintWindow() : window.open('', '_blank'); if (!w) { A().toast('Autorisez les fenêtres pour imprimer.', true); return; }
     w.document.open();
-    w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(title)}</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{font:13px/1.45 'DM Sans',Arial,sans-serif;color:#14231a;margin:24px}h1{font-size:20px;margin:0 0 4px}table{width:100%;border-collapse:collapse}th,td{padding:7px 8px;border-bottom:1px solid #e3e9e4;text-align:left}th{font-size:11px;text-transform:uppercase;color:#6b7a70}.r{text-align:right}.muted{color:#6b7a70}.actions{margin:18px 0}.actions button{padding:9px 16px;border:0;border-radius:10px;background:#0d4426;color:#fff;font-weight:700;cursor:pointer}@media print{.actions{display:none}body{margin:8mm}}${css}</style></head><body>${inner}<div class="actions"><button onclick="window.print()">Imprimer / Enregistrer en PDF</button></div></body></html>`);
+    w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(title)}</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{font:13px/1.45 Inter,'DM Sans',Arial,sans-serif;color:#1b1e1c;margin:0}.bar{position:sticky;top:0;display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;background:#f3f4f3}.bar button{font:500 13.5px Inter,Arial,sans-serif;border:1px solid #dcdfdc;background:#fff;border-radius:999px;padding:9px 18px;cursor:pointer}.bar .dark{background:#171a18;color:#fff;border-color:#171a18}@media print{.bar{display:none}}${css}</style></head><body><div class="bar"><button type="button" id="mdClose">Fermer</button><button type="button" class="dark" id="mdPrint">Imprimer / PDF</button></div>${inner}</body></html>`);
     w.document.close();
+    w.document.getElementById('mdPrint').onclick = () => { w.focus(); w.print(); };
+    w.document.getElementById('mdClose').onclick = () => { if (w.__myraPrintFrame) w.__myraPrintFrame.remove(); else w.close(); };
   }
 
   /* Lecture de codes-barres / QR par la caméra (API BarcodeDetector du navigateur). */
@@ -141,5 +150,5 @@
 
   const waNumber = phone => { let d = String(phone || '').replace(/\D/g, ''); if (!d) return ''; if (d.startsWith('00')) d = d.slice(2); else if (!d.startsWith('242') && (d.startsWith('0') || d.length <= 9)) d = '242' + d; return d; };
 
-  window.MyraX = { loadKeyed, isMissing, EXT, A, whenReady, addField, isReady: () => v29, esc, money, num, fdate, iso, today, monthStart, addDays, daysBetween, on, menu, load, explain, errorPanel, loading, modal, head, kpis, table, qrSvg, printHtml, scan, findProduct, waNumber };
+  window.MyraX = { loadKeyed, isMissing, EXT, A, whenReady, addField, isReady: () => v29, esc, money, num, fdate, iso, today, monthStart, addDays, daysBetween, on, menu, load, explain, errorPanel, loading, modal, head, kpis, table, qrSvg, printHtml, printDoc, scan, findProduct, waNumber };
 })();
