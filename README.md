@@ -157,3 +157,12 @@ Limites importantes : les workflows financiers et les actions métier de stock/p
 - Reprise d'une vente si son insertion a réussi côté serveur mais que la réponse réseau a été perdue : recherche du numéro de vente déjà créé avant toute nouvelle insertion.
 
 Limites : la synchronisation n'est pas un moteur temps réel partagé entre appareils ; chaque appareil conserve sa propre file locale. La détection des conflits sur modifications existantes reste optimiste et au niveau de la fiche. Les lignes `purchase_order_items` ne disposent pas encore d'un formulaire de saisie hors connexion dédié ; l'ordonnanceur sait gérer des références parent-enfant pour les enregistrements mis en file, mais le workflow multi-lignes d'achat reste à développer. Les validations métier de stock, réception et production restent en ligne.
+
+## Version 32 — Connecteur Loyverse (socle sécurisé)
+- Migration additive `supabase/myra_v32_loyverse.sql` : paramètres, correspondances d'identifiants, inbox Webhooks et file de synchronisation idempotente.
+- Edge Function `loyverse-api` : test de connexion authentifié, rôle administrateur requis, jeton conservé côté serveur.
+- Edge Function `loyverse-webhook` : réception et déduplication des événements Loyverse avant accusé 2xx.
+- Page de contrôle `/loyverse.html`.
+- Politique `myra_wins` : les notifications Loyverse ne remplacent jamais automatiquement les données maîtres de Myra.
+
+**Limite explicite :** cette livraison prépare et sécurise le canal de synchronisation mais n'active pas encore la réplication métier automatique. Le mapping des articles, clients, reçus, paiements et stocks doit être finalisé après vérification du schéma réel Supabase et des magasins Loyverse. Voir `docs/IMPLEMENTATION-LOYVERSE-V32.md`.

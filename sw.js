@@ -1,9 +1,9 @@
 /* Myra Business Manager — cache applicatif résilient */
-const CACHE_NAME = 'myra-manager-shell-v21';
-const RUNTIME_CACHE = 'myra-manager-runtime-v21';
+const CACHE_NAME = 'myra-manager-shell-v22';
+const RUNTIME_CACHE = 'myra-manager-runtime-v22';
 const APP_SHELL = [
   './', './index.html', './manifest.webmanifest', './css/styles.css', './css/ux.css', './css/pro.css', './css/v28.css', './css/mobile.css', './vendor/fontawesome-6.5.2/css/all.min.css', './vendor/fontawesome-6.5.2/webfonts/fa-solid-900.woff2', './vendor/fontawesome-6.5.2/webfonts/fa-regular-400.woff2', './vendor/fontawesome-6.5.2/webfonts/fa-brands-400.woff2',
-  './vendor/supabase-js-2.118.0.min.js', './css/ext.css', './vendor/qrcode-generator-1.4.4/qrcode.js', './js/ext/core.js', './js/ext/tracabilite.js', './js/ext/b2b.js', './js/ext/evenements.js', './js/ext/equipe.js', './js/ext/lieux.js', './js/ext/intelligence.js', './js/ext/activation.js', './js/ext/relation.js', './js/ext/pilotage.js', './js/ext/confort.js', './js/ext/boutique.js', './js/config.js', './js/app.js', './js/pwa.js', './js/ui-kit.js', './js/shell.js',
+  './vendor/supabase-js-2.118.0.min.js', './css/ext.css', './vendor/qrcode-generator-1.4.4/qrcode.js', './js/ext/core.js', './js/ext/tracabilite.js', './js/ext/b2b.js', './js/ext/evenements.js', './js/ext/equipe.js', './js/ext/lieux.js', './js/ext/intelligence.js', './js/ext/activation.js', './js/ext/relation.js', './js/ext/pilotage.js', './js/ext/confort.js', './js/ext/boutique.js', './js/config.js', './js/app.js', './loyverse.html', './js/pwa.js', './js/ui-kit.js', './js/shell.js',
   './assets/favicon.png', './assets/logo-les-saveurs-de-myra.png'
 ];
 self.addEventListener('install', event => {
