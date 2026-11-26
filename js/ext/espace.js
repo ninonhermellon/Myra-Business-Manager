@@ -3,7 +3,7 @@
   const X = window.MyraX, { EXT, A, esc, money, fdate } = X;
   const ROLES = { owner: 'Propriétaire', super_admin: 'Super administrateur', admin: 'Administrateur', manager: 'Gérant·e', sales: 'Vente', accountant: 'Comptabilité', stock_manager: 'Gestion de stock', employee: 'Employé·e' };
   const roleLabel = r => ROLES[r] || r || 'Utilisateur';
-  const VERSION = 'V36';
+  const VERSION = 'V38';
   const pref = () => { try { return { theme: 'light', size: 'md', ...JSON.parse(localStorage.getItem('myra_display') || '{}') }; } catch (_) { return { theme: 'light', size: 'md' }; } };
   function applyTheme(theme) {
     const p = { ...pref(), theme }; try { localStorage.setItem('myra_display', JSON.stringify(p)); } catch (_) {}
@@ -95,6 +95,76 @@
     } catch (_) { wrap.querySelector('#pfKpis').innerHTML = '<p class="muted">Activité indisponible hors connexion.</p>'; }
   });
 
+  /* ---------- Équipe et accès (V38) ---------- */
+  const isBoss = () => ['owner', 'admin'].includes(A()?.state?.profile?.role);
+  const ROLE_HELP = { admin: 'Tout, sauf toucher au propriétaire', manager: 'Gère ventes, stock, clients, équipe au quotidien', sales: 'Ventes, clients, commandes', stock_manager: 'Produits, stock, achats', accountant: 'Paiements, dépenses, rapports', employee: 'Accès de base' };
+  const fdt = d => d ? new Date(d).toLocaleString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'jamais';
+  const tempPw = () => { const c = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'; const a = new Uint32Array(10); crypto.getRandomValues(a); return Array.from(a, x => c[x % c.length]).join(''); };
+  async function invokeTeam(app, body) {
+    const { data, error } = await app.sb.functions.invoke('myra-team', { body });
+    if (error) { let m = error.message; try { m = (await error.context.json()).error || m; } catch (_) {} throw new Error(m); }
+    if (data?.error) throw new Error(data.error); return data;
+  }
+  function shareAccess(app, name, email, pw) {
+    const url = location.origin + location.pathname;
+    const msg = `Bonjour ${name.split(' ')[0]}, votre accès à Myra Business Manager est prêt.\nAdresse : ${url}\nE-mail : ${email}\nMot de passe provisoire : ${pw}\nChangez-le dès la première connexion (Mon profil › Sécurité).`;
+    const m = X.modal('Accès à transmettre', `<p>Transmettez ces informations à <b>${esc(name)}</b> (en main propre ou par WhatsApp). Le mot de passe ne sera plus affiché ensuite.</p><pre class="tm-cred">${esc(msg)}</pre>`, '<button type="button" class="btn light" id="tmCopy"><i class="fa-solid fa-copy"></i> Copier</button><button type="button" class="btn primary" id="tmWa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>');
+    m.el.querySelector('#tmCopy').onclick = async () => { try { await navigator.clipboard.writeText(msg); app.toast('Copié.'); } catch (_) { app.toast('Copie impossible : sélectionnez le texte.', true); } };
+    m.el.querySelector('#tmWa').onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+  }
+  async function team(host, app) {
+    const box = host.querySelector('#tmList'); const meId = app.state.user?.id; const meRole = app.state.profile?.role;
+    const roleOpts = cur => Object.keys(ROLES).filter(r => r !== 'super_admin' && (meRole === 'owner' || !['owner', 'admin'].includes(r) || r === cur)).map(r => `<option value="${r}" ${r === cur ? 'selected' : ''}>${esc(roleLabel(r))}</option>`).join('');
+    async function load() {
+      const { data, error } = await app.sb.rpc('get_team_accounts');
+      if (error) { box.innerHTML = `<p class="muted">${esc(X.explain(error))}</p>`; return; }
+      const rows = data || []; const pending = rows.filter(r => !r.is_active).length;
+      box.innerHTML = (pending ? `<div class="tm-alert"><i class="fa-solid fa-hourglass-half"></i> ${pending} compte${pending > 1 ? 's' : ''} en attente d’activation : choisissez le rôle puis « Activer ».</div>` : '')
+        + rows.map(r => {
+          const me = r.id === meId; const locked = me || (meRole !== 'owner' && ['owner', 'admin'].includes(r.role));
+          const av = r.avatar_url ? `<img src="${esc(r.avatar_url)}" alt="">` : esc(app.initials(r.full_name || r.email || '?'));
+          return `<div class="tm-row ${r.is_active ? '' : 'pending'}" data-id="${r.id}">
+            <span class="tm-av">${av}</span>
+            <span class="tm-who"><b>${esc(r.full_name || '—')}${me ? ' <em>(vous)</em>' : ''}</b><small>${esc(r.email || '')}</small><small>Dernière connexion : ${esc(fdt(r.last_sign_in_at))}</small></span>
+            <span class="tm-ctl">${locked ? `<span class="tm-role">${esc(roleLabel(r.role))}</span>` : `<select data-role aria-label="Rôle de ${esc(r.full_name || '')}" title="${esc(ROLE_HELP[r.role] || '')}">${roleOpts(r.role)}</select>`}
+              <span class="tm-state ${r.is_active ? 'on' : 'off'}">${r.is_active ? 'Actif' : r.last_sign_in_at ? 'Désactivé' : 'En attente'}</span>
+              ${locked ? '' : `<button type="button" class="btn ${r.is_active ? 'light' : 'primary'} sm" data-active="${r.is_active ? 0 : 1}">${r.is_active ? 'Désactiver' : 'Activer'}</button><button type="button" class="btn light sm" data-pw title="Nouveau mot de passe provisoire"><i class="fa-solid fa-key"></i></button>`}</span>
+          </div>`;
+        }).join('');
+      box.querySelectorAll('.tm-row').forEach(row => {
+        const r = rows.find(x => x.id === row.dataset.id); const sel = row.querySelector('[data-role]');
+        const save = async (role, active, okMsg) => {
+          const { error } = await app.sb.rpc('set_team_member', { p_user: r.id, p_role: role, p_active: active, p_name: null });
+          if (error) { app.toast(X.explain(error), true); return load(); }
+          app.toast(okMsg); load();
+        };
+        if (sel) sel.onchange = () => save(sel.value, r.is_active, `${r.full_name} : ${roleLabel(sel.value)}.`);
+        const act = row.querySelector('[data-active]');
+        if (act) act.onclick = () => { const on = act.dataset.active === '1'; if (!on && !confirm(`Désactiver ${r.full_name} ? Il ne pourra plus se connecter.`)) return; save(sel ? sel.value : r.role, on, on ? `${r.full_name} peut maintenant se connecter.` : `${r.full_name} est désactivé.`); };
+        const pw = row.querySelector('[data-pw]');
+        if (pw) pw.onclick = async () => {
+          if (!confirm(`Créer un nouveau mot de passe provisoire pour ${r.full_name} ?`)) return;
+          const p = tempPw(); try { await invokeTeam(app, { action: 'reset_password', user_id: r.id, password: p }); shareAccess(app, r.full_name || '', r.email || '', p); } catch (e) { app.toast(e.message, true); }
+        };
+      });
+    }
+    host.querySelector('#tmAdd').onclick = () => {
+      const m = X.modal('Ajouter un membre de l’équipe', `<div class="form-grid">
+          <label class="field full-span">Nom complet<input name="full_name" required maxlength="120" autocomplete="off"></label>
+          <label class="field">E-mail de connexion<input name="email" type="email" required autocomplete="off"></label>
+          <label class="field">Rôle<select name="role">${roleOpts('sales')}</select></label>
+          <label class="field full-span">Mot de passe provisoire<input name="password" required minlength="8" value="${tempPw()}" autocomplete="off"></label></div>
+          <p class="muted small" id="tmHelp">${esc(ROLE_HELP.sales)}</p>`, '<button type="button" class="btn light" data-close>Annuler</button><button class="btn primary" type="submit"><i class="fa-solid fa-user-plus"></i> Créer le compte</button>', { form: true, sub: 'Le compte est actif tout de suite, sans e-mail de confirmation.' });
+      m.el.querySelector('[name=role]').onchange = e => { m.el.querySelector('#tmHelp').textContent = ROLE_HELP[e.target.value] || ''; };
+      m.el.onsubmit = async e => {
+        e.preventDefault(); const f = Object.fromEntries(new FormData(m.el)); const b = m.el.querySelector('[type=submit]'); b.disabled = true;
+        try { await invokeTeam(app, { action: 'create', ...f }); m.close(); app.toast(`Compte de ${f.full_name} créé.`); shareAccess(app, f.full_name, f.email.trim().toLowerCase(), f.password); load(); }
+        catch (err) { b.disabled = false; app.toast(err.message, true); }
+      };
+    };
+    load();
+  }
+
   /* ---------- Paramètres ---------- */
   EXT.pages.settings = {
     title: 'Paramètres',
@@ -106,10 +176,11 @@
       const tile = (go, ico, cls, t, d) => `<button type="button" class="st-tile" data-go="${go}"><span class="m-ico ${cls}"><i class="fa-solid ${ico}"></i></span><span><b>${t}</b><small>${d}</small></span></button>`;
       const field = (k, l, type = 'text', full = false) => `<label class="field ${full ? 'full-span' : ''}">${l}<input name="${k}" type="${type}" value="${esc(cs[k] ?? '')}" ${canAdmin() ? '' : 'disabled'}></label>`;
       host.innerHTML = X.head('Paramètres', 'Tout ce qui règle l’application : votre entreprise, la boutique, les notifications, les données et la sauvegarde.')
-        + `<nav class="st-nav" aria-label="Rubriques">${[['st-ent', 'Entreprise'], ['st-mod', 'Modules'], ['st-data', 'Données'], ['st-app', 'Application']].map(([id, l]) => `<a href="#${id}" data-anchor="${id}">${l}</a>`).join('')}</nav>`
+        + `<nav class="st-nav" aria-label="Rubriques">${[['st-ent', 'Entreprise'], ...(isBoss() ? [['st-team', 'Équipe et accès']] : []), ['st-mod', 'Modules'], ['st-data', 'Données'], ['st-app', 'Application']].map(([id, l]) => `<a href="#${id}" data-anchor="${id}">${l}</a>`).join('')}</nav>`
         + `<section class="card" id="st-ent"><div class="card-head"><h3><i class="fa-solid fa-building"></i> Entreprise et documents</h3>${canAdmin() ? '' : '<span class="muted">Lecture seule (réservé à la direction)</span>'}</div>
             <form id="stCompany"><div class="form-grid">${field('company_name', 'Nom de l’entreprise', 'text', true)}${field('phone', 'Téléphone', 'tel')}${field('email', 'E-mail', 'email')}${field('address', 'Adresse', 'text', true)}${field('logo_url', 'Adresse du logo (facultatif)', 'url', true)}${field('currency_label', 'Monnaie affichée')}${field('currency', 'Code monnaie')}${field('invoice_prefix', 'Préfixe des factures')}${field('quote_prefix', 'Préfixe des devis')}${field('sale_prefix', 'Préfixe des ventes')}${field('purchase_prefix', 'Préfixe des achats')}</div>
             <p class="muted small">Ces informations apparaissent sur les factures, devis, bons et sur la boutique en ligne.</p>${canAdmin() ? '<div class="actions"><button class="btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button></div>' : ''}</form></section>`
+        + (isBoss() ? `<section class="card" id="st-team"><div class="card-head"><h3><i class="fa-solid fa-user-shield"></i> Équipe et accès</h3><button type="button" class="btn primary sm" id="tmAdd"><i class="fa-solid fa-user-plus"></i> Ajouter un membre</button></div><p class="muted small">Qui peut se connecter à l’application et ce que chacun peut faire. Un compte créé directement dans Supabase apparaît ici « en attente » : activez-le en choisissant son rôle.</p><div id="tmList"><div class="loading"><i class="fa-solid fa-circle-notch fa-spin"></i></div></div></section>` : '')
         + `<section class="card" id="st-mod"><div class="card-head"><h3><i class="fa-solid fa-puzzle-piece"></i> Modules et réglages</h3></div><div class="st-tiles">
             ${tile('shop', 'fa-store', 'i-green', 'Boutique en ligne', 'Textes, image d’accueil, réseaux, ouverture')}
             ${tile('notifications', 'fa-bell', 'i-amber', 'Notifications', 'Historique et alertes par appareil')}
@@ -135,6 +206,7 @@
           </section>`;
       host.querySelectorAll('[data-anchor]').forEach(a => a.onclick = e => { e.preventDefault(); host.querySelector('#' + a.dataset.anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
       host.querySelectorAll('.st-tile').forEach(b => b.onclick = () => b.dataset.go === '__loyverse' ? window.open('loyverse.html', '_blank', 'noopener') : app.navigate(b.dataset.go));
+      if (isBoss()) team(host, app);
       host.querySelector('#stCompany').onsubmit = async e => {
         e.preventDefault(); if (!canAdmin()) return;
         const row = Object.fromEntries(new FormData(e.target)); Object.keys(row).forEach(k => { row[k] = String(row[k]).trim() || null; }); row.updated_at = new Date().toISOString();

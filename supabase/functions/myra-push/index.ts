@@ -19,6 +19,7 @@ const ROLES: Record<string, string[]> = {
   payments: ['owner', 'super_admin', 'admin', 'manager', 'accountant'],
   reviews: ['owner', 'super_admin', 'admin', 'manager', 'sales'],
   stock: ['owner', 'super_admin', 'admin', 'manager', 'stock_manager'],
+  team: ['owner', 'super_admin', 'admin'],
   test: ALL,
 };
 

@@ -18,6 +18,10 @@ with checks(nom, ok, detail) as (
       select 1 from pg_tables where schemaname = 'public' and tablename = 'product_reviews'
       union all select 1 from information_schema.columns where table_schema = 'public' and table_name = 'order_reviews' and column_name = 'rating_after_sales'
       union all select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname in ('submit_product_review','get_product_reviews') and has_function_privilege('anon', p.oid, 'execute')) x
+  union all select 'Équipe : fiche automatique des nouveaux comptes, gestion réservée à la direction (V38)', count(*) = 3, count(*)::text from (
+      select 1 from pg_trigger where tgname = 'trg_myra_new_auth_user'
+      union all select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname in ('get_team_accounts','set_team_member') and not has_function_privilege('anon', p.oid, 'execute')) x
+  union all select 'Tous les comptes ont une fiche d''équipe', count(*) = 0, count(*)::text from auth.users u where not exists (select 1 from public.profiles p where p.id = u.id)
   union all select 'Règles d''accès actives sur toutes les tables', count(*) = 0, coalesce(string_agg(tablename, ', '), '') from pg_tables where schemaname = 'public' and not rowsecurity
   union all select 'Clés étrangères toutes indexées', count(*) = 0, count(*)::text from pg_constraint c join pg_namespace n on n.oid = c.connamespace and n.nspname = 'public'
     where c.contype = 'f' and array_length(c.conkey, 1) = 1 and not exists (select 1 from pg_index i where i.indrelid = c.conrelid and i.indkey[0] = c.conkey[1])

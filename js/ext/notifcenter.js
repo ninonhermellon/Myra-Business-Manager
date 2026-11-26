@@ -4,7 +4,7 @@
   const X = window.MyraX, { A, esc } = X;
   const KINDS = {
     orders: ['Commandes', 'fa-bag-shopping', 'k-or'], sales: ['Ventes', 'fa-cash-register', 'k-sa'], payments: ['Paiements', 'fa-money-bill-wave', 'k-pa'],
-    reviews: ['Avis clients', 'fa-star', 'k-re'], stock: ['Stock', 'fa-triangle-exclamation', 'k-st'], test: ['Système', 'fa-bell', 'k-sy']
+    reviews: ['Avis clients', 'fa-star', 'k-re'], stock: ['Stock', 'fa-triangle-exclamation', 'k-st'], team: ['Équipe', 'fa-user-plus', 'k-sy'], test: ['Système', 'fa-bell', 'k-sy']
   };
   const kindOf = k => KINDS[k] || ['Autres', 'fa-bell', 'k-sy'];
   const VIEW_KEY = 'myra_notif_view';

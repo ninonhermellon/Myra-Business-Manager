@@ -312,3 +312,18 @@ input.switch:focus-visible{outline:3px solid #71990e;outline-offset:2px}
 .av-q{margin:8px 0 12px;padding:10px 12px;background:#f6f8f6;border-radius:12px}
 @media (max-width:640px){.av-c{grid-template-columns:30px 1fr 40px;row-gap:4px}.av-c .av-bar{grid-column:2/4;grid-row:2}.av-c small{display:none}}
 .m-row.av-more{display:none}
+/* V38 — Équipe et accès */
+.tm-alert{display:flex;gap:8px;align-items:center;padding:10px 12px;margin:0 0 10px;border-radius:12px;background:#fff6e0;color:#7a5200;font-size:13.5px}
+.tm-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid #eef1ee}
+.tm-row:first-of-type{border-top:0}
+.tm-row.pending{background:#fffaf0;margin:0 -12px;padding:10px 12px;border-radius:12px}
+.tm-av{flex:0 0 40px;width:40px;height:40px;border-radius:50%;background:#eef5dc;color:#0d4426;display:grid;place-items:center;font-weight:700;overflow:hidden}
+.tm-av img{width:100%;height:100%;object-fit:cover}
+.tm-who{flex:1;min-width:0}.tm-who b,.tm-who small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tm-who small{color:#7b887f;font-size:12px}.tm-who em{font-weight:400;color:#7b887f}
+.tm-ctl{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.tm-ctl select{padding:6px 8px;border-radius:10px;border:1px solid #dfe6e1;font:inherit;font-size:13px;background:#fff}
+.tm-role{font-size:13px;font-weight:600;color:#0d4426}
+.tm-state{font-size:12px;padding:3px 9px;border-radius:99px;font-weight:600}.tm-state.on{background:#e4f4e9;color:#16723c}.tm-state.off{background:#fde9d2;color:#9a4b00}
+.tm-cred{white-space:pre-wrap;word-break:break-word;background:#f4f8f4;padding:12px;border-radius:12px;font-size:13px;user-select:all}
+@media (max-width:640px){.tm-row{flex-wrap:wrap}.tm-ctl{width:100%;justify-content:flex-start;padding-left:52px}}
+.theme-dark .tm-row.pending,.theme-dark .tm-alert{background:#2a2414;color:#f3d9a0}.theme-dark .tm-cred,.theme-dark .tm-ctl select{background:#18211b;color:inherit;border-color:#2c3a30}

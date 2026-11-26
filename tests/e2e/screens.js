@@ -40,6 +40,7 @@ const nowIso = () => new Date().toISOString();
 customers.forEach((c, i) => { c.price_tier = i % 4 === 3 ? 'wholesale' : 'retail'; c.credit_limit = i === 4 ? 100000 : null; c.payment_terms_days = 30; c.birth_date = i === 1 ? new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10).replace(/^\d{4}/, '1990') : null; });
 products.forEach((p, i) => { p.barcode = '61300000000' + i; p.wholesale_price = Math.round(p.sale_price * 0.85); });
 sales.forEach((s, i) => { s.created_by = i % 3 === 0 ? uid(2) : USER.id; });
+const TEAMLOG = [];
 const PROFILES = [PROFILE, { id: uid(2), full_name: 'Grâce Vendeuse', role: 'sales', is_active: true }];
 const lots = products.slice(0, 6).map((p, i) => ({ id: uid(3000 + i), product_id: p.id, lot_number: 'LOT-202611' + (10 + i) + '-01', production_date: day(20 - i), expiry_date: new Date(Date.now() + (i * 6 - 3) * 864e5).toISOString().slice(0, 10), quantity_initial: 50, quantity_remaining: i === 5 ? 0 : 20 - i, created_at: day(20 - i) }));
 const employees = ['Mama Nzaba (cuisinière)', 'Ruth (vendeuse)', 'Junior (livreur)'].map((n, i) => ({ id: uid(4000 + i), full_name: n.split(' (')[0], job_title: n.split('(')[1].replace(')', ''), phone: '06 400 00 0' + i, monthly_salary: [120000, 90000, 80000][i], is_active: true, created_at: day(100) }));
@@ -135,6 +136,8 @@ function rpc(name, args) {
   REQLOG.push('RPC ' + name);
   const R = {
     generate_due_recurring_orders: () => 1, get_team_members: () => PROFILES,
+    get_team_accounts: () => DB.profiles.map(p => ({ last_sign_in_at: null, created_at: '2026-11-01T08:00:00Z', avatar_url: null, phone: null, ...p })),
+    set_team_member: () => { if (args.p_user === USER.id) return { error: 'Vous ne pouvez pas modifier vos propres droits.' }; const t = DB.profiles.find(x => x.id === args.p_user); if (!t) return { error: 'Membre introuvable.' }; Object.assign(t, { role: args.p_role, is_active: args.p_active }); return { id: t.id, role: t.role, is_active: t.is_active }; },
     redeem_gift_card: () => { const g = DB.gift_cards.find(x => x.code === String(args.p_code).toUpperCase()); if (!g || g.balance < args.p_amount) return { error: 'Solde insuffisant' }; g.balance -= args.p_amount; return g.balance; },
     transfer_stock: () => require('crypto').randomUUID(), apply_inventory: () => DB.inventory_lines.length, resolve_price: () => 4000,
     get_customer_portal: () => args.p_token === TOK ? { company: { name: 'Les Saveurs de Myra', phone: '06 600 00 00', address: 'Poto-Poto, Brazzaville', currency: 'FCFA' }, customer: { name: customers[0].full_name }, points: 340, outstanding: 23500, sales: sales.filter(x => x.customer_id === customers[0].id && x.status !== 'draft').slice(0, 4).map(x => ({ number: x.sale_number, date: x.sale_date, status: x.status, total: x.total, paid: x.amount_paid, discount: 0, shipping: 0, items: sale_items.filter(i => i.sale_id === x.id).map(i => ({ name: i.products.name, unit: i.products.unit, quantity: i.quantity, price: i.unit_price, total: i.line_total })) })) } : { error: 'Lien invalide ou expiré' },
@@ -179,6 +182,10 @@ async function setup(ctx, loggedIn = true) {
     const req = route.request(), u = new URL(req.url());
     if (u.pathname.startsWith('/auth/v1/')) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(u.pathname.includes('user') ? USER : SESSION) });
     if (u.pathname === '/functions/v1/myra-push') { const b = JSON.parse(req.postData() || '{}'); REQLOG.push('FN myra-push ' + b.action); return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(b.action === 'public_key' ? { publicKey: 'BMDxvtIWB4ADBPq_pHbph_Las2ZxZOy378QEDsg47M8noLhUQb7kiYja2b8thMjNU-6SEmOi_NdVWoQTuyT9Lwo' } : { sent: 1, removed: 0, failed: 0 }) }); }
+    if (u.pathname === '/functions/v1/myra-team') { const b = JSON.parse(req.postData() || '{}'); REQLOG.push('FN myra-team ' + b.action); TEAMLOG.push(b);
+      if (b.action === 'create' && DB.profiles.some(x => x.email === b.email)) return route.fulfill({ status: 409, contentType: 'application/json', body: JSON.stringify({ error: 'Un compte existe déjà avec cette adresse e-mail.' }) });
+      if (b.action === 'create') { const id = require('crypto').randomUUID(); DB.profiles.push({ id, full_name: b.full_name, email: b.email, role: b.role, is_active: true }); return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id, email: b.email, role: b.role }) }); }
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) }); }
     if (u.pathname.startsWith('/functions/v1/')) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ answer: 'Réponse de test de l’assistant : ce mois-ci, le saka-saka est votre meilleure vente.' }) });
     const r = /\/rest\/v1\/rpc\/([a-z_]+)/.exec(u.pathname);
     if (r) { const out = rpc(r[1], JSON.parse(req.postData() || '{}')); return route.fulfill({ status: out.status, contentType: 'application/json', body: JSON.stringify(out.body) }); }

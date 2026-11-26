@@ -140,7 +140,7 @@
       if(cached?.is_active)return enterWorkspace(session.user,cached,true);
       return showAuth('Impossible de vérifier votre profil pour le moment. Réessayez dans un instant.',true)
     }
-    await sb.auth.signOut().catch(()=>{});forgetSession();showAuth('Profil introuvable ou désactivé. Contactez le propriétaire.',true)
+    await sb.auth.signOut().catch(()=>{});forgetSession();showAuth(profile?'Votre compte est en attente d’activation. Le propriétaire doit l’activer dans Paramètres › Équipe et accès.':'Votre compte n’est pas encore rattaché à l’équipe. Demandez au propriétaire de l’activer dans Paramètres › Équipe et accès.',true)
   }
   function setAvatarElements(profile,name){const url=profile.avatar_url;['#userAvatar','#topAvatar'].forEach(sel=>{const el=$(sel);el.innerHTML=url?`<img src="${esc(url)}" alt="Photo de profil">`:esc(initials(name));});}
   const FORM_SECTIONS={

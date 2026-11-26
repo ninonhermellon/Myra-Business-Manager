@@ -19,6 +19,7 @@ node tests/e2e/v29.test.js        # 22 parcours : tarifs, bon cadeau, crédit, i
 node tests/e2e/v30.test.js        # 19 parcours : espace client, avis, parrainage, objectifs, lieu de vente, affichage
 node tests/e2e/boutique.test.js   # 36 parcours : boutique (catalogue, panier, codes promo, commande, sécurité, écran équipe)
 node tests/e2e/v37.test.js        # 15 parcours : avis détaillés (boutique, avis.html, relances, réponse, masquage)
+node tests/e2e/v38.test.js        # 14 parcours : équipe et accès (activer, rôle, créer un compte, mot de passe)
 node tests/e2e/v36.test.js        # 26 parcours : centre de notifications, menu avatar, profil, paramètres, suivi de commande, pages publiques
 node tests/e2e/documents.test.js     # 28 vérifications : tous les documents imprimables au gabarit unique
 node tests/e2e/audit.test.js         # 49 vérifications : en-têtes de sécurité, Open Graph / SEO, responsive 320 → 1440 px
