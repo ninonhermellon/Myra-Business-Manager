@@ -19,14 +19,14 @@
     data: null,
     async load(user, offline) {
       const key = 'myra_perm_' + (user?.id || '');
-      if (!offline && navigator.onLine) {
+      if (navigator.onLine) {
         const { data, error } = await A().sb.rpc('get_my_permissions');
         if (!error && data) { this.data = data; try { localStorage.setItem(key, JSON.stringify(data)); } catch (_) {} }
       }
       if (!this.data) { try { this.data = JSON.parse(localStorage.getItem(key) || 'null'); } catch (_) {} }
       this.apply();
     },
-    all() { const r = A()?.state?.profile?.role; return ['owner', 'admin', 'super_admin'].includes(r) || !!this.data?.all; },
+    all() { if (this.data && this.data.role) return !!this.data.all; const r = A()?.state?.profile?.role; return ['owner', 'admin', 'super_admin'].includes(r); },
     page(id) {
       if (this.all()) return true;
       if (ADMIN_ONLY.includes(id)) return false;

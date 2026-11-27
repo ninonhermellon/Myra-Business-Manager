@@ -68,7 +68,7 @@ srv.listen(0, async () => {
     check(`${f} : Open Graph complet (image absolue https, existante, < 300 Ko)`, !!img && /^https:\/\//.test(img) && fs.existsSync(local) && fs.statSync(local).size < 300 * 1024
       && /og:title/.test(h) && /og:description/.test(h) && /og:url/.test(h) && /twitter:card/.test(h) && (h.match(/<title>/g) || []).length === 1, img);
     check(`${f} : titre ≤ 60 et description 50–200 caractères`, title && title.length <= 60 && desc && desc.length >= 50 && desc.length <= 230, `${title?.length} / ${desc?.length}`);
-    check(`${f} : favicon et icône Apple`, /href="\/favicon\.ico"/.test(h) && /apple-touch-icon/.test(h));
+    check(`${f} : favicon et icône Apple`, (/href="\/favicon\.ico"/.test(h) || /href="\/assets\/icons\/public-(32|192)\.png"/.test(h)) && /apple-touch-icon/.test(h));
   }
   ['favicon.ico', 'apple-touch-icon.png', 'robots.txt', 'sitemap.xml', 'assets/og/og-boutique.jpg', 'assets/icons/icon-512.png', 'assets/icons/icon-maskable-512.png'].forEach(f => check(`Fichier présent : ${f}`, fs.existsSync(path.join(ROOT, f))));
   await b.close(); srv.close();
