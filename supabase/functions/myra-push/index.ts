@@ -12,7 +12,7 @@ const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 
 // Qui reçoit quoi (en plus du choix fait sur chaque appareil)
-const ALL = ['owner', 'super_admin', 'admin', 'manager', 'accountant', 'sales', 'stock_manager', 'employee'];
+const ALL = ['owner', 'super_admin', 'admin', 'manager', 'accountant', 'sales', 'stock_manager', 'employee', 'driver'];
 const ROLES: Record<string, string[]> = {
   orders: ALL,
   sales: ['owner', 'super_admin', 'admin', 'manager', 'accountant', 'sales'],
@@ -20,6 +20,7 @@ const ROLES: Record<string, string[]> = {
   reviews: ['owner', 'super_admin', 'admin', 'manager', 'sales'],
   stock: ['owner', 'super_admin', 'admin', 'manager', 'stock_manager'],
   team: ['owner', 'super_admin', 'admin'],
+  summary: ['owner', 'super_admin', 'admin', 'manager', 'accountant'],
   test: ALL,
 };
 
