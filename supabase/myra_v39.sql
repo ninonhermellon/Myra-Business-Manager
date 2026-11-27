@@ -862,3 +862,14 @@ language sql stable security definer set search_path = '' as $$
 $$;
 
 notify pgrst, 'reload schema';
+
+-- Noms de l'équipe (livreurs à choisir, clôtures de caisse) : aussi pour la comptabilité et la vente
+create or replace function public.get_team_members()
+returns table (id uuid, full_name text, role text, is_active boolean)
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  if (select private.current_staff_role()) not in ('owner','admin','manager','accountant','sales') then raise exception 'Accès refusé'; end if;
+  return query select p.id, p.full_name, p.role, p.is_active from public.profiles p order by p.full_name;
+end $$;
+revoke all on function public.get_team_members() from public, anon;
+grant execute on function public.get_team_members() to authenticated;

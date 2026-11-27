@@ -13,7 +13,13 @@
   const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
   const layer = $('#layer');
 
-  const S = { products: [], categories: [], shop: {}, company: {}, popular: [], promos: [], cat: '', q: '', limit: 12, cart: store.get('myra_shop_cart', []), wa: '', promo: null, promoCode: '' };
+  const S = { products: [], categories: [], shop: {}, company: {}, popular: [], promos: [], cat: '', q: '', limit: 12, cart: store.get('myra_shop_cart', []), wa: '', promo: null, promoCode: '', zones: [], pay: 'cash_on_delivery' };
+  /* Panier enregistré (relance des paniers abandonnés) : identifiant aléatoire propre à cet appareil */
+  const cartToken = () => { let t = store.get('myra_cart_token', ''); if (!/^[0-9a-f-]{36}$/.test(t)) { t = crypto.randomUUID(); store.set('myra_cart_token', t); } return t; };
+  let cartTimer = 0;
+  const saveRemoteCart = (name, phone) => { clearTimeout(cartTimer); cartTimer = setTimeout(() => { const items = cartLines().map(l => ({ product_id: l.id, quantity: l.qty })); if (items.length && String(phone || '').replace(/\D/g, '').length >= 8) sb.rpc('save_shop_cart', { p_token: cartToken(), p_name: name || null, p_phone: phone, p_items: items }).then(() => {}, () => {}); }, 900); };
+  const zoneFee = name => { const z = S.zones.find(x => x.name.toLowerCase() === String(name || '').toLowerCase()); if (!z) return null; const free = Number(S.shop.free_delivery_from || 0); return free && cartTotal() >= free ? 0 : Number(z.fee || 0); };
+  const PAYS = () => [S.shop.cash_on_delivery !== false && ['cash_on_delivery', 'À la livraison', 'fa-hand-holding-dollar', 'Espèces ou Mobile Money au livreur'], S.shop.momo_code && ['mtn_momo', 'MTN MoMo', 'fa-mobile-screen', 'Paiement marchand, maintenant'], S.shop.airtel_code && ['airtel_money', 'Airtel Money', 'fa-mobile-screen-button', 'Paiement marchand, maintenant']].filter(Boolean);
   const byId = id => S.products.find(p => p.id === id);
   const unitLabel = p => p.unit ? ` / ${esc(p.unit)}` : '';
   const stars = r => { const n = Math.round(Number(r) || 0); return '<span class="stars" aria-label="' + Number(r).toFixed(1) + ' sur 5">' + '★'.repeat(n) + '<i>' + '★'.repeat(5 - n) + '</i></span>'; };
@@ -71,6 +77,7 @@
         <p class="pd-price">${money(p.price)}<small>${unitLabel(p)}</small></p>
         ${p.available ? '' : '<p class="pd-note"><i class="fa-solid fa-clock" aria-hidden="true"></i> Préparé sur commande : nous vous confirmons le délai par téléphone.</p>'}
         ${p.description ? `<p class="pd-desc">${esc(p.description)}</p>` : ''}
+        ${p.bundle ? `<div class="pd-bundle"><b><i class="fa-solid fa-gift" aria-hidden="true"></i> Dans ce coffret</b><ul>${p.bundle.map(i => `<li>${Number(i.quantity)} × ${esc(i.name)}</li>`).join('')}</ul>${Number(p.value) > p.price ? `<p class="pd-save">Valeur ${money(p.value)} · vous économisez <b>${money(Number(p.value) - p.price)}</b></p>` : ''}</div>` : ''}
         ${open ? `<div class="pd-qty"><span>Quantité souhaitée</span>${stepper(1)}</div>
         <div class="pd-actions">
           <button type="button" class="btn btn-line" id="pdAdd"><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Ajouter au panier</button>
@@ -126,7 +133,7 @@
     const el = sheet(`${closeBtn}<h2 class="sh-title">Mon panier</h2>
       <div class="lines">${lines.map(l => `<div class="line" data-id="${esc(l.id)}">${thumb(l.p, 'ln-img')}<div class="ln-txt"><b>${esc(l.p.name)}</b><small>${money(l.p.price)}${unitLabel(l.p)}</small>${stepper(l.qty, l.id)}</div><div class="ln-end"><b class="ln-sum">${money(l.p.price * l.qty)}</b><button type="button" class="ln-del" data-del="${esc(l.id)}" aria-label="Retirer ${esc(l.p.name)}"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></button></div></div>`).join('')}</div>
       <div class="sum"><span>Sous-total</span><b id="cartSum">${money(cartTotal())}</b></div>
-      <p class="hint"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Frais de livraison confirmés par téléphone.</p>
+      <p class="hint"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> ${S.zones.length ? `Livraison selon votre quartier : dès ${money(Math.min(...S.zones.map(z => Number(z.fee))))}${Number(S.shop.free_delivery_from) ? ` · offerte dès ${money(S.shop.free_delivery_from)} d’achats` : ''}.` : 'Frais de livraison confirmés par téléphone.'}</p>
       <button type="button" class="btn btn-green full" id="toCheckout">Passer la commande <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>`, 'side');
     bindStepper(el, (v, id) => { const l = S.cart.find(x => x.id === id); if (l) l.qty = v; saveCart(); const row = el.querySelector(`.line[data-id="${id}"]`); row.querySelector('.ln-sum').textContent = money(byId(id).price * v); el.querySelector('#cartSum').textContent = money(cartTotal()); });
     el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { S.cart = S.cart.filter(x => x.id !== b.dataset.del); saveCart(); openCart(); });
@@ -149,23 +156,49 @@
         <label class="check"><input type="checkbox" name="same" ${me.whatsapp ? '' : 'checked'}> Mon numéro WhatsApp est le même que mon téléphone</label>
         <label class="fld"><span>Adresse de livraison *</span><input name="address" autocomplete="street-address" required maxlength="300" value="${esc(me.address || '')}" placeholder="N°, rue, repère (ex. : près de l’église…)"></label>
         <div class="two">
-          <label class="fld"><span>Quartier / arrondissement</span><input name="zone" maxlength="80" value="${esc(me.zone || '')}" placeholder="Ex. : Moungali"></label>
+          ${S.zones.length ? `<label class="fld"><span>Quartier *</span><select name="zone" required><option value="">Choisissez…</option>${S.zones.map(z => `<option value="${esc(z.name)}" ${String(me.zone || '').toLowerCase() === z.name.toLowerCase() ? 'selected' : ''}>${esc(z.name)} · ${Number(z.fee) ? money(z.fee) : 'offerte'}${z.delay ? ' · ' + esc(z.delay) : ''}</option>`).join('')}</select></label>` : `<label class="fld"><span>Quartier / arrondissement</span><input name="zone" maxlength="80" value="${esc(me.zone || '')}" placeholder="Ex. : Moungali"></label>`}
           <label class="fld"><span>Livraison souhaitée le</span><input name="date" type="date" min="${minDate}"></label>
         </div>
         <label class="fld"><span>Remarque</span><textarea name="notes" rows="2" maxlength="500" placeholder="Heure préférée, précisions…"></textarea></label>
+        <fieldset class="pay"><legend>Paiement</legend><div class="pay-opts">${PAYS().map(([k, l, i, d]) => `<label class="pay-opt"><input type="radio" name="pay" value="${k}" ${k === (PAYS().some(x => x[0] === S.pay) ? S.pay : PAYS()[0]?.[0]) ? 'checked' : ''}><span><i class="fa-solid ${i}" aria-hidden="true"></i><b>${l}</b><small>${d}</small></span></label>`).join('')}</div>
+          <div class="momo" id="momoBox" hidden></div></fieldset>
+        <label class="fld"><span>Recevoir cette commande régulièrement ?</span><select name="sub"><option value="">Non, une seule fois</option><option value="weekly">Oui, chaque semaine</option><option value="biweekly">Oui, toutes les 2 semaines</option><option value="monthly">Oui, chaque mois</option></select></label>
         <p class="form-err" id="formErr" role="alert" hidden></p>
         <button type="submit" class="btn btn-green full" id="sendOrder"></button>
-        <p class="hint center">Aucun paiement en ligne : nous vous appelons pour confirmer le total et la livraison.</p>
+        <p class="hint center" id="payHint">Nous vous appelons pour confirmer la commande et l’heure de livraison.</p>
       </form>`, 'side');
     const f = el.querySelector('#orderForm'), wa = f.elements.whatsapp, same = f.elements.same;
-    const due = () => Math.max(0, cartTotal() - (S.promo?.discount || 0));
+    const fee = () => S.zones.length ? zoneFee(f.elements.zone.value) : null;
+    const due = () => Math.max(0, cartTotal() - (S.promo?.discount || 0)) + (fee() || 0);
     const sendLabel = () => `<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Envoyer ma commande · ${money(due())}`;
     const paintRecap = () => {
       el.querySelector('#recap').innerHTML = cartLines().map(l => `<div><span>${l.qty} × ${esc(l.p.name)}</span><b>${money(l.p.price * l.qty)}</b></div>`).join('')
         + (S.promo ? `<div class="disc"><span>Code ${esc(S.promo.code)} (${esc(S.promo.name)})</span><b>− ${money(S.promo.discount)}</b></div>` : '')
-        + `<div class="recap-total"><span>${S.promo ? 'Total des produits' : 'Sous-total'}</span><b>${money(due())}</b></div>`;
-      el.querySelector('#sendOrder').innerHTML = sendLabel();
+        + (S.zones.length ? `<div><span>Livraison${f.elements.zone.value ? ' · ' + esc(f.elements.zone.value) : ''}</span><b>${fee() === null ? 'selon le quartier' : fee() ? money(fee()) : 'offerte'}</b></div>` : '')
+        + `<div class="recap-total"><span>${S.zones.length ? 'Total à payer' : S.promo ? 'Total des produits' : 'Sous-total'}</span><b>${money(due())}</b></div>`;
+      el.querySelector('#sendOrder').innerHTML = sendLabel(); paintPay();
     };
+    function paintPay() {
+      const k = f.querySelector('[name=pay]:checked')?.value || 'cash_on_delivery'; S.pay = k; const box = el.querySelector('#momoBox');
+      if (k === 'cash_on_delivery') { box.hidden = true; box.innerHTML = ''; el.querySelector('#payHint').textContent = 'Vous payez à la livraison (espèces ou Mobile Money au livreur).'; return; }
+      const momo = k === 'mtn_momo'; const code = momo ? S.shop.momo_code : S.shop.airtel_code;
+      const keep = { ref: box.querySelector('[name=ref]')?.value || '', payer: box.querySelector('[name=payer]')?.value || '' };
+      box.hidden = false;
+      box.innerHTML = `<p class="momo-amt">Montant à payer : <b>${money(due())}</b></p>
+        <ol class="momo-steps"><li>Ouvrez ${momo ? 'MTN MoMo (application ou menu USSD MTN)' : 'Airtel Money'} et choisissez <b>« Payer un marchand »</b>.</li>
+          <li>Code marchand : <b class="momo-code">${esc(code)}</b> <button type="button" class="btn btn-ghost btn-xs" data-copy="${esc(code)}">Copier</button>${momo && S.shop.momo_name ? `<br><small>Nom affiché : <b>${esc(S.shop.momo_name)}</b></small>` : ''}</li>
+          <li>Montant : <b>${money(due())}</b>, puis validez avec votre code secret.</li>
+          <li>Recopiez ci-dessous la <b>référence (ID de transaction)</b> reçue par SMS.</li></ol>
+        ${momo && S.shop.momo_number ? `<p class="hint">Vous pouvez aussi faire un transfert au <b>${esc(S.shop.momo_number)}</b>${S.shop.momo_name ? ' (' + esc(S.shop.momo_name) + ')' : ''}.</p>` : ''}
+        ${S.shop.momo_instructions ? `<p class="hint">${esc(S.shop.momo_instructions)}</p>` : ''}
+        <div class="two"><label class="fld"><span>Référence de la transaction *</span><input name="ref" maxlength="40" autocomplete="off" placeholder="Ex. : MP2611.1234.A56789" value="${esc(keep.ref)}"></label>
+        <label class="fld"><span>Numéro qui a payé</span><input name="payer" type="tel" inputmode="tel" placeholder="06 …" value="${esc(keep.payer)}"></label></div>`;
+      box.querySelector('[data-copy]').onclick = async e => { try { await navigator.clipboard.writeText(e.currentTarget.dataset.copy); e.currentTarget.textContent = 'Copié ✔'; } catch (_) {} };
+      el.querySelector('#payHint').textContent = 'Nous vérifions votre paiement puis vous appelons pour la livraison.';
+    }
+    f.addEventListener('change', e => { if (e.target.name === 'pay' || e.target.name === 'zone') paintRecap(); });
+    f.addEventListener('input', e => { if (e.target.name === 'phone' || e.target.name === 'name') saveRemoteCart(f.elements.name.value.trim(), f.elements.phone.value.trim()); });
+    if (me.phone) saveRemoteCart(me.name, me.phone);
     const promoMsg = (txt, ok) => { const m = el.querySelector('#promoMsg'); m.textContent = txt; m.className = 'promo-msg ' + (ok ? 'ok' : 'bad'); m.hidden = !txt; };
     async function applyPromo(silent) {
       const code = el.querySelector('#promoCode').value.trim().toUpperCase(); S.promoCode = code;
@@ -190,10 +223,16 @@
       if (digits(v.phone).length < 8 || digits(v.phone).length > 15) return bad('phone', 'Numéro de téléphone invalide.');
       if (!same.checked && v.whatsapp && (digits(v.whatsapp).length < 8 || digits(v.whatsapp).length > 15)) return bad('whatsapp', 'Numéro WhatsApp invalide.');
       if ((v.address || '').trim().length < 3) return bad('address', 'Indiquez votre adresse de livraison.');
+      if (S.zones.length && !v.zone) return bad('zone', 'Choisissez votre quartier de livraison.');
+      const pay = v.pay || 'cash_on_delivery';
+      if (pay !== 'cash_on_delivery' && (v.ref || '').replace(/[^A-Za-z0-9]/g, '').length < 4) return bad('ref', 'Indiquez la référence de la transaction reçue par SMS après le paiement.');
       const btn = el.querySelector('#sendOrder'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Envoi en cours…';
       const items = cartLines().map(l => ({ product_id: l.id, quantity: l.qty }));
       const args = { p_name: v.name.trim(), p_phone: v.phone.trim(), p_whatsapp: same.checked ? '' : (v.whatsapp || '').trim(), p_address: v.address.trim(), p_zone: (v.zone || '').trim(), p_delivery_date: v.date || null, p_notes: (v.notes || '').trim(), p_items: items };
       if (S.promo) args.p_promo_code = S.promo.code;
+      if (pay !== 'cash_on_delivery') { args.p_payment_method = pay; args.p_payment_reference = (v.ref || '').trim(); if ((v.payer || '').trim()) args.p_payer_phone = v.payer.trim(); }
+      if (v.sub) args.p_subscription = v.sub;
+      args.p_cart_token = cartToken();
       const { data, error } = await sb.rpc('place_public_order', args);
       if (error || !data) {
         btn.disabled = false; btn.innerHTML = sendLabel();
@@ -204,19 +243,21 @@
       store.set('myra_shop_me', { name: v.name.trim(), phone: v.phone.trim(), whatsapp: same.checked ? '' : (v.whatsapp || '').trim(), address: v.address.trim(), zone: (v.zone || '').trim() });
       const summary = cartLines().map(l => `• ${l.qty} × ${l.p.name}`).join('\n');
       try { const r = store.get('myra_shop_orders', []).filter(x => x !== data.order_number); r.unshift(data.order_number); localStorage.setItem('myra_shop_orders', JSON.stringify(r.slice(0, 6))); } catch (_) {}
-      S.cart = []; S.promo = null; S.promoCode = ''; saveCart();
+      S.cart = []; S.promo = null; S.promoCode = ''; saveCart(); store.set('myra_cart_token', '');
       done(data, v, summary);
     };
   }
 
   function done(r, v, summary) {
-    const msg = `Bonjour, je viens de passer la commande ${r.order_number} sur votre boutique en ligne :\n${summary}\nTotal : ${money(r.total)}\nNom : ${v.name.trim()}\nAdresse : ${v.address.trim()}${v.zone ? ' (' + v.zone.trim() + ')' : ''}`;
+    const msg = `Bonjour, je viens de passer la commande ${r.order_number} sur votre boutique en ligne :\n${summary}\nTotal : ${money(r.total)}${r.payment_method && r.payment_method !== 'cash_on_delivery' ? '\nPayé par ' + (r.payment_method === 'mtn_momo' ? 'MTN MoMo' : 'Airtel Money') + ' (réf. ' + (v.ref || '').trim() + ')' : ''}\nNom : ${v.name.trim()}\nAdresse : ${v.address.trim()}${v.zone ? ' (' + v.zone.trim() + ')' : ''}`;
     const link = waLink(msg);
     sheet(`${closeBtn}<div class="ok">
       <span class="ok-ico"><i class="fa-solid fa-check" aria-hidden="true"></i></span>
       <h2>Merci ${esc(v.name.trim().split(' ')[0])}, commande reçue !</h2>
       <p>Votre numéro de commande</p><p class="ok-num">${esc(r.order_number)}</p>
-      <p class="ok-total">Total des produits : <b>${money(r.total)}</b>${Number(r.discount) ? ` <small class="muted">(remise ${money(r.discount)} incluse)</small>` : ''}</p>
+      <p class="ok-total">Total : <b>${money(r.total)}</b>${Number(r.delivery_fee) ? ` <small class="muted">(livraison ${money(r.delivery_fee)} incluse)</small>` : ''}${Number(r.discount) ? ` <small class="muted">(remise ${money(r.discount)} incluse)</small>` : ''}</p>
+      ${r.payment_status === 'to_verify' ? '<p class="ok-pay"><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Paiement Mobile Money reçu : nous le vérifions et vous confirmons la livraison.</p>' : ''}
+      ${r.subscription ? '<p class="ok-pay"><i class="fa-solid fa-repeat" aria-hidden="true"></i> Votre demande d’abonnement est enregistrée : nous vous appelons pour la confirmer.</p>' : ''}
       <p class="muted">Nous vous appelons très vite au <b>${esc(v.phone.trim())}</b> pour confirmer la commande et la livraison.</p>
       ${link ? `<a class="btn btn-wa full" href="${esc(link)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Recevoir la confirmation sur WhatsApp</a>` : ''}
       <a class="btn btn-line full" href="commande.html?n=${encodeURIComponent(r.order_number)}"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i> Suivre ma commande</a>
@@ -230,7 +271,7 @@
   const card = (p, rank) => `<article class="card">
       <button type="button" class="card-hit" data-open="${esc(p.id)}" aria-label="${esc(p.name)}, ${money(p.price)}"></button>
       ${rank ? `<span class="rank" aria-hidden="true">${rank}</span>` : ''}
-      <div class="card-media">${thumb(p, 'card-img')}${!p.available ? '<span class="tag">Sur commande</span>' : p.is_new ? '<span class="tag new">Nouveau</span>' : ''}</div>
+      <div class="card-media">${thumb(p, 'card-img')}${!p.available ? '<span class="tag">Sur commande</span>' : p.bundle ? '<span class="tag gift"><i class="fa-solid fa-gift" aria-hidden="true"></i> Coffret</span>' : p.is_new ? '<span class="tag new">Nouveau</span>' : ''}</div>
       <div class="card-body">
         ${p.category ? `<small class="card-cat">${esc(p.category)}</small>` : ''}
         <h3>${esc(p.name)}</h3>
@@ -311,7 +352,7 @@
 
   function fill(data) {
     S.shop = data.shop || {}; S.company = data.company || {}; CUR = S.company.currency || 'FCFA';
-    S.categories = data.categories || []; S.popular = data.popular || []; S.promos = data.promos || [];
+    S.categories = data.categories || []; S.popular = data.popular || []; S.promos = data.promos || []; S.zones = data.zones || [];
     const cats = new Map(S.categories.map(c => [c.id, c.name]));
     S.products = (data.products || []).map(p => ({ ...p, price: Number(p.price || 0), category: cats.get(p.category_id) || '' }));
     const name = S.company.name || 'Les saveurs de Myra';

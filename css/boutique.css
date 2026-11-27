@@ -210,3 +210,13 @@ body.has-cartbar .wa-float{bottom:92px}
   .trust li{flex:1 1 140px}
 }
 @media (max-width:639px){.price small{display:block;margin:2px 0 0}}
+/* V39 — Paiement Mobile Money, quartiers, coffrets, abonnement */
+.pay{border:1px solid var(--line,#e8ebe4);border-radius:16px;padding:10px 12px 12px;margin:4px 0 12px}.pay legend{font-weight:700;padding:0 6px;color:var(--brand-green,#033B02)}
+.pay-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.pay-opt{position:relative;cursor:pointer}.pay-opt input{position:absolute;opacity:0;inset:0}.pay-opt span{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1.5px solid var(--line,#e8ebe4);border-radius:14px;background:#fff;height:100%}
+.pay-opt i{color:var(--brand-gold,#DB820A);font-size:18px}.pay-opt small{color:#6a7a70;font-size:12px}.pay-opt input:checked+span{border-color:var(--brand-green,#033B02);box-shadow:0 0 0 3px rgba(3,59,2,.12);background:#f7fbf2}.pay-opt input:focus-visible+span{outline:2px solid var(--brand-gold,#DB820A)}
+.momo{margin-top:10px;padding:12px;border-radius:14px;background:#fff8e6;border:1px solid #f6dfa4}.momo-amt{margin:0 0 6px;font-size:16px}.momo-steps{margin:0 0 8px;padding-left:20px;line-height:1.6}.momo-code{font-size:18px;letter-spacing:.08em;color:var(--brand-green,#033B02)}
+.btn-xs{padding:3px 10px;font-size:12px;border-radius:99px;min-height:0}
+.pd-bundle{margin:10px 0;padding:12px;border-radius:14px;background:var(--brand-cream,#F4F0E3)}.pd-bundle ul{margin:6px 0;padding-left:20px}.pd-save{margin:0;color:#1d7a3e}
+.tag.gift{background:var(--brand-gold,#DB820A);color:#fff}
+.ok-pay{background:#f1f8e9;border-radius:12px;padding:10px 12px;color:#1E5E05;margin:8px 0}

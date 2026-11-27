@@ -327,3 +327,38 @@ input.switch:focus-visible{outline:3px solid #348907;outline-offset:2px}
 .tm-cred{white-space:pre-wrap;word-break:break-word;background:#f4f8f4;padding:12px;border-radius:12px;font-size:13px;user-select:all}
 @media (max-width:640px){.tm-row{flex-wrap:wrap}.tm-ctl{width:100%;justify-content:flex-start;padding-left:52px}}
 .theme-dark .tm-row.pending,.theme-dark .tm-alert{background:#2a2414;color:#f3d9a0}.theme-dark .tm-cred,.theme-dark .tm-ctl select{background:#18211b;color:inherit;border-color:#2c3a30}
+/* ===== V39 — Administration, caisse, livraisons, coffrets, rentabilité, sécurité ===== */
+.tm-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.tm-tools select,.tm-tools input[type=date]{padding:9px 12px;border-radius:12px;border:1px solid #dfe6e1;font:inherit;background:#fff}
+.tm-tools .search-wrap{flex:1;min-width:200px}
+.tm-del:hover{color:#D11A05;border-color:#f3c3bd}
+.tm-roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}.tm-roles div{padding:10px 12px;border:1px solid #eef1ee;border-radius:14px}.tm-roles b{display:block;color:#033B02}.tm-roles small{color:#7b887f}
+.pm-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.pm-tabs button{padding:9px 16px;border-radius:99px;border:1px solid #e3e8e4;background:#fff;font:inherit;font-weight:600;color:#033B02;cursor:pointer}.pm-tabs button.on{background:#033B02;color:#fff;border-color:#033B02}
+.pm-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:6px}.pm-sw{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid #eef1ee;border-radius:14px}.pm-sw b{display:block}.pm-sw small{color:#7b887f}
+.pm-pct{display:flex;align-items:center;gap:4px}.pm-pct input{width:70px;padding:6px 8px;border-radius:10px;border:1px solid #dfe6e1;font:inherit}
+.pm-sub{margin:14px 0 8px;font-size:14px;color:#033B02;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pm-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}.pm-groups fieldset{border:1px solid #eef1ee;border-radius:14px;padding:8px 12px 10px}.pm-groups legend{font-size:11.5px;font-weight:700;letter-spacing:.04em;color:#DB820A;padding:0 4px}.pm-groups label{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:13.5px;cursor:pointer}.pm-groups i{color:#348907;width:16px;text-align:center}
+.ac-day{margin:14px 0 6px;font-size:12.5px;text-transform:capitalize;color:#DB820A;letter-spacing:.02em}
+.ac-row{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #f0f2f0}.ac-row time{margin-left:auto;color:#7b887f;font-size:12.5px;white-space:nowrap}
+.ac-ico{flex:0 0 32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:13px}.ac-ico.ok{background:#e4f4e9;color:#16723c}.ac-ico.info{background:#eaf3f9;color:#2c6a8f}.ac-ico.bad{background:#fdeeec;color:#D11A05}
+.ac-body{min-width:0;font-size:13.5px}.ac-ch{margin:4px 0 0;padding-left:18px;color:#3a4a40;font-size:12.5px}
+.cc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.cc-col h4{margin:0 0 8px;color:#033B02}
+.cc-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed #e8ebe4}.cc-line.total{border-bottom:0;font-size:15px}.cc-line input{width:150px;padding:8px 10px;border-radius:10px;border:1px solid #dfe6e1;font:inherit;text-align:right}
+.cc-diff{margin:8px 0 12px;padding:10px 12px;border-radius:12px;font-weight:600}.cc-diff.ok{background:#e4f4e9;color:#16723c}.cc-diff.bad{background:#fdeeec;color:#D11A05}.cc-diff.warn{background:#fff6dc;color:#9a6a00}
+.txt-ok{color:#16723c}.txt-bad{color:#D11A05}.txt-warn{color:#b36b00}
+.ds-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}.ds-list{margin:0;padding-left:18px}
+.dv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:14px}
+.dv-card{background:#fff;border:1px solid #eef1ee;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 2px rgba(3,59,2,.04)}.dv-card.out_for_delivery{border-color:#F4BE2B;box-shadow:0 0 0 2px rgba(244,190,43,.25)}.dv-card.delivered{opacity:.8}
+.dv-card header{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.dv-card header b{font-size:15px;color:#033B02}.dv-card i{color:#348907;width:16px}
+.dv-money{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13.5px}.dv-collect{margin-left:auto;color:#DB820A}
+.dv-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.dv-driver{display:flex;gap:8px;align-items:center;font-size:13px}.dv-driver select{flex:1;padding:6px 8px;border-radius:10px;border:1px solid #dfe6e1;font:inherit}
+.dv-photo{width:100%;border-radius:14px}.dv-verify{border-color:#F4BE2B}
+.od-pay{margin-bottom:12px;padding:10px 12px;background:#F4F0E3;border-radius:14px}.od-pay .actions{margin-top:8px}
+.bd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}.bd-items{margin:6px 0 8px;padding-left:18px}.bd-save{color:#16723c;margin:0 0 4px}
+.bd-line{display:flex;gap:8px;margin-bottom:6px}.bd-line select{flex:1;padding:8px;border-radius:10px;border:1px solid #dfe6e1;font:inherit}.bd-line input{width:90px;padding:8px;border-radius:10px;border:1px solid #dfe6e1;font:inherit}
+.co-in{width:90px;padding:6px 8px;border-radius:10px;border:1px solid #dfe6e1;font:inherit}.co-in.sm{width:56px;padding:2px 6px}
+.mfa-box h2{margin:0;color:#033B02}.mfa-ico{font-size:34px;color:#DB820A;margin:0}.mfa-qr{display:flex;justify-content:center;margin:8px 0}.mfa-qr img{width:200px;height:200px;background:#fff;padding:8px;border-radius:12px;border:1px solid #e8ebe4}.mfa-secret{word-break:break-all;background:#F4F0E3;padding:2px 6px;border-radius:6px}.mfa-steps{padding-left:18px;margin:0 0 6px}
+/* Droits : actions masquées selon le rôle (le serveur refuse aussi) */
+body.perm-no-delete [data-delete],body.perm-no-delete #rdDelete,body.perm-no-delete #odDelete,body.perm-no-delete #sdDelete{display:none!important}
+body.perm-no-costs [data-k="cost_price"],body.perm-no-costs [data-k="average_cost"],body.perm-no-costs label.field:has(> [name="cost_price"]),body.perm-no-costs label.field:has(> [name="average_cost"]),body.perm-no-costs .kv:has(+ .kv-cost){display:none!important}
+@media (max-width:760px){.cc-grid{grid-template-columns:1fr}.cc-line input{width:120px}.ac-row time{display:none}.dv-grid,.bd-grid{grid-template-columns:1fr}}
+.theme-dark .dv-card,.theme-dark .tm-tools select,.theme-dark .pm-tabs button,.theme-dark .cc-line input{background:#18211b;color:inherit;border-color:#2c3a30}.theme-dark .od-pay{background:#1d2a20}

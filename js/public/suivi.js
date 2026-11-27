@@ -39,7 +39,8 @@
         ${Number(o.discount) ? `<div class="kv ok"><span>Remise</span><b>− ${money(o.discount)}</b></div>` : ''}
         <div class="kv"><span>Livraison</span><b>${Number(o.delivery_fee) ? money(o.delivery_fee) : 'confirmée par téléphone'}</b></div>
         <div class="kv tot"><span>Total</span><b>${money(o.total)}</b></div>
-        ${o.paid != null && Number(o.paid) > 0 ? `<div class="kv ok"><span>Déjà payé</span><b>${money(o.paid)}</b></div>` : ''}</section>
+        ${o.paid != null && Number(o.paid) > 0 ? `<div class="kv ok"><span>Déjà payé</span><b>${money(o.paid)}</b></div>` : ''}
+        ${o.pay ? `<div class="kv ${o.pay.status === 'paid' ? 'ok' : ''}"><span>Paiement</span><b>${{ mtn_momo: 'MTN MoMo', airtel_money: 'Airtel Money', cash_on_delivery: 'À la livraison' }[o.pay.method] || 'À la livraison'} · ${{ paid: 'reçu ✔', to_verify: 'en cours de vérification', refused: 'non retrouvé : à régler à la livraison', unpaid: 'à la livraison' }[o.pay.status] || ''}</b></div>` : ''}</section>
       <div class="tr-actions">${help ? `<a class="btn btn-wa" href="${esc(help)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Une question ? WhatsApp</a>` : ''}<a class="btn btn-ghost" href="boutique.html"><i class="fa-solid fa-store" aria-hidden="true"></i> Retour à la boutique</a></div>
       <p class="tr-state ${cancelled ? 'bad' : ''}">${cancelled ? 'Commande annulée' : idx >= 0 ? `Étape ${idx + 1} sur ${STEPS.length} · ${esc(STEPS[idx][1])}` : ''}</p>`;
     out.hidden = false; out.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -56,6 +57,7 @@
     if (error || !data) { out.hidden = true; const m = error?.message || ''; err.textContent = /^[A-ZÀ-Ü][^]*\.$/.test(m) && !/function|permission|schema/i.test(m) ? m : (navigator.onLine ? 'Recherche impossible pour le moment. Réessayez dans un instant.' : 'Pas de connexion Internet.'); err.hidden = false; return; }
     try { const r = store.get('myra_shop_orders', []).filter(x => x !== data.number); r.unshift(data.number); localStorage.setItem('myra_shop_orders', JSON.stringify(r.slice(0, 6))); } catch (_) {}
     history.replaceState(null, '', '?n=' + encodeURIComponent(data.number));
+    try { const { data: pay } = await sb.rpc('get_public_order_payment', { p_number: num, p_phone: phone }); if (pay) data.pay = pay; } catch (_) {}
     render(data);
   });
   if (params.get('n') && form.phone.value) form.requestSubmit();
