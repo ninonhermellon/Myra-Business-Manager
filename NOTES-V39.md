@@ -63,4 +63,4 @@ Coût matières (recette × coût moyen des matières ÷ rendement, sinon prix d
 Ensuite un code à 6 chiffres est demandé à chaque nouvelle connexion. **Le serveur refuse toute donnée tant que le code
 n’est pas saisi.** Fortement recommandé pour le compte propriétaire.
 
-Tests : `node tests/e2e/v39.test.js` (50 vérifications). Cache PWA v31.
+Tests : `node tests/e2e/v39.test.js` (52 vérifications). Cache PWA v31.

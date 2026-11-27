@@ -184,7 +184,14 @@ srv.listen(0, async () => {
   await w.screenshot({ path: OUT + '/boutique-confirmation.png', fullPage: true });
   check('Boutique : aucune violation de sécurité ni erreur', csp.length === 0 && werr.length === 0, csp.concat(werr).join(' | ').slice(0, 200));
   check('Boutique : pas de défilement horizontal', await w.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-  await s.close(); await b.close(); srv.close();
+  await s.close();
+  // Service worker (notifications fermées, hors connexion) : il doit s'installer et s'activer
+  const swc = await b.newContext(); await setup(swc, 'visitor'); const sp = await swc.newPage(); await sp.goto(base + 'boutique.html'); await sp.waitForTimeout(500);
+  const swState = await sp.evaluate(async () => { try { const r = await navigator.serviceWorker.register('sw.js'); await navigator.serviceWorker.ready; return (r.active || r.waiting || r.installing)?.state || 'aucun'; } catch (e) { return 'erreur : ' + e.message; } });
+  check('Service worker : installé et actif (notifications, hors connexion)', /activ/.test(swState), swState);
+  const bad = require('child_process').execSync('for f in $(git ls-files "*.js" | grep -v vendor); do node --check "$f" 2>/dev/null || echo "$f"; done', { cwd: ROOT, shell: '/bin/bash' }).toString().trim();
+  check('Tous les fichiers JavaScript sont valides', !bad, bad);
+  await swc.close(); await b.close(); srv.close();
   results.forEach(r => console.log(r.join(' · ')));
   const ok = results.filter(r => r[0].startsWith('OK')).length; console.log(`\n${ok}/${results.length} vérifications réussies`); process.exit(ok === results.length ? 0 : 1);
 });

@@ -52,7 +52,7 @@ self.addEventListener('push', event => {
   event.waitUntil(self.registration.showNotification(title, {
     body: d.body || '',
     icon: './assets/favicon.png',
-    badge: './assets/badge-notification.png', './assets/icons/icon-192.png', './assets/icons/icon-512.png', './favicon.ico',
+    badge: './assets/badge-notification.png',
     tag: d.tag || undefined,
     renotify: !!d.tag,
     vibrate: [120, 60, 120],
