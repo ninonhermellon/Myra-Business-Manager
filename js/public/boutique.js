@@ -273,7 +273,7 @@
     const rated = S.products.filter(p => p.reviews); const avg = rated.length ? rated.reduce((n, p) => n + p.rating * p.reviews, 0) / rated.reduce((n, p) => n + p.reviews, 0) : 0;
     let inner = '<div class="ha-bg"></div>';
     if (S.shop.hero_image) inner += `<img class="ha-cover" src="${esc(S.shop.hero_image)}" alt="">`;
-    else if (document.querySelector('#heroArt .ha-cover')) inner = `<img class="ha-cover" src="assets/hero-marinade.jpg" alt="Marinade universelle Les Saveurs de Myra, 100 % naturelle">`;
+    else if (document.querySelector('#heroArt .ha-cover')) inner = `<img class="ha-cover" src="assets/hero-marinade.jpg" alt="Marinade universelle Les saveurs de Myra, 100 % naturelle">`;
     else if (withImg.length) inner += `<img class="ha-main" src="${esc(withImg[0].image)}" alt="">` + (withImg[1] ? `<img class="ha-side a" src="${esc(withImg[1].image)}" alt="">` : '') + (withImg[2] ? `<img class="ha-side b" src="${esc(withImg[2].image)}" alt="">` : '');
     else inner += '<img class="ha-logo" src="assets/logo-les-saveurs-de-myra.png" alt="">';
     if (isFinite(minPrice) && !inner.includes('hero-marinade')) inner += `<div class="ha-badge">À partir de<b>${money(minPrice)}</b></div>`;
@@ -314,7 +314,7 @@
     S.categories = data.categories || []; S.popular = data.popular || []; S.promos = data.promos || [];
     const cats = new Map(S.categories.map(c => [c.id, c.name]));
     S.products = (data.products || []).map(p => ({ ...p, price: Number(p.price || 0), category: cats.get(p.category_id) || '' }));
-    const name = S.company.name || 'Les Saveurs de Myra';
+    const name = S.company.name || 'Les saveurs de Myra';
     $('#shopName').textContent = name; $('#footName').textContent = name;
     if (S.shop.headline) { const words = S.shop.headline.trim().split(/\s+/); const last = words.pop(); $('#heroTitle').innerHTML = `${esc(words.join(' '))} <span class="hl">${esc(last)}<svg viewBox="0 0 200 14" aria-hidden="true" preserveAspectRatio="none"><path d="M3 10 C 50 2, 120 2, 197 8" /></svg></span>`; }
     if (S.shop.intro) { $('#heroIntro').textContent = S.shop.intro; $('#footIntro').textContent = S.shop.intro; }
@@ -339,7 +339,7 @@
   /* Données structurées des produits (Google : nom, photo, prix, disponibilité) */
   function productsJsonLd() {
     const base = location.origin + location.pathname.replace(/[^/]*$/, '');
-    const data = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Produits ' + (S.company.name || 'Les Saveurs de Myra'),
+    const data = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Produits ' + (S.company.name || 'Les saveurs de Myra'),
       itemListElement: S.products.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, item: {
         '@type': 'Product', name: p.name, description: p.description || undefined, image: p.image || undefined, category: p.category || undefined,
         url: base + 'boutique.html?p=' + encodeURIComponent(p.id),

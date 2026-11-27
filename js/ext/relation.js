@@ -27,7 +27,7 @@
         const c = customers.find(x => x.id === b.dataset.send); let l = active.get(c.id);
         if (!l) { const { data, error } = await app.sb.from('customer_portal_links').insert({ customer_id: c.id }).select('*').single(); if (error) return app.toast(X.explain(error), true); l = data; }
         const url = siteUrl('client.html?t=' + l.token);
-        window.open(wa(c.phone, `Bonjour ${c.full_name.split(' ')[0]}, voici votre espace client Les Saveurs de Myra : vos factures, ce qu’il reste à payer et vos points fidélité.\n${url}`), '_blank', 'noopener');
+        window.open(wa(c.phone, `Bonjour ${c.full_name.split(' ')[0]}, voici votre espace client Les saveurs de Myra : vos factures, ce qu’il reste à payer et vos points fidélité.\n${url}`), '_blank', 'noopener');
         EXT.pages.portal_links.render(host, app);
       });
       host.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy(siteUrl('client.html?t=' + b.dataset.copy)));
@@ -161,7 +161,7 @@
           if (g.error) return app.toast(X.explain(g.error), true);
           const r = await app.sb.from('referral_rewards').insert({ referrer_id: p.id, referee_id: f.id, gift_card_id: g.data.id, amount });
           if (r.error) return app.toast(X.explain(r.error), true);
-          m.close(); window.open(wa(p.phone, `Bonjour ${p.full_name.split(' ')[0]}, merci d’avoir recommandé Les Saveurs de Myra à ${f.full_name} ! 🎁 Voici un bon cadeau de ${money(amount)} : code ${code}, valable 6 mois.`), '_blank', 'noopener');
+          m.close(); window.open(wa(p.phone, `Bonjour ${p.full_name.split(' ')[0]}, merci d’avoir recommandé Les saveurs de Myra à ${f.full_name} ! 🎁 Voici un bon cadeau de ${money(amount)} : code ${code}, valable 6 mois.`), '_blank', 'noopener');
           app.toast('Bon cadeau créé.'); EXT.pages.referrals.render(host, app);
         });
       });

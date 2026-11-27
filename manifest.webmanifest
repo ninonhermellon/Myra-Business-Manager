@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Myra Business Manager",
-  "short_name": "Myra Manager",
-  "description": "Gestion commerciale et de production — Les Saveurs de Myra",
+  "name": "LSM Business Manager",
+  "short_name": "LSM Manager",
+  "description": "Gestion commerciale et de production — Les saveurs de Myra",
   "lang": "fr-FR",
   "dir": "ltr",
   "start_url": "./",
@@ -11,7 +11,7 @@
   "display_override": ["window-controls-overlay", "standalone"],
   "orientation": "any",
   "background_color": "#f5f8f5",
-  "theme_color": "#0d4426",
+  "theme_color": "#033B02",
   "categories": ["business", "productivity", "food"],
   "icons": [
     { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

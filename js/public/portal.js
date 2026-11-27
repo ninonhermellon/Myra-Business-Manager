@@ -17,7 +17,7 @@
     const waNum = (() => { let d = String(c.phone || '').replace(/\D/g, ''); if (!d) return ''; if (d.startsWith('00')) d = d.slice(2); else if (!d.startsWith('242') && (d.startsWith('0') || d.length <= 9)) d = '242' + d; return d; })();
     const wa = waNum ? 'https://wa.me/' + waNum : '';
     app.innerHTML = `
-      <header class="pub-head">${c.logo ? `<img src="${esc(c.logo)}" alt="" class="pub-logo">` : '<img src="assets/logo-les-saveurs-de-myra.png" alt="" class="pub-logo">'}<div><small>${esc(c.name || 'Les Saveurs de Myra')}</small><h1>Bonjour ${esc((data.customer?.name || '').split(' ')[0])} 👋</h1></div></header>
+      <header class="pub-head">${c.logo ? `<img src="${esc(c.logo)}" alt="" class="pub-logo">` : '<img src="assets/logo-les-saveurs-de-myra.png" alt="" class="pub-logo">'}<div><small>${esc(c.name || 'Les saveurs de Myra')}</small><h1>Bonjour ${esc((data.customer?.name || '').split(' ')[0])} 👋</h1></div></header>
       <section class="pub-kpis">
         <div class="pub-kpi ${Number(data.outstanding) > 0 ? 'warn' : 'ok'}"><small>Reste à payer</small><b>${money(data.outstanding, cur)}</b></div>
         <div class="pub-kpi"><small>Points fidélité</small><b>${Number(data.points || 0)}</b></div>

@@ -81,7 +81,7 @@
       const labelHtml = () => {
         const p = products.find(x => x.id === f.elements.product.value); const l = lots.find(x => x.id === f.elements.lot.value);
         const qrText = f.elements.qr.value === 'lot' && l ? `MYRA:LOT:${l.lot_number}` : f.elements.qr.value === 'none' ? '' : `MYRA:PRODUIT:${p.id}`;
-        return `<div class="lbl"><div class="lbl-txt"><small>${esc(company.name || 'Les Saveurs de Myra')}</small><b>${esc(p.name)}</b><span>${esc(p.unit || '')}</span><strong>${money(p.sale_price)}</strong>${l ? `<em>Lot ${esc(l.lot_number)}</em><em>À consommer avant le ${fdate(l.expiry_date)}</em>` : ''}</div>${qrText ? `<div class="lbl-qr">${X.qrSvg(qrText, 2)}</div>` : ''}</div>`;
+        return `<div class="lbl"><div class="lbl-txt"><small>${esc(company.name || 'Les saveurs de Myra')}</small><b>${esc(p.name)}</b><span>${esc(p.unit || '')}</span><strong>${money(p.sale_price)}</strong>${l ? `<em>Lot ${esc(l.lot_number)}</em><em>À consommer avant le ${fdate(l.expiry_date)}</em>` : ''}</div>${qrText ? `<div class="lbl-qr">${X.qrSvg(qrText, 2)}</div>` : ''}</div>`;
       };
       const preview = () => { host.querySelector('#lblPreview').innerHTML = products.length ? labelHtml() : '<p class="muted">Ajoutez d’abord des produits.</p>'; };
       f.elements.product.addEventListener('change', fillLots); f.elements.lot.addEventListener('change', preview); f.elements.qr.addEventListener('change', preview);

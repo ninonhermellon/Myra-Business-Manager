@@ -1,4 +1,4 @@
-// Myra Business Manager — assistant (fonction serveur Supabase « myra-assistant »)
+// LSM Business Manager — assistant (fonction serveur Supabase « myra-assistant »)
 //
 // Reçoit une question et un résumé chiffré préparé par l'application (ventes,
 // produits, clients, stock), puis demande la réponse à Claude. La clé de l'API

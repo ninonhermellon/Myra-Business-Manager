@@ -1,6 +1,6 @@
 /* ==========================================================================
    MYRA BUSINESS MANAGER — V28 · REMISE EN ORDRE UI/UX
-   Chargée en dernier. Ne change pas l'identité (vert #0d4426, feuille #71990e,
+   Chargée en dernier. Ne change pas l'identité (vert #033B02, feuille #348907,
    verre dépoli) : corrige la hiérarchie, la lisibilité et l'usage mobile.
    Principes : un seul titre par écran, une action principale visible,
    aucune donnée utile cachée hors écran, cibles tactiles ≥ 44 px.
@@ -40,7 +40,7 @@
 /* ---------- 4. Cartes produits : nom et prix d'abord, un seul badge utile ---------- */
 .prod-card .pc-body{gap:8px}
 .prod-card .pc-body h4{order:0;margin:0;font:800 15px/1.3 Manrope,sans-serif;color:var(--v28-ink)}
-.prod-card .pc-price{order:1;font:800 17px/1.2 Manrope,sans-serif;color:#0d4426;font-variant-numeric:tabular-nums}
+.prod-card .pc-price{order:1;font:800 17px/1.2 Manrope,sans-serif;color:#033B02;font-variant-numeric:tabular-nums}
 .prod-card .pc-tags{order:2;display:flex;flex-wrap:wrap;gap:6px}
 .prod-card .pc-tags .tag{display:inline-flex;width:auto;margin:0;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:700;background:var(--v28-neutral-bg);color:var(--v28-neutral)}
 .prod-card .pc-tags .tag.ok{background:var(--v28-ok-bg);color:var(--v28-ok)}

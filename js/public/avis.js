@@ -12,7 +12,7 @@
   sb.rpc('get_review_request', { p_token: token }).then(({ data, error }) => {
     if (error || !data) { app.innerHTML = window.MyraLanding ? window.MyraLanding('avis', 'Ce lien n’existe pas ou plus. Vous pouvez nous donner votre avis directement sur WhatsApp.') : box('fa-link-slash', 'Lien indisponible', 'Ce lien n’existe pas ou plus.'); return; }
     if (data.submitted) { app.innerHTML = box('fa-circle-check', 'Avis déjà envoyé', `Merci, vous avez déjà donné votre avis (${'★'.repeat(data.rating || 0)}).`); return; }
-    app.innerHTML = `<section class="pub-card"><header class="pub-head"><img src="assets/logo-les-saveurs-de-myra.png" alt="" class="pub-logo"><div><small>${esc(data.company || 'Les Saveurs de Myra')}</small><h1>${data.customer ? 'Bonjour ' + esc(data.customer) + ' !' : 'Bonjour !'}</h1></div></header>
+    app.innerHTML = `<section class="pub-card"><header class="pub-head"><img src="assets/logo-les-saveurs-de-myra.png" alt="" class="pub-logo"><div><small>${esc(data.company || 'Les saveurs de Myra')}</small><h1>${data.customer ? 'Bonjour ' + esc(data.customer) + ' !' : 'Bonjour !'}</h1></div></header>
       <p>Comment avez-vous trouvé votre commande <b>${esc(data.reference || '')}</b> ?</p>${(data.items || []).length ? `<p class="muted">${(data.items || []).map(esc).join(', ')}</p>` : ''}
       <form id="rvForm" novalidate>${window.MyraAvis.CRITERIA.map(window.MyraAvis.starInput).join('')}
       <label class="pub-field">Un commentaire ? (facultatif)<textarea id="comment" maxlength="1000" rows="3" placeholder="Ce que vous avez aimé, ce que nous pouvons améliorer…"></textarea></label>

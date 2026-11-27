@@ -1,6 +1,6 @@
 /* ==========================================================================
    MYRA BUSINESS MANAGER — V25 · COUCHE UX / DESIGN PATTERNS
-   Chargée après styles.css. Palette conservée : #0d4426 · #71990e · #f9e207
+   Chargée après styles.css. Palette conservée : #033B02 · #348907 · #F4BE2B
    ========================================================================== */
 :root{
   --ok:#2f7d4f;--ok-bg:#eaf5ee;--warn:#9a6a00;--warn-bg:#fff6dc;--danger:#b3392e;--danger-bg:#fdeeec;--info:#2c6a8f;--info-bg:#eaf3f9;
@@ -229,7 +229,7 @@ td{padding-top:var(--row-pad,14px);padding-bottom:var(--row-pad,14px)}
   .bottom-nav button i{font-size:17px}
   .bottom-nav button.active{color:var(--green)}
   .bottom-nav button.active i{color:var(--leaf)}
-  .bottom-nav .bn-plus{width:50px;height:50px;min-height:0;margin:-20px auto 0;border-radius:50%;background:linear-gradient(135deg,#0d4426,#155b35);color:#fff;box-shadow:0 8px 20px rgba(13,68,38,.35)}
+  .bottom-nav .bn-plus{width:50px;height:50px;min-height:0;margin:-20px auto 0;border-radius:50%;background:linear-gradient(135deg,#033B02,#155b35);color:#fff;box-shadow:0 8px 20px rgba(3,59,2,.35)}
   .bottom-nav .bn-plus i{font-size:19px;color:#fff}
   .top-search{min-width:0;width:38px;padding:0;justify-content:center}.top-search span,.top-search kbd{display:none}
   #quickCreateBtn{display:none}

@@ -1,13 +1,13 @@
 /* ==========================================================================
    MYRA BUSINESS MANAGER — FEUILLE DE STYLES CONSOLIDÉE
-   Identité : Les Saveurs de Myra (#0d4426, #71990e, #f9e207)
+   Identité : Les Saveurs de Myra (#033B02, #348907, #F4BE2B)
    ========================================================================== */
 
 :root {
-  --green: #0d4426;
+  --green: #033B02;
   --green2: #155b35;
-  --leaf: #71990e;
-  --yellow: #f9e207;
+  --leaf: #348907;
+  --yellow: #F4BE2B;
   --ink: #18251d;
   --muted: #78847b;
   --line: #edf1ee;
@@ -65,7 +65,7 @@ button {
   padding: 42px;
   border: 1px solid #e8eee9;
   border-radius: 24px;
-  box-shadow: 0 25px 80px rgba(13, 68, 38, 0.1);
+  box-shadow: 0 25px 80px rgba(3,59,2, 0.1);
 }
 
 .auth-logo {
@@ -75,7 +75,7 @@ button {
   object-fit: contain;
   border-radius: 18px;
   margin: 0 auto 14px;
-  box-shadow: 0 12px 34px rgba(13, 68, 38, 0.13);
+  box-shadow: 0 12px 34px rgba(3,59,2, 0.13);
 }
 
 .brand-mark {
@@ -154,7 +154,7 @@ button {
 .field select:focus,
 .field textarea:focus {
   border-color: var(--leaf);
-  box-shadow: 0 0 0 3px #71990e18;
+  box-shadow: 0 0 0 3px #34890718;
 }
 
 .btn {
@@ -850,7 +850,7 @@ td strong {
 .bar {
   width: min(100%, 34px);
   border-radius: 6px 6px 2px 2px;
-  background: linear-gradient(180deg, #71990e, #0d4426);
+  background: linear-gradient(180deg, #348907, #033B02);
   min-height: 3px;
 }
 
@@ -1099,7 +1099,7 @@ td strong {
 }
 
 .legend-dot.income {
-  background: #71990e;
+  background: #348907;
 }
 
 .legend-dot.expense {
@@ -1204,7 +1204,7 @@ td strong {
 .progress-fill {
   height: 100%;
   border-radius: 20px;
-  background: linear-gradient(90deg, #71990e, #0d4426);
+  background: linear-gradient(90deg, #348907, #033B02);
 }
 
 .collection-summary {
@@ -1236,7 +1236,7 @@ td strong {
 }
 
 .paid-dot {
-  background: #71990e;
+  background: #348907;
 }
 
 .due-dot {
@@ -1276,7 +1276,7 @@ td strong {
   height: 130px;
   border-radius: 50%;
   margin: 14px auto 10px;
-  background: conic-gradient(#71990e var(--ring), #e9efea 0);
+  background: conic-gradient(#348907 var(--ring), #e9efea 0);
   display: grid;
   place-items: center;
   position: relative;
@@ -2106,16 +2106,19 @@ td strong {
    Direction artistique : Premium & élégante · Densité équilibrée
    Couche de présentation uniquement : aucune logique métier modifiée.
    ========================================================================== */
-:root{color-scheme:light;--green:#0d4426;--green2:#155b35;--leaf:#71990e;--yellow:#f9e207;--ink:#17251c;--muted:#758278;--line:#e8eee9;--bg:#f5f7f5;--white:#fff;--shadow-xs:0 1px 2px rgba(18,43,27,.035);--shadow:0 8px 24px rgba(18,43,27,.055);--shadow-lg:0 18px 55px rgba(18,43,27,.12);--radius-sm:10px;--radius-md:15px;--radius-lg:20px;--focus-ring:0 0 0 3px rgba(113,153,14,.18)}
+:root{
+  /* Charte graphique officielle — Les saveurs de Myra (V39) */
+  --brand-green:#033B02;--brand-gold:#DB820A;--brand-natural:#348907;--brand-light:#84C70E;--brand-yellow:#F4BE2B;--brand-red:#D11A05;--brand-cream:#F4F0E3;
+color-scheme:light;--green:#033B02;--green2:#155b35;--leaf:#348907;--yellow:#F4BE2B;--ink:#17251c;--muted:#758278;--line:#e8eee9;--bg:#f5f7f5;--white:#fff;--shadow-xs:0 1px 2px rgba(18,43,27,.035);--shadow:0 8px 24px rgba(18,43,27,.055);--shadow-lg:0 18px 55px rgba(18,43,27,.12);--radius-sm:10px;--radius-md:15px;--radius-lg:20px;--focus-ring:0 0 0 3px rgba(113,153,14,.18)}
 html{scroll-behavior:smooth;scrollbar-color:#cbd7ce transparent}body{background:var(--bg);color:var(--ink);font-family:"DM Sans",sans-serif;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}button,input,select,textarea{font-family:inherit}button{transition:background-color .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;box-shadow:var(--focus-ring)}::selection{color:#fff;background:var(--green)}
 /* Authentification */
-.auth-shell{padding:28px;background:radial-gradient(ellipse at 12% 15%,rgba(113,153,14,.10),transparent 34%),radial-gradient(ellipse at 88% 85%,rgba(13,68,38,.08),transparent 38%),#f5f8f5}.auth-card{width:min(100%,440px);padding:42px 40px 34px;border:1px solid rgba(222,232,224,.9);border-radius:26px;box-shadow:0 24px 75px rgba(13,68,38,.10)}.auth-logo{width:116px;height:116px;padding:5px;border:1px solid #edf2ed;border-radius:22px;box-shadow:0 8px 24px rgba(13,68,38,.08)}.eyebrow{margin-top:22px;letter-spacing:2.2px}.auth-card h1{font-size:clamp(27px,5vw,32px);letter-spacing:-1.2px}.auth-card>p.muted{font-size:13px;line-height:1.7}
+.auth-shell{padding:28px;background:radial-gradient(ellipse at 12% 15%,rgba(113,153,14,.10),transparent 34%),radial-gradient(ellipse at 88% 85%,rgba(3,59,2,.08),transparent 38%),#f5f8f5}.auth-card{width:min(100%,440px);padding:42px 40px 34px;border:1px solid rgba(222,232,224,.9);border-radius:26px;box-shadow:0 24px 75px rgba(3,59,2,.10)}.auth-logo{width:116px;height:116px;padding:5px;border:1px solid #edf2ed;border-radius:22px;box-shadow:0 8px 24px rgba(3,59,2,.08)}.eyebrow{margin-top:22px;letter-spacing:2.2px}.auth-card h1{font-size:clamp(27px,5vw,32px);letter-spacing:-1.2px}.auth-card>p.muted{font-size:13px;line-height:1.7}
 /* Cadre et navigation */
 .app{background:var(--bg)}.sidebar{width:268px;padding:23px 16px 18px;background:#fff;border-right:1px solid #e9efea;box-shadow:5px 0 28px rgba(21,50,33,.018)}.brand{gap:12px;padding:0 9px 27px}.sidebar-logo{width:48px;height:48px;padding:2px;object-fit:contain;background:#fff;border:1px solid #edf1ed;border-radius:14px}.brand b{font-size:15px;letter-spacing:1.4px}.brand small{font-size:8px;letter-spacing:1.25px}.workspace-label,.nav-group{color:#98a49b;font-size:9px;letter-spacing:1.25px}.workspace-label{padding:0 12px 11px}.navigation{gap:4px;padding:0 1px 12px;scrollbar-width:thin}.nav-group{padding:17px 12px 6px}.nav-item{min-height:42px;padding:10px 12px;gap:12px;border-radius:11px;color:#647268;font-size:12px;font-weight:600}.nav-item i{width:18px;font-size:14px;color:#87958a}.nav-item:hover{background:#f5f8f5;color:var(--green)}.nav-item:hover i{color:var(--leaf)}.nav-item.active{position:relative;background:#edf4ee;color:var(--green);font-weight:700;box-shadow:none}.nav-item.active::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 5px 5px 0;background:var(--leaf)}.nav-item.active i{color:var(--green)}.sidebar-bottom{padding-top:14px}.user-mini{gap:11px;padding:7px 8px 14px}.user-mini b{font-size:12px;font-weight:700}.avatar{width:36px;height:36px;background:#eaf2eb;border:1px solid #e1ebe2;color:var(--green)}.logout{padding:10px 9px;border-radius:9px;font-size:11px}.logout:hover{color:#a33d35;background:#fff4f2}
 /* Barre supérieure */
 .main{margin-left:268px;width:calc(100% - 268px);background:#f6f8f6}.topbar{min-height:78px;height:78px;padding:0 36px;background:rgba(255,255,255,.92);border-bottom:1px solid #e9efea;box-shadow:0 2px 12px rgba(24,50,32,.018)}.crumb{color:#9aa69d;font-size:10px;letter-spacing:.1px}.crumb b{color:#526257;font-weight:700}.welcome{margin-top:3px;color:#17251c;font:800 18px/1.3 "Manrope",sans-serif;letter-spacing:-.45px}.topbar-right{gap:10px}.live-dot{width:8px;height:8px;box-shadow:0 0 0 4px rgba(67,166,106,.10)}.status-text{font-size:11px;font-weight:600}.top-avatar{margin-left:8px}.content{max-width:1760px;padding:32px 36px 44px}.main footer{padding:17px 36px;color:#9aa59d;background:rgba(255,255,255,.55);font-size:10px}
 /* Titres et boutons */
-.page-head{align-items:center;margin-bottom:24px}.page-head h2{margin-bottom:6px;color:#193d27;font:800 22px/1.3 "Manrope",sans-serif;letter-spacing:-.55px}.page-head p{max-width:720px;color:#7c8980;font-size:12px;line-height:1.65}.actions{gap:9px}.btn{min-height:39px;padding:10px 15px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.05px}.btn.primary{color:#fff;background:linear-gradient(135deg,#0d4426,#155b35);box-shadow:0 4px 10px rgba(13,68,38,.12)}.btn.primary:hover{background:#0b3820;box-shadow:0 6px 15px rgba(13,68,38,.18);transform:translateY(-1px)}.btn.yellow{background:var(--yellow);color:#183c24;box-shadow:0 3px 8px rgba(180,157,0,.12)}.btn.light{color:#365541;background:#f0f5f0;border:1px solid #e5ede6}.btn.light:hover{color:var(--green);background:#e8f0e9;border-color:#d7e4d9}.btn.danger{border:1px solid #f7e2df}.icon-button{width:38px;height:38px;display:inline-grid;place-items:center;border:1px solid #e8eee9;border-radius:11px;background:#fff;color:#5f7064}.icon-button:hover{color:var(--green);background:#f6faf6}
+.page-head{align-items:center;margin-bottom:24px}.page-head h2{margin-bottom:6px;color:#193d27;font:800 22px/1.3 "Manrope",sans-serif;letter-spacing:-.55px}.page-head p{max-width:720px;color:#7c8980;font-size:12px;line-height:1.65}.actions{gap:9px}.btn{min-height:39px;padding:10px 15px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.05px}.btn.primary{color:#fff;background:linear-gradient(135deg,#033B02,#155b35);box-shadow:0 4px 10px rgba(3,59,2,.12)}.btn.primary:hover{background:#022801;box-shadow:0 6px 15px rgba(3,59,2,.18);transform:translateY(-1px)}.btn.yellow{background:var(--yellow);color:#183c24;box-shadow:0 3px 8px rgba(180,157,0,.12)}.btn.light{color:#365541;background:#f0f5f0;border:1px solid #e5ede6}.btn.light:hover{color:var(--green);background:#e8f0e9;border-color:#d7e4d9}.btn.danger{border:1px solid #f7e2df}.icon-button{width:38px;height:38px;display:inline-grid;place-items:center;border:1px solid #e8eee9;border-radius:11px;background:#fff;color:#5f7064}.icon-button:hover{color:var(--green);background:#f6faf6}
 /* Cartes, panneaux, KPI */
 .stat-card,.panel,.table-card{border:1px solid #e8eee9;border-radius:17px;background:#fff;box-shadow:var(--shadow-xs),0 6px 18px rgba(21,50,33,.025)}.stat-card{position:relative;padding:19px 20px;overflow:hidden}.stat-card::after{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,rgba(113,153,14,.55),transparent 70%);opacity:.65}.stat-top{color:#78867c;font-size:11px;font-weight:600}.stat-icon{width:36px;height:36px;border-radius:12px}.stat-value{margin:14px 0 5px;color:#183c26;font:800 23px/1.25 "Manrope",sans-serif;letter-spacing:-.65px;overflow-wrap:anywhere}.stat-foot{color:#9aa69d;font-size:10px;line-height:1.5}.panel{padding:20px}.panel-title{margin-bottom:17px}.panel-title h3{color:#23382a;font:800 13px/1.4 "Manrope",sans-serif;letter-spacing:-.15px}.panel-title span{color:#95a198;font-size:10px;line-height:1.5}.quick-action{min-height:58px;padding:13px 14px;border:1px solid #e9efea;border-radius:12px;background:#fff;font-size:11px}.quick-action:hover{border-color:#cbdaca;background:#f8fbf8;box-shadow:var(--shadow-xs);transform:translateY(-1px)}.quick-action i{color:var(--leaf)}
 /* Tableaux */

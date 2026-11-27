@@ -1,4 +1,4 @@
-# Myra Business Manager V32 — connecteur Loyverse
+# LSM Business Manager V32 — connecteur Loyverse
 
 ## Périmètre livré
 

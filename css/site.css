@@ -1,10 +1,13 @@
 /* Les Saveurs de Myra — système graphique du site public (boutique, suivi de commande, avis, espace client).
-   Charte : vert profond #0d4426 · vert feuille #71990e · jaune #F9E207 · crème · blanc. */
+   Charte : vert profond #033B02 · vert feuille #348907 · jaune #F4BE2B · crème · blanc. */
 :root{
-  --green:#0d4426;--green-2:#145c35;--green-3:#1d7043;--leaf:#71990e;--leaf-2:#86b01a;--lime:#e9f3d0;--yellow:#F9E207;
-  --cream:#f6f2e6;--cream-2:#fbf8ef;--paper:#fff;--ink:#13231a;--ink-2:#3a4a40;--muted:#6a7a70;--line:#e8ebe4;
-  --bad:#b3261e;--warn:#9a6a00;--r:20px;--r-lg:28px;
-  --shadow:0 1px 2px rgba(13,68,38,.05),0 12px 32px rgba(13,68,38,.08);
+  /* Charte graphique officielle — Les saveurs de Myra (V39) */
+  --brand-green:#033B02;--brand-gold:#DB820A;--brand-natural:#348907;--brand-light:#84C70E;--brand-yellow:#F4BE2B;--brand-red:#D11A05;--brand-cream:#F4F0E3;
+
+  --green:#033B02;--green-2:#1E5E05;--green-3:#2A7406;--leaf:#348907;--leaf-2:#84C70E;--lime:#e9f3d0;--yellow:#F4BE2B;
+  --cream:var(--brand-cream);--cream-2:#fbf8ef;--paper:#fff;--ink:#13231a;--ink-2:#3a4a40;--muted:#6a7a70;--line:#e8ebe4;
+  --bad:#D11A05;--warn:#9a6a00;--r:20px;--r-lg:28px;
+  --shadow:0 1px 2px rgba(3,59,2,.05),0 12px 32px rgba(3,59,2,.08);
   --head:'Fraunces',Georgia,'Times New Roman',serif;--body:'DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --wrap:1200px;
 }
@@ -126,7 +129,7 @@ h1,h2,h3{font-family:var(--head);line-height:1.12;margin:0;letter-spacing:-.015e
 .page-hero h1{font-size:clamp(28px,4.5vw,40px)}
 .page-hero p{color:var(--muted);font-size:17px;margin:8px auto 0;max-width:560px}
 .narrow{max-width:640px;margin:0 auto;padding:24px 20px 60px}
-.box{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:0 1px 2px rgba(13,68,38,.04);margin-bottom:16px}
+.box{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:0 1px 2px rgba(3,59,2,.04);margin-bottom:16px}
 .box-h{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;margin:-20px -20px 14px;padding:16px 20px;border-bottom:1px solid var(--line)}
 
 @media (min-width:700px){.two{grid-template-columns:1fr 1fr}.foot-grid{grid-template-columns:1.4fr 1fr 1fr 1.2fr}.act .lbl{display:inline}}

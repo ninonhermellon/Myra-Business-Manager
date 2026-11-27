@@ -1,4 +1,4 @@
-/* Myra Business Manager — UI Kit (chargé avant app.js)
+/* LSM Business Manager — UI Kit (chargé avant app.js)
    Remplace les fenêtres natives confirm()/prompt() par des dialogues accessibles,
    fournit des formulaires modaux validés et des notifications (toasts) enrichies. */
 (() => {

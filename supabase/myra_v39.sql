@@ -326,9 +326,13 @@ alter table public.shop_settings
   add column if not exists momo_instructions text,
   add column if not exists airtel_code text,
   add column if not exists accept_cash_on_delivery boolean not null default true,
-  add column if not exists free_delivery_from numeric(14,2);
-update public.shop_settings set momo_code = '245950' where momo_code is null;
-update public.shop_settings set momo_name = 'Les Saveurs de Myra' where momo_name is null;
+  add column if not exists free_delivery_from numeric(14,2),
+  add column if not exists momo_number text;
+-- Identité officielle (V39)
+update public.shop_settings set momo_code = '245950', momo_number = '068172503', momo_name = 'Hermellon Glacial',
+  whatsapp = '+242069007022', facebook_url = 'https://www.facebook.com/lessaveursdemyra', instagram_url = 'https://www.instagram.com/lessaveursdemyra',
+  tiktok_url = 'https://www.tiktok.com/@lessaveursdemyra', updated_at = now();
+update public.company_settings set company_name = 'Les saveurs de Myra', phone = '+242069007022', updated_at = now();
 
 alter table public.customer_orders
   add column if not exists payment_method text,
@@ -413,7 +417,7 @@ returns jsonb language sql stable security definer set search_path = '' as $$
   select jsonb_build_object(
     'shop', (select jsonb_build_object('open', s.is_open, 'headline', s.headline, 'intro', s.intro, 'delivery', s.delivery_info, 'min_order', s.min_order, 'whatsapp', s.whatsapp,
               'hero_image', s.hero_image_url, 'announcement', s.announcement, 'hours', s.hours, 'facebook', s.facebook_url, 'instagram', s.instagram_url, 'tiktok', s.tiktok_url,
-              'momo_code', s.momo_code, 'momo_name', s.momo_name, 'momo_instructions', s.momo_instructions, 'airtel_code', s.airtel_code,
+              'momo_code', s.momo_code, 'momo_number', s.momo_number, 'momo_name', s.momo_name, 'momo_instructions', s.momo_instructions, 'airtel_code', s.airtel_code,
               'cash_on_delivery', s.accept_cash_on_delivery, 'free_delivery_from', s.free_delivery_from) from public.shop_settings s limit 1),
     'company', (select jsonb_build_object('name', cs.company_name, 'phone', cs.phone, 'email', cs.email, 'address', cs.address, 'currency', coalesce(cs.currency_label, 'FCFA')) from public.company_settings cs order by cs.created_at limit 1),
     'zones', coalesce((select jsonb_agg(jsonb_build_object('name', z.name, 'fee', z.fee, 'delay', z.delay) order by z.sort_order, z.name) from public.delivery_zones z where z.is_active), '[]'::jsonb),

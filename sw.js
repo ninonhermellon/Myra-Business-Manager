@@ -1,4 +1,4 @@
-/* Myra Business Manager — cache applicatif résilient */
+/* LSM Business Manager — cache applicatif résilient */
 const CACHE_NAME = 'myra-manager-shell-v30';
 const RUNTIME_CACHE = 'myra-manager-runtime-v30';
 const APP_SHELL = [
@@ -48,7 +48,7 @@ self.addEventListener('fetch', event => {
 self.addEventListener('push', event => {
   let d = {};
   try { d = event.data ? event.data.json() : {}; } catch (_) { d = { body: event.data ? event.data.text() : '' }; }
-  const title = d.title || 'Myra Business Manager';
+  const title = d.title || 'LSM Business Manager';
   event.waitUntil(self.registration.showNotification(title, {
     body: d.body || '',
     icon: './assets/favicon.png',

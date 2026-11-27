@@ -25,7 +25,7 @@ function jsonld(p) {
   const data = [
     { '@context': 'https://schema.org', '@type': 'WebSite', name: cfg.siteName, url: abs(p.path), inLanguage: 'fr' },
     { '@context': 'https://schema.org', '@type': 'Store', '@id': abs('/#entreprise'), name: cfg.siteName, url: abs(p.path),
-      logo: abs('/assets/icons/icon-512.png'), image: [abs(p.image), abs('/assets/og/og-square.jpg')], description: p.description,
+      logo: abs('/assets/icons/public-512.png'), image: [abs(p.image), abs('/assets/og/og-square.jpg')], description: p.description,
       slogan: 'Le secret de nos marmites', currenciesAccepted: 'XAF', paymentAccepted: 'Espèces, Mobile Money',
       address: { '@type': 'PostalAddress', addressLocality: 'Brazzaville', addressCountry: 'CG' }, areaServed: { '@type': 'City', name: 'Brazzaville' } },
   ];
@@ -40,12 +40,17 @@ function block(file, p) {
     `<meta name="description" content="${esc(p.description)}">`,
     `<meta name="robots" content="${esc(p.robots)}">`,
     `<meta name="theme-color" content="${esc(cfg.themeColor)}">`,
-    `<meta name="application-name" content="${esc(file === 'index.html' ? 'Myra Manager' : cfg.siteName)}">`,
+    `<meta name="application-name" content="${esc(file === 'index.html' ? 'LSM Manager' : cfg.siteName)}">`,
     p.noCanonical ? '' : `<link rel="canonical" href="${esc(url)}">`,
-    `<link rel="icon" href="/favicon.ico" sizes="any">`,
-    `<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">`,
-    `<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">`,
-    `<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">`,
+    // Logo officiel : fond vert pour l'application (administration), fond blanc pour les pages publiques
+    ...(['index.html', 'loyverse.html'].includes(file) ? [
+      `<link rel="icon" href="/favicon.ico" sizes="any">`,
+      `<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">`,
+      `<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">`,
+      `<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">`] : [
+      `<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/public-192.png">`,
+      `<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/public-32.png">`,
+      `<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/public-180.png">`]),
     p.manifest ? `<link rel="manifest" href="manifest.webmanifest">` : '',
     `<meta property="og:type" content="${esc(p.type || 'website')}">`,
     `<meta property="og:site_name" content="${esc(cfg.siteName)}">`,
@@ -86,5 +91,5 @@ for (const [file, p] of Object.entries(cfg.pages)) {
 const indexable = Object.values(cfg.pages).filter(p => /(^|,\s*)index/.test(p.robots) && !p.noCanonical);
 const today = new Date().toISOString().slice(0, 10);
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${[...new Map(indexable.map(p => [p.path, p])).values()].map(p => `  <url>\n    <loc>${abs(p.path)}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n    <image:image><image:loc>${abs(p.image)}</image:loc></image:image>\n  </url>`).join('\n')}\n</urlset>\n`);
-fs.writeFileSync(path.join(ROOT, 'robots.txt'), `# Les Saveurs de Myra\n# Seule la boutique est destinée aux moteurs de recherche ; les autres pages portent « noindex ».\n# (Pas de « Disallow » : les aperçus WhatsApp / Facebook doivent pouvoir lire toutes les pages.)\nUser-agent: *\nAllow: /\n\nSitemap: ${abs('/sitemap.xml')}\n`);
+fs.writeFileSync(path.join(ROOT, 'robots.txt'), `# Les saveurs de Myra\n# Seule la boutique est destinée aux moteurs de recherche ; les autres pages portent « noindex ».\n# (Pas de « Disallow » : les aperçus WhatsApp / Facebook doivent pouvoir lire toutes les pages.)\nUser-agent: *\nAllow: /\n\nSitemap: ${abs('/sitemap.xml')}\n`);
 console.log(`${changed} page(s) mises à jour · sitemap.xml et robots.txt générés pour ${site}`);

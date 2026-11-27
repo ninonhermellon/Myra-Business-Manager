@@ -1,4 +1,4 @@
-# Myra Business Manager
+# LSM Business Manager
 
 Application web responsive de gestion de **Les Saveurs de Myra**, connectée au projet Supabase `fvpvfmlmszcoyhjlgago`.
 

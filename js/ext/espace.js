@@ -26,7 +26,7 @@
       <div class="am-group">${item('profile', 'fa-user', 'Mon profil', 'Informations, photo, sécurité')}${item('settings', 'fa-gear', 'Paramètres', 'Entreprise, boutique, données')}${item('notifications', 'fa-bell', 'Notifications', 'Historique et alertes', unread ? `<span class="am-count">${unread > 99 ? '99+' : unread}</span>` : '')}${item('display', 'fa-text-height', 'Affichage', 'Thème et taille du texte')}</div>
       <div class="am-group">${item('shop', 'fa-store', 'Boutique en ligne', 'Lien, QR code, commandes')}${item('__shop', 'fa-arrow-up-right-from-square', 'Voir ma boutique', 'Comme vos clients')}${item('__help', 'fa-keyboard', 'Aide et raccourcis', 'Recherche rapide : Ctrl K')}</div>
       <div class="am-group">${item('__logout', 'fa-arrow-right-from-bracket', 'Déconnexion', 'Fermer la session sur cet appareil')}</div>
-      <div class="am-foot">Myra Business Manager · ${VERSION}</div>`;
+      <div class="am-foot">LSM Business Manager · ${VERSION}</div>`;
     document.body.appendChild(menuEl);
     const r = btn.getBoundingClientRect(); menuEl.style.top = (r.bottom + 10) + 'px'; menuEl.style.right = Math.max(12, innerWidth - r.right) + 'px';
     btn.setAttribute('aria-expanded', 'true');
@@ -107,7 +107,7 @@
   }
   function shareAccess(app, name, email, pw) {
     const url = location.origin + location.pathname;
-    const msg = `Bonjour ${name.split(' ')[0]}, votre accès à Myra Business Manager est prêt.\nAdresse : ${url}\nE-mail : ${email}\nMot de passe provisoire : ${pw}\nChangez-le dès la première connexion (Mon profil › Sécurité).`;
+    const msg = `Bonjour ${name.split(' ')[0]}, votre accès à LSM Business Manager est prêt.\nAdresse : ${url}\nE-mail : ${email}\nMot de passe provisoire : ${pw}\nChangez-le dès la première connexion (Mon profil › Sécurité).`;
     const m = X.modal('Accès à transmettre', `<p>Transmettez ces informations à <b>${esc(name)}</b> (en main propre ou par WhatsApp). Le mot de passe ne sera plus affiché ensuite.</p><pre class="tm-cred">${esc(msg)}</pre>`, '<button type="button" class="btn light" id="tmCopy"><i class="fa-solid fa-copy"></i> Copier</button><button type="button" class="btn primary" id="tmWa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>');
     m.el.querySelector('#tmCopy').onclick = async () => { try { await navigator.clipboard.writeText(msg); app.toast('Copié.'); } catch (_) { app.toast('Copie impossible : sélectionnez le texte.', true); } };
     m.el.querySelector('#tmWa').onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
@@ -199,7 +199,7 @@
             <div class="m-row"><span class="m-txt"><b>Catalogue (Excel / CSV)</b><small>Produits, prix, stock</small></span><button type="button" class="btn light sm" data-csv="products"><i class="fa-solid fa-file-csv"></i> CSV</button></div>
           </section>`
         + `<section class="card" id="st-app"><div class="card-head"><h3><i class="fa-solid fa-mobile-screen"></i> Application</h3></div>
-            <div class="m-row"><span class="m-txt"><b>Version</b><small>Myra Business Manager ${VERSION} · cache ${esc(swVer)}</small></span><button type="button" class="btn light sm" id="stUpdate"><i class="fa-solid fa-arrows-rotate"></i> Rechercher une mise à jour</button></div>
+            <div class="m-row"><span class="m-txt"><b>Version</b><small>LSM Business Manager ${VERSION} · cache ${esc(swVer)}</small></span><button type="button" class="btn light sm" id="stUpdate"><i class="fa-solid fa-arrows-rotate"></i> Rechercher une mise à jour</button></div>
             <div class="m-row"><span class="m-txt"><b>Connexion</b><small>${navigator.onLine ? 'En ligne' : 'Hors connexion'} · base ${esc(ref)}</small></span></div>
             <div class="m-row"><span class="m-txt"><b>Application installée</b><small>${matchMedia('(display-mode: standalone)').matches ? 'Oui, ouverte depuis l’icône' : 'Non : utilisez « Installer » ou « Ajouter à l’écran d’accueil »'}</small></span></div>
             <div class="m-row"><span class="m-txt"><b>Vider les données locales</b><small>Efface le cache de cet appareil (pas vos données en ligne). Reconnexion nécessaire.</small></span><button type="button" class="btn light sm" id="stClear"><i class="fa-solid fa-broom"></i> Vider</button></div>
@@ -217,7 +217,7 @@
       host.querySelector('#stBackup').onclick = async e => {
         const b = e.currentTarget; b.disabled = true; b.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Préparation…';
         const tables = ['customers', 'products', 'product_categories', 'sales', 'sale_items', 'payments', 'customer_orders', 'customer_order_items', 'expenses', 'company_settings'];
-        const out = { app: 'Myra Business Manager', version: VERSION, exported_at: new Date().toISOString(), tables: {} };
+        const out = { app: 'LSM Business Manager', version: VERSION, exported_at: new Date().toISOString(), tables: {} };
         for (const t of tables) { const r = await app.fetchAll(() => app.sb.from(t).select('*').order('created_at'), 50000).catch(e => ({ error: e })); out.tables[t] = r.error ? { erreur: X.explain(r.error) } : r.data; }
         const url = URL.createObjectURL(new Blob([JSON.stringify(out, null, 1)], { type: 'application/json' }));
         const a = Object.assign(document.createElement('a'), { href: url, download: `myra-sauvegarde-${new Date().toISOString().slice(0, 10)}.json` }); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);

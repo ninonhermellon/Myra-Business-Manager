@@ -1,4 +1,4 @@
-# Déploiement manuel — Myra Business Manager V24
+# Déploiement manuel — LSM Business Manager V24
 
 ## 1. Base de données Supabase
 

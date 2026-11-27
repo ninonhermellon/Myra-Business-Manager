@@ -11,7 +11,7 @@
     const root = document.documentElement;
     root.classList.toggle('theme-dark', !!dark);
     root.classList.remove('text-lg', 'text-xl'); if (p.size === 'lg' || p.size === 'xl') root.classList.add('text-' + p.size);
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#111814' : '#0d4426');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#111814' : '#033B02');
   }
   apply(); media?.addEventListener?.('change', () => apply());
   X.menu('MON ESPACE', [['display', 'Affichage', 'fa-circle-half-stroke']]);

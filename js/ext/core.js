@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Myra Business Manager — socle des modules V29
+   LSM Business Manager — socle des modules V29
    Chargé AVANT js/app.js. Chaque module déclare ses tables (MyraExt.config),
    ses pages (MyraExt.pages), son menu (MyraExt.groups) et ses crochets
    (MyraExt.hooks). L'application les intègre au démarrage.

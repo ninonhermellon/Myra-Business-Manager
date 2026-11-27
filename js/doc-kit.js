@@ -89,7 +89,7 @@ th,td{padding:6px 12px;font-size:11.5px}.text,.html{padding:9px 16px}.sign div{m
   const card = (title, inner, soft) => inner ? `<section class="card${soft ? ' soft' : ''}">${title ? `<div class="card-h">${esc(title)}</div>` : ''}${inner}</section>` : '';
 
   function html(d) {
-    const c = d.company || {}, cur = c.currency || 'FCFA', name = c.name || 'Les Saveurs de Myra';
+    const c = d.company || {}, cur = c.currency || 'FCFA', name = c.name || 'Les saveurs de Myra';
     const contact = [...new Set([c.address && !/@/.test(c.address) ? c.address : '', c.phone ? 'Tél. ' + c.phone : '', c.email].filter(Boolean))];
     const subtitle = d.subtitle ?? [d.number ? 'N° ' + d.number : '', d.date ? fdate(d.date) : ''].filter(Boolean).join(' · ');
     const hero = d.hero ?? `<div class="ill"><img src="${esc(asset('assets/logo-les-saveurs-de-myra.png'))}" alt="${esc(name)}"></div>`;

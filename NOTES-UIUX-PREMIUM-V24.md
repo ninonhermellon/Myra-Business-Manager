@@ -1,4 +1,4 @@
-# Myra Business Manager V24 — Refonte UI/UX Premium
+# LSM Business Manager V24 — Refonte UI/UX Premium
 
 ## Direction artistique
 - Premium & élégante

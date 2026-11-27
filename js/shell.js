@@ -1,4 +1,4 @@
-/* Myra Business Manager — couche d'expérience (chargée après app.js)
+/* LSM Business Manager — couche d'expérience (chargée après app.js)
    Palette de commandes, création rapide, notifications, navigation mobile,
    routage par URL, états de chargement, accessibilité des modales. */
 (() => {

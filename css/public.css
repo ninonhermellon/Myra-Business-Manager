@@ -26,8 +26,8 @@ body{margin:0;background:#f2f4f3;color:#0f1a14;font:15px/1.5 'DM Sans',system-ui
 .pub-sale-body table{width:100%;border-collapse:collapse;font-size:14px}
 .pub-sale-body th,.pub-sale-body td{padding:7px 4px;border-bottom:1px solid #eef0ee;text-align:left}
 .pub-sale-body .r{text-align:right}.pub-sale-body .tot td{font-weight:800}
-.pub-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin-top:12px;border:0;border-radius:14px;background:#0d4426;color:#fff;font-weight:700;font-size:15px;font-family:inherit;text-decoration:none;cursor:pointer}
-.pub-btn.light{background:#eef2ef;color:#0d4426}
+.pub-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin-top:12px;border:0;border-radius:14px;background:#033B02;color:#fff;font-weight:700;font-size:15px;font-family:inherit;text-decoration:none;cursor:pointer}
+.pub-btn.light{background:#eef2ef;color:#033B02}
 .pub-btn:disabled{opacity:.45;cursor:default}
 .pub-foot{text-align:center;margin-top:18px}
 .muted{color:#6b7a70}.small{font-size:12px}
