@@ -46,12 +46,33 @@
     try { localStorage.setItem(cacheKey(), JSON.stringify(S.items.slice(0, 150))); } catch (_) {}
     rerender(); live();
   }
+  /* V41 : petit son quand une commande, une vente ou un paiement arrive, application ouverte (réglable dans Notifications) */
+  window.MyraSound = {
+    pref() { try { return { on: true, volume: 0.6, ...JSON.parse(localStorage.getItem('myra_sound') || '{}') }; } catch (_) { return { on: true, volume: 0.6 }; } },
+    set(p) { try { localStorage.setItem('myra_sound', JSON.stringify({ ...this.pref(), ...p })); } catch (_) {} },
+    ctx: null,
+    play(kind, force) {
+      const p = this.pref(); if (!force && (!p.on || !['orders', 'sales', 'payments', 'reviews', 'team'].includes(kind))) return;
+      try {
+        const C = window.AudioContext || window.webkitAudioContext; if (!C) return; this.ctx = this.ctx || new C(); const ctx = this.ctx; if (ctx.state === 'suspended') ctx.resume();
+        const notes = kind === 'payments' ? [880, 1175, 1568] : kind === 'orders' ? [784, 988, 1319, 1568] : [988, 1319];
+        notes.forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(); const t = ctx.currentTime + i * 0.13;
+          o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(0.01, p.volume) * 0.35, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+          o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 0.3); });
+        navigator.vibrate?.(kind === 'orders' ? [120, 60, 120, 60, 200] : [100, 50, 100]);
+      } catch (_) {}
+    }
+  };
+  // Les navigateurs n'autorisent le son qu'après un premier geste : on prépare le son au premier clic
+  document.addEventListener('pointerdown', () => { try { const C = window.AudioContext || window.webkitAudioContext; if (C && !window.MyraSound.ctx) window.MyraSound.ctx = new C(); } catch (_) {} }, { once: true });
+
   function live() {
     const app = A(); if (S.channel || !app?.sb?.channel) return;
     S.channel = app.sb.channel('myra-notifs').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'app_notifications' }, ({ new: n }) => {
       if (!n || S.items.some(x => x.id === n.id)) return;
       S.items.unshift({ ...n, read: false }); rerender();
       const bell = document.getElementById('bellBtn'); bell?.classList.remove('ring'); void bell?.offsetWidth; bell?.classList.add('ring');
+      if (n.actor !== app.state?.user?.id) window.MyraSound?.play(n.kind);
     }).subscribe();
   }
   async function setRead(ids, read) {

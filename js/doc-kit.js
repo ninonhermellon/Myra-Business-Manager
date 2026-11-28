@@ -121,7 +121,7 @@ th,td{padding:6px 12px;font-size:11.5px}.text,.html{padding:9px 16px}.sign div{m
     return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(d.title || d.kicker || name)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>${CSS}${d.wide ? '@media print{@page{size:A4 landscape;margin:12mm}}' : ''}${d.extraCss || ''}</style></head>
-<body class="${d.wide ? 'wide' : ''}"><div class="bar"><button type="button" id="mdClose">Fermer</button><button type="button" class="dark" id="mdPrint">Imprimer / PDF</button></div>
+<body class="${d.wide ? 'wide' : ''}"><div class="bar"><button type="button" id="mdClose">Fermer</button><button type="button" id="mdShare">Partager</button><button type="button" class="dark" id="mdPrint">Imprimer / PDF</button></div>
 <main class="paper"><header class="hero">${hero}<h1>${esc(d.kicker || d.title || '')}</h1>${subtitle ? `<p class="sub">${esc(subtitle)}</p>` : ''}<p class="org">${esc(name)}</p></header>
 ${d.items ? card(d.itemsTitle || '', items) : ''}
 ${info.length ? card(d.infoTitle || 'Récapitulatif', `<div class="rows">${rowsHtml(info)}</div>`, true) : ''}
@@ -140,6 +140,9 @@ ${d.notice ? `<p class="notice"><b>${esc(d.notice[0])}</b>${esc(d.notice[1])}</p
     const close = () => { if (win.__myraPrintFrame) win.__myraPrintFrame.remove(); else win.close(); };
     doc.getElementById('mdPrint').addEventListener('click', () => { win.focus(); win.print(); });
     doc.getElementById('mdClose').addEventListener('click', close);
+    // V41 : partager le document (WhatsApp, SMS, e-mail, Telegram…) par un lien sécurisé
+    const share = doc.getElementById('mdShare');
+    if (share) { if (!window.MyraShare || d.noShare) share.remove(); else share.addEventListener('click', () => window.MyraShare.fromWindow(win, { title: d.title || 'Document', kind: d.kicker || d.title, phone: d.sharePhone || null, text: d.shareText || null })); }
     doc.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
     if (d.autoprint) setTimeout(() => { win.focus(); win.print(); }, 600);
   }

@@ -67,3 +67,12 @@ body{background:#fff}
 .land-list li{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--cream-2);font-weight:600;font-size:14.5px}
 .land-list i{color:var(--leaf);width:20px;text-align:center}
 .land-actions{display:grid;gap:10px;max-width:380px;margin:0 auto}
+/* V41 — Document partagé et reçu en ligne */
+.wide-doc{max-width:900px}
+.doc-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:18px 0 10px;padding:10px 14px;background:#fff;border:1px solid var(--line,#e8ebe4);border-radius:16px;position:sticky;top:8px;z-index:3}
+.doc-bar b{color:var(--brand-green,#033B02)}.doc-bar .sp{flex:1}
+#docFrame{width:100%;min-height:70vh;border:0;border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(3,59,2,.05),0 12px 32px rgba(3,59,2,.08)}
+.doc-missing{padding:28px 18px}.doc-missing .ill{font-size:34px;color:var(--brand-gold,#DB820A)}
+.tr-hero.warn .ill{background:#fff4d6;color:#a87500}
+.kv.tot.bad b{color:#D11A05}
+@media print{#siteTop,#siteFoot,.doc-bar,.tr-actions,header.top,footer.foot{display:none!important}#docFrame{box-shadow:none}}

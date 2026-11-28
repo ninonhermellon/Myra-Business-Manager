@@ -1,9 +1,9 @@
 /* LSM Business Manager — cache applicatif résilient */
-const CACHE_NAME = 'myra-manager-shell-v32';
-const RUNTIME_CACHE = 'myra-manager-runtime-v32';
+const CACHE_NAME = 'myra-manager-shell-v33';
+const RUNTIME_CACHE = 'myra-manager-runtime-v33';
 const APP_SHELL = [
   './', './index.html', './manifest.webmanifest', './css/styles.css', './css/ux.css', './css/pro.css', './css/v28.css', './css/mobile.css', './vendor/fontawesome-6.5.2/css/all.min.css', './vendor/fontawesome-6.5.2/webfonts/fa-solid-900.woff2', './vendor/fontawesome-6.5.2/webfonts/fa-regular-400.woff2', './vendor/fontawesome-6.5.2/webfonts/fa-brands-400.woff2',
-  './vendor/supabase-js-2.118.0.min.js', './css/ext.css', './vendor/qrcode-generator-1.4.4/qrcode.js', './js/doc-kit.js', './js/ext/core.js', './js/ext/tracabilite.js', './js/ext/b2b.js', './js/ext/evenements.js', './js/ext/equipe.js', './js/ext/lieux.js', './js/ext/intelligence.js', './js/ext/activation.js', './js/ext/relation.js', './js/ext/pilotage.js', './js/ext/confort.js', './js/ext/boutique.js', './js/ext/notifications.js', './js/ext/notifcenter.js', './js/ext/espace.js', './js/ext/admin.js', './js/ext/caisse.js', './js/ext/livraisons.js', './js/ext/ventes-plus.js', './js/ext/securite.js', './js/public/avis-ui.js', './js/config.js', './js/app.js', './loyverse.html', './js/pwa.js', './js/ui-kit.js', './js/shell.js',
+  './vendor/supabase-js-2.118.0.min.js', './css/ext.css', './vendor/qrcode-generator-1.4.4/qrcode.js', './js/doc-kit.js', './js/ext/core.js', './js/ext/tracabilite.js', './js/ext/b2b.js', './js/ext/evenements.js', './js/ext/equipe.js', './js/ext/lieux.js', './js/ext/intelligence.js', './js/ext/activation.js', './js/ext/relation.js', './js/ext/pilotage.js', './js/ext/confort.js', './js/ext/boutique.js', './js/ext/notifications.js', './js/ext/notifcenter.js', './js/ext/espace.js', './js/ext/admin.js', './js/ext/caisse.js', './js/ext/livraisons.js', './js/ext/ventes-plus.js', './js/ext/securite.js', './js/ext/partage.js', './js/ext/tresorerie.js', './js/ext/caisse-rapide.js', './js/ext/retours.js', './js/ext/planning.js', './js/public/avis-ui.js', './js/config.js', './js/app.js', './loyverse.html', './js/pwa.js', './js/ui-kit.js', './js/shell.js',
   './assets/favicon.png', './assets/logo-les-saveurs-de-myra.png', './assets/logo-admin.png', './assets/badge-notification.png', './assets/icons/icon-192.png', './assets/icons/icon-512.png', './favicon.ico'
 ];
 self.addEventListener('install', event => {
@@ -55,7 +55,11 @@ self.addEventListener('push', event => {
     badge: './assets/badge-notification.png',
     tag: d.tag || undefined,
     renotify: !!d.tag,
-    vibrate: [120, 60, 120],
+    silent: false,
+    // V41 : nouvelle commande et paiement à vérifier restent affichés jusqu'à ce qu'on les touche
+    requireInteraction: ['orders', 'payments', 'team'].includes(d.kind),
+    vibrate: ['orders', 'payments'].includes(d.kind) ? [200, 100, 200, 100, 300] : [120, 60, 120],
+    actions: d.kind === 'orders' ? [{ action: 'open', title: 'Voir la commande' }] : [],
     timestamp: Date.now(),
     data: { url: d.url || './', kind: d.kind || '' }
   }));

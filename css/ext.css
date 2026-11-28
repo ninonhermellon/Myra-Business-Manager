@@ -362,3 +362,27 @@ body.perm-no-delete [data-delete],body.perm-no-delete #rdDelete,body.perm-no-del
 body.perm-no-costs [data-k="cost_price"],body.perm-no-costs [data-k="average_cost"],body.perm-no-costs label.field:has(> [name="cost_price"]),body.perm-no-costs label.field:has(> [name="average_cost"]),body.perm-no-costs .kv:has(+ .kv-cost){display:none!important}
 @media (max-width:760px){.cc-grid{grid-template-columns:1fr}.cc-line input{width:120px}.ac-row time{display:none}.dv-grid,.bd-grid{grid-template-columns:1fr}}
 .theme-dark .dv-card,.theme-dark .tm-tools select,.theme-dark .pm-tabs button,.theme-dark .cc-line input{background:#18211b;color:inherit;border-color:#2c3a30}.theme-dark .od-pay{background:#1d2a20}
+/* ===== V41 — Trésorerie, bénéfice, caisse rapide, retours, planning, sauvegardes ===== */
+.tr-accounts{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:14px}
+.tr-acc.off{opacity:.62}.tr-acc-h{display:flex;gap:10px;align-items:center}.tr-acc-h b{display:block}.tr-acc-h small{color:#7b887f}.tr-acc-h .tm-state{margin-left:auto}
+.tr-bal{font-size:24px;font-weight:800;color:#033B02;margin:10px 0 4px}.tr-bal.neg{color:#D11A05}
+.tr-sum{display:flex;gap:14px;flex-wrap:wrap;padding:8px 0 10px;font-size:13.5px}.tr-sum b{margin-left:auto}
+.tr-amt{white-space:nowrap;font-weight:700;margin-left:auto}
+.pf-chart{width:100%;height:auto}.pf-chart .gl{stroke:#e8ebe4}.pf-chart .gt{font-size:11px;fill:#7b887f}.pf-chart .r-rev{fill:#84C70E}.pf-chart .r-net{fill:#033B02}.pf-chart .r-loss{fill:#D11A05}.pf-m{cursor:pointer}.pf-m.on rect{stroke:#DB820A;stroke-width:2}
+.pf-legend{display:flex;gap:16px;font-size:12.5px;color:#5c6b61}.pf-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}.pf-legend .r-rev{background:#84C70E}.pf-legend .r-net{background:#033B02}.pf-legend .r-loss{background:#D11A05}
+.pos{display:grid;grid-template-columns:1fr 380px;gap:14px;align-items:start}
+.pos-tools{display:flex;gap:8px;margin-bottom:10px}.pos-tools .search-wrap{flex:1}.pos-cats{margin-bottom:10px}
+.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.pos-p{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border:1px solid #e6ebe7;border-radius:16px;background:#fff;cursor:pointer;font:inherit;text-align:center;min-height:150px;transition:transform .08s}
+.pos-p:active{transform:scale(.96)}.pos-p:hover{border-color:#348907}.pos-p img,.pos-ini{width:64px;height:64px;border-radius:14px;object-fit:cover}.pos-ini{display:grid;place-items:center;background:#eef5dc;color:#033B02;font-weight:800;font-size:20px}
+.pos-p b{font-size:13px;line-height:1.2}.pos-p small{color:#DB820A;font-weight:700}.pos-p em{font-style:normal;font-size:11px;color:#7b887f}.pos-p.out{opacity:.55}
+.pos-right{position:sticky;top:76px}.pos-lines{max-height:38vh;overflow:auto;margin-bottom:8px}
+.pos-line{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed #e8ebe4}.pos-line>span:first-child{flex:1;min-width:0}.pos-line b{display:block}.pos-line small{color:#7b887f}
+.pos-step{display:flex;align-items:center;gap:6px}.pos-step button{width:32px;height:32px;border-radius:10px;border:1px solid #dfe6e1;background:#fff;font-size:18px;cursor:pointer}.pos-lt{min-width:84px;text-align:right}
+.pos-total{display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:16px}.pos-total b{font-size:26px;color:#033B02}
+.pos-pay{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 10px}.pos-pay button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border:1.5px solid #e6ebe7;border-radius:14px;background:#fff;font:600 12px inherit;cursor:pointer}.pos-pay button.on{border-color:#033B02;background:#f4f9ee;color:#033B02}.pos-pay i{font-size:16px;color:#DB820A}
+.pos-change{min-height:20px;margin:4px 0 10px;font-size:14px}.pos-go{font-size:17px;padding:14px}
+.pos-done{text-align:center}.pos-big{font-size:34px;font-weight:800;color:#033B02;margin:4px 0}.pos-change-big{font-size:18px}
+.pp-ok td{color:#7b887f}
+@media (max-width:980px){.pos{grid-template-columns:1fr}.pos-right{position:static}.pos-grid{grid-template-columns:repeat(auto-fill,minmax(105px,1fr))}.pos-p{min-height:128px}.pos-p img,.pos-ini{width:52px;height:52px}}
+.theme-dark .pos-p,.theme-dark .pos-pay button,.theme-dark .pos-step button{background:#18211b;color:inherit;border-color:#2c3a30}
