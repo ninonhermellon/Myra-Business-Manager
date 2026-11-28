@@ -28,7 +28,8 @@
           <div class="cc-grid">
             <div class="cc-col"><h4>Ce que l’application attend</h4>${keys.map(k => `<div class="cc-line"><span><i class="fa-solid ${(METHODS.find(m => m[0] === k) || [, , 'fa-circle'])[2]}"></i> ${esc(mLabel(k))}</span><b>${money(exp[k] || 0)}</b></div>`).join('')}
               ${dc ? `<div class="cc-line"><span><i class="fa-solid fa-motorcycle"></i> Encaissé en livraison</span><b>${money(dc)}</b></div>` : ''}
-              <div class="cc-line total"><span>Total attendu</span><b>${money(expTotal)}</b></div><p class="muted small">${data.sales_count} vente(s) confirmée(s) · paiements que vous avez encaissés ce jour-là.</p></div>
+              ${Object.keys(data.expenses || {}).length ? `<div class="cc-line cc-exp"><span><i class="fa-solid fa-receipt"></i> Dont dépenses que vous avez payées</span><b>− ${money(Object.values(data.expenses).reduce((n, v) => n + Number(v), 0))}</b></div>` : ''}
+              <div class="cc-line total"><span>Total attendu</span><b>${money(expTotal)}</b></div><p class="muted small">${data.sales_count} vente(s) confirmée(s) · paiements que vous avez encaissés ce jour-là, moins les dépenses que vous avez payées.</p></div>
             <form class="cc-col" id="ccForm"><h4>Ce que vous avez compté</h4>${keys.map(k => `<label class="cc-line"><span>${esc(mLabel(k))}</span><input type="number" min="0" step="5" inputmode="numeric" name="${k}" value="${counted[k] ?? ''}" placeholder="0" ${cl?.status === 'validated' ? 'disabled' : ''}></label>`).join('')}
               <div class="cc-line total"><span>Total compté</span><b id="ccCounted">—</b></div>
               <div class="cc-diff" id="ccDiff"></div>
