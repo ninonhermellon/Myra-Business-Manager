@@ -368,7 +368,7 @@ body.perm-no-costs [data-k="cost_price"],body.perm-no-costs [data-k="average_cos
 .tr-bal{font-size:24px;font-weight:800;color:#033B02;margin:10px 0 4px}.tr-bal.neg{color:#D11A05}
 .tr-sum{display:flex;gap:14px;flex-wrap:wrap;padding:8px 0 10px;font-size:13.5px}.tr-sum b{margin-left:auto}
 .tr-amt{white-space:nowrap;font-weight:700;margin-left:auto}
-.pf-chart{width:100%;height:auto}.pf-chart .gl{stroke:#e8ebe4}.pf-chart .gt{font-size:11px;fill:#7b887f}.pf-chart .r-rev{fill:#84C70E}.pf-chart .r-net{fill:#033B02}.pf-chart .r-loss{fill:#D11A05}.pf-m{cursor:pointer}.pf-m.on rect{stroke:#DB820A;stroke-width:2}
+.pf-chart{width:100%;height:auto}.pf-chart .gl{stroke:#e8ebe4}.pf-chart .gt{font-size:11px;fill:#7b887f}.pf-chart .r-rev{fill:#84C70E}.pf-chart .r-net{fill:#033B02}.pf-chart .r-loss{fill:#D11A05}.pf-m{cursor:pointer;outline:none}.pf-chart .hit{fill:transparent}.pf-m:hover .hit,.pf-m:focus .hit{fill:rgba(219,130,10,.08)}.pf-m.on rect{stroke:#DB820A;stroke-width:2}
 .pf-legend{display:flex;gap:16px;font-size:12.5px;color:#5c6b61}.pf-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}.pf-legend .r-rev{background:#84C70E}.pf-legend .r-net{background:#033B02}.pf-legend .r-loss{background:#D11A05}
 .pos{display:grid;grid-template-columns:1fr 380px;gap:14px;align-items:start}
 .pos-tools{display:flex;gap:8px;margin-bottom:10px}.pos-tools .search-wrap{flex:1}.pos-cats{margin-bottom:10px}

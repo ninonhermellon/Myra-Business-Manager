@@ -90,7 +90,7 @@
     "recu.html": {
       "path": "/recu.html",
       "title": "Reçu · Les saveurs de Myra",
-      "description": "Votre reçu d’achat chez Les saveurs de Myra.",
+      "description": "Votre reçu d’achat chez Les saveurs de Myra : produits, total, paiement et coordonnées.",
       "ogTitle": "Votre reçu · Les saveurs de Myra",
       "ogDescription": "Merci pour votre achat ! Consultez votre reçu en ligne.",
       "image": "/assets/og/og-boutique.jpg",
