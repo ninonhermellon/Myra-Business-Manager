@@ -163,6 +163,10 @@
     {
       "source": "/suivi",
       "destination": "/commande.html"
+    },
+    {
+      "source": "/catalogue-facebook.csv",
+      "destination": "https://fvpvfmlmszcoyhjlgago.supabase.co/functions/v1/myra-catalog"
     }
   ]
 }

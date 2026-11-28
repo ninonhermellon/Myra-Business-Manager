@@ -220,3 +220,5 @@ body.has-cartbar .wa-float{bottom:92px}
 .pd-bundle{margin:10px 0;padding:12px;border-radius:14px;background:var(--brand-cream,#F4F0E3)}.pd-bundle ul{margin:6px 0;padding-left:20px}.pd-save{margin:0;color:#1d7a3e}
 .tag.gift{background:var(--brand-gold,#DB820A);color:#fff}
 .ok-pay{background:#f1f8e9;border-radius:12px;padding:10px 12px;color:#1E5E05;margin:8px 0}
+.momo-modes{display:grid;gap:8px;margin:6px 0 10px}.momo-modes label{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #f0d99a;border-radius:12px;background:#fff;cursor:pointer;line-height:1.35}.momo-modes small{color:#6a7a70}
+.ok-pay.warn{background:#fff6dc;color:#7a5200}.momo-wait .ok-ico{background:#fff4d6;color:#a87500}

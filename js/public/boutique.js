@@ -182,8 +182,18 @@
       const k = f.querySelector('[name=pay]:checked')?.value || 'cash_on_delivery'; S.pay = k; const box = el.querySelector('#momoBox');
       if (k === 'cash_on_delivery') { box.hidden = true; box.innerHTML = ''; el.querySelector('#payHint').textContent = 'Vous payez à la livraison (espèces ou Mobile Money au livreur).'; return; }
       const momo = k === 'mtn_momo'; const code = momo ? S.shop.momo_code : S.shop.airtel_code;
-      const keep = { ref: box.querySelector('[name=ref]')?.value || '', payer: box.querySelector('[name=payer]')?.value || '' };
+      const keep = { ref: box.querySelector('[name=ref]')?.value || '', payer: box.querySelector('[name=payer]')?.value || '', mode: box.querySelector('[name=momomode]:checked')?.value || 'api' };
       box.hidden = false;
+      if (momo && S.momoApi) {
+        box.innerHTML = `<p class="momo-amt">Montant à payer : <b>${money(due())}</b></p>
+          <div class="momo-modes"><label><input type="radio" name="momomode" value="api" ${keep.mode === 'api' ? 'checked' : ''}> <b>Recevoir la demande de paiement sur mon téléphone</b> <small>(recommandé : vous validez avec votre code MoMo)</small></label>
+          <label><input type="radio" name="momomode" value="manual" ${keep.mode === 'manual' ? 'checked' : ''}> J’ai déjà payé au code marchand <b>${esc(code)}</b></label></div>
+          ${keep.mode === 'manual' ? `<div class="two"><label class="fld"><span>Référence de la transaction *</span><input name="ref" maxlength="40" autocomplete="off" placeholder="Ex. : MP2611.1234.A56789" value="${esc(keep.ref)}"></label><label class="fld"><span>Numéro qui a payé</span><input name="payer" type="tel" inputmode="tel" placeholder="06 …" value="${esc(keep.payer)}"></label></div>`
+            : `<label class="fld"><span>Numéro MTN MoMo qui va payer *</span><input name="payer" type="tel" inputmode="tel" placeholder="06 …" value="${esc(keep.payer || f.elements.phone.value)}"></label>`}`;
+        box.querySelectorAll('[name=momomode]').forEach(r => r.onchange = paintPay);
+        el.querySelector('#payHint').textContent = keep.mode === 'manual' ? 'Nous vérifions votre paiement puis vous appelons pour la livraison.' : 'Après « Envoyer », validez la demande MTN MoMo qui s’affiche sur votre téléphone.';
+        return;
+      }
       box.innerHTML = `<p class="momo-amt">Montant à payer : <b>${money(due())}</b></p>
         <ol class="momo-steps"><li>Ouvrez ${momo ? 'MTN MoMo (application ou menu USSD MTN)' : 'Airtel Money'} et choisissez <b>« Payer un marchand »</b>.</li>
           <li>Code marchand : <b class="momo-code">${esc(code)}</b> <button type="button" class="btn btn-ghost btn-xs" data-copy="${esc(code)}">Copier</button>${momo && S.shop.momo_name ? `<br><small>Nom affiché : <b>${esc(S.shop.momo_name)}</b></small>` : ''}</li>
@@ -225,12 +235,14 @@
       if ((v.address || '').trim().length < 3) return bad('address', 'Indiquez votre adresse de livraison.');
       if (S.zones.length && !v.zone) return bad('zone', 'Choisissez votre quartier de livraison.');
       const pay = v.pay || 'cash_on_delivery';
-      if (pay !== 'cash_on_delivery' && (v.ref || '').replace(/[^A-Za-z0-9]/g, '').length < 4) return bad('ref', 'Indiquez la référence de la transaction reçue par SMS après le paiement.');
+      const momoApi = pay === 'mtn_momo' && S.momoApi && (v.momomode || 'api') === 'api';
+      if (momoApi && digits(v.payer).length < 8) return bad('payer', 'Indiquez le numéro MTN MoMo qui va payer.');
+      if (pay !== 'cash_on_delivery' && !momoApi && (v.ref || '').replace(/[^A-Za-z0-9]/g, '').length < 4) return bad('ref', 'Indiquez la référence de la transaction reçue par SMS après le paiement.');
       const btn = el.querySelector('#sendOrder'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Envoi en cours…';
       const items = cartLines().map(l => ({ product_id: l.id, quantity: l.qty }));
       const args = { p_name: v.name.trim(), p_phone: v.phone.trim(), p_whatsapp: same.checked ? '' : (v.whatsapp || '').trim(), p_address: v.address.trim(), p_zone: (v.zone || '').trim(), p_delivery_date: v.date || null, p_notes: (v.notes || '').trim(), p_items: items };
       if (S.promo) args.p_promo_code = S.promo.code;
-      if (pay !== 'cash_on_delivery') { args.p_payment_method = pay; args.p_payment_reference = (v.ref || '').trim(); if ((v.payer || '').trim()) args.p_payer_phone = v.payer.trim(); }
+      if (pay !== 'cash_on_delivery') { args.p_payment_method = pay; args.p_payment_reference = momoApi ? 'APP' + crypto.randomUUID().replace(/-/g, '').slice(0, 10).toUpperCase() : (v.ref || '').trim(); if ((v.payer || '').trim()) args.p_payer_phone = v.payer.trim(); }
       if (v.sub) args.p_subscription = v.sub;
       args.p_cart_token = cartToken();
       const { data, error } = await sb.rpc('place_public_order', args);
@@ -244,8 +256,28 @@
       const summary = cartLines().map(l => `• ${l.qty} × ${l.p.name}`).join('\n');
       try { const r = store.get('myra_shop_orders', []).filter(x => x !== data.order_number); r.unshift(data.order_number); localStorage.setItem('myra_shop_orders', JSON.stringify(r.slice(0, 6))); } catch (_) {}
       S.cart = []; S.promo = null; S.promoCode = ''; saveCart(); store.set('myra_cart_token', '');
+      if (momoApi) return momoWait(data, v, summary);
       done(data, v, summary);
     };
+  }
+
+  /* Paiement MTN MoMo automatique : demande envoyée au téléphone du client, puis vérification toutes les 4 secondes */
+  async function momoWait(r, v, summary) {
+    const sh = () => sheet(`${closeBtn}<div class="ok momo-wait"><span class="ok-ico"><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i></span><h2>Validez le paiement sur votre téléphone</h2>
+      <p>Une demande de <b>${money(r.total)}</b> a été envoyée au <b>${esc(v.payer)}</b>. Saisissez votre code secret MTN MoMo pour confirmer.</p><p class="muted" id="mwState"><i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> En attente de votre validation…</p>
+      <button type="button" class="btn btn-ghost full" id="mwSkip">Payer plus tard / au code marchand</button></div>`, 'side');
+    sh(); let stop = false; layer.querySelector('#mwSkip').onclick = () => { stop = true; done({ ...r, payment_status: 'to_verify' }, v, summary); };
+    const fail = m => { if (stop) return; stop = true; done({ ...r, payment_status: 'to_verify', momo_error: m }, v, summary); };
+    const { data: q, error } = await sb.functions.invoke('myra-momo', { body: { action: 'request', order_number: r.order_number, phone: v.phone, payer: v.payer } });
+    if (error || !q?.reference) { let m = 'La demande MTN MoMo n’a pas pu être envoyée.'; try { m = (await error?.context?.json())?.error || q?.error || m; } catch (_) {} return fail(m); }
+    const t0 = Date.now();
+    while (!stop && Date.now() - t0 < 180000) {
+      await new Promise(res => setTimeout(res, 4000)); if (stop) return;
+      const { data: st } = await sb.functions.invoke('myra-momo', { body: { action: 'status', reference: q.reference } }).catch(() => ({}));
+      if (st?.status === 'SUCCESSFUL') { stop = true; return done({ ...r, payment_status: 'paid' }, v, summary); }
+      if (st?.status === 'FAILED' || st?.status === 'REJECTED') return fail('Paiement refusé ou annulé sur le téléphone.');
+    }
+    fail('Nous n’avons pas encore reçu la validation.');
   }
 
   function done(r, v, summary) {
@@ -256,7 +288,9 @@
       <h2>Merci ${esc(v.name.trim().split(' ')[0])}, commande reçue !</h2>
       <p>Votre numéro de commande</p><p class="ok-num">${esc(r.order_number)}</p>
       <p class="ok-total">Total : <b>${money(r.total)}</b>${Number(r.delivery_fee) ? ` <small class="muted">(livraison ${money(r.delivery_fee)} incluse)</small>` : ''}${Number(r.discount) ? ` <small class="muted">(remise ${money(r.discount)} incluse)</small>` : ''}</p>
-      ${r.payment_status === 'to_verify' ? '<p class="ok-pay"><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Paiement Mobile Money reçu : nous le vérifions et vous confirmons la livraison.</p>' : ''}
+      ${r.payment_status === 'paid' ? '<p class="ok-pay"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Paiement MTN MoMo reçu ✔ Merci !</p>' : ''}
+      ${r.momo_error ? `<p class="ok-pay warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> ${esc(r.momo_error)} Vous pouvez payer au code marchand <b>${esc(S.shop.momo_code || '')}</b> puis nous envoyer la référence sur WhatsApp.</p>` : ''}
+      ${r.payment_status === 'to_verify' && !r.momo_error ? '<p class="ok-pay"><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Paiement Mobile Money reçu : nous le vérifions et vous confirmons la livraison.</p>' : ''}
       ${r.subscription ? '<p class="ok-pay"><i class="fa-solid fa-repeat" aria-hidden="true"></i> Votre demande d’abonnement est enregistrée : nous vous appelons pour la confirmer.</p>' : ''}
       <p class="muted">Nous vous appelons très vite au <b>${esc(v.phone.trim())}</b> pour confirmer la commande et la livraison.</p>
       ${link ? `<a class="btn btn-wa full" href="${esc(link)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Recevoir la confirmation sur WhatsApp</a>` : ''}
@@ -400,6 +434,7 @@
       $('#retry')?.addEventListener('click', load); return;
     }
     store.set('myra_shop_catalog', data); fill(data);
+    sb.rpc('get_public_momo_api').then(r => { S.momoApi = !!r.data; }, () => {});
   }
 
   $('#search').addEventListener('input', e => { S.q = e.target.value; S.limit = 12; paintGrid(); });
